@@ -1,0 +1,62 @@
+global:
+  device: cuda
+  precision_train: bf16
+  precision_diffusion: fp16
+  epochs:
+    cifar: 200
+    waterbirds: 50
+    celeba: 50
+    nico: 50
+  batch_size: 128
+  optim:
+    lr_resnet: 0.001
+    lr_vit: 0.0005
+    weight_decay: 0.0001
+  loss_weights:
+    lambda_inv: 1.0
+    lambda_feat: 0.1
+    lambda_fourier: 0.05
+  counterfactual:
+    lora_r: 4
+    lora_alpha: 16
+    lora_steps: 50
+    model_id: stabilityai/stable-diffusion-2-1-base
+  seeds:
+    - 0
+    - 1
+    - 2
+
+datasets:
+  cifar10:
+    class: CIFAR10
+    url: https://www.cs.toronto.edu/~kriz/cifar.html
+    input_size: 32
+    shift:
+      cifar10.1:
+        url: https://github.com/modestyachts/CIFAR-10.1
+        split: test
+      cifar10c:
+        url: https://github.com/hendrycks/robustness
+  waterbirds:
+    wilds_key: waterbirds
+    input_size: 224
+  celeba:
+    wilds_key: celebA
+    input_size: 128
+  nico:
+    custom: true
+    input_size: 128
+    url: https://zenodo.org/records/4807599/files/NICO.zip?download=1
+
+models:
+  - name: resnet18
+    type: resnet
+    pretrained: true
+  - name: vit_s16
+    type: vit
+    pretrained: true
+
+algorithms:
+  - ERM
+  - GroupDRO
+  - PCD

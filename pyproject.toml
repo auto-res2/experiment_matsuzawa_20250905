@@ -1,1 +1,30 @@
-# Please list the required python packages.
+[project]
+name = "pcd-benchmark-suite"
+version = "0.1.0"
+description = "Prompt-to-Counterfactual Diffusion (PCD) – Benchmark Suite"
+readme = "README.md"
+authors = [
+  { name = "Anonymous Researcher", email = "pcd@example.com" }
+]
+requires-python = ">=3.9"
+
+# -----------------------------------------------------------------------------
+# The minimal set of dependencies required for running the benchmark.  Heavy
+# packages like *diffusers* and *wilds* are optional – the code is robust to
+# their absence but full functionality will be disabled if they are missing.
+# -----------------------------------------------------------------------------
+
+dependencies = [
+  "torch>=2.0",
+  "torchvision>=0.15",
+  "timm>=0.9",
+  "pyyaml>=6.0",
+  "matplotlib>=3.7",
+  "seaborn>=0.12",
+  "wilds>=2.0 ; extra == 'wilds'",
+  "diffusers>=0.20 ; extra == 'diffusion'",
+  "peft>=0.5 ; extra == 'diffusion'"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

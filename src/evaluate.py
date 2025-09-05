@@ -1,20 +1,16 @@
-"""src/evaluate.py
---------------------------------------------------------------------
-Plotting and evaluation helpers live here.
-All figures are written under `.research/iteration2/images` as required.
-"""
 from pathlib import Path
 from typing import List
 
 import matplotlib
 
+# Use a non-interactive backend suitable for headless environments
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402 – after backend set
+import matplotlib.pyplot as plt  # noqa: E402 – backend must be set before import
 
 # ----------------------------------------------------------------------------
-# Image output directory (updated to iteration2 as per specification)          
+# Image output directory (specification: `.research/iteration3/images`)
 # ----------------------------------------------------------------------------
-IMG_DIR = Path(".research/iteration2/images")
+IMG_DIR = Path(".research/iteration3/images")
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 

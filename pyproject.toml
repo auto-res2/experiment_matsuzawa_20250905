@@ -13,7 +13,6 @@ requires-python = ">=3.8"
 dependencies = [
     "diffusers>=0.22.0",
     "matplotlib>=3.7",
-    "notears>=0.1",
     "numpy>=1.23",
     "opencv-python-headless>=4.8",
     "peft>=0.4.0",
@@ -27,6 +26,3 @@ dependencies = [
     "transformers>=4.33",
     "wilds>=2.0",
 ]
-
-[tool.setuptools.packages.find]
-where = ["src"]

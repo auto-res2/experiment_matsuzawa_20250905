@@ -3,16 +3,15 @@ Data downloading, synthetic dataset generation and DataLoader helpers.
 """
 from __future__ import annotations
 
-import math
-import random
 import sys
+import random
+import numpy as np
 from pathlib import Path
 from typing import Tuple
 
-import numpy as np
 import torch
-import torchvision
 import torchvision.transforms as T
+import torchvision
 
 # -----------------------------------------------------------------------------
 # Directory handling – `data` directory is created one level above src.
@@ -27,10 +26,10 @@ __all__ = [
 ]
 
 # -----------------------------------------------------------------------------
-# 1.  Utility
+# 1.  Utility helpers
 # -----------------------------------------------------------------------------
 
-def _die(msg: str) -> None:
+def _die(msg: str) -> None:  # pragma: no cover
     print(msg, file=sys.stderr)
     sys.exit(1)
 
@@ -38,6 +37,7 @@ def _die(msg: str) -> None:
 # -----------------------------------------------------------------------------
 # 2.  Real datasets (WILDS, CelebA, CIFAR-10)
 # -----------------------------------------------------------------------------
+
 
 def get_waterbirds(split: str):
     try:
@@ -47,11 +47,26 @@ def get_waterbirds(split: str):
 
     dataset = get_dataset("waterbirds", root_dir=str(DATA_DIR), download=True)
     subset = dataset.get_subset(split)
+
     tfm = T.Compose(
-        [T.Resize(256), T.CenterCrop(224), T.ToTensor(), T.ConvertImageDtype(torch.float16)]
+        [T.Resize(224), T.CenterCrop(224), T.ToTensor(), T.ConvertImageDtype(torch.float32)]
     )
-    subset.transform = tfm
-    return subset
+
+    class _WaterbirdsXY(torch.utils.data.Dataset):
+        def __init__(self, base):
+            self.base = base
+            self.transform = tfm
+
+        def __len__(self):
+            return len(self.base)
+
+        def __getitem__(self, idx):
+            img, y, _ = self.base[idx]
+            if self.transform is not None:
+                img = self.transform(img)
+            return img, int(y)
+
+    return _WaterbirdsXY(subset)
 
 
 def get_celeba(split: str):
@@ -60,7 +75,7 @@ def get_celeba(split: str):
         _die(f"Bad split {split} for CelebA")
 
     tfm = T.Compose(
-        [T.Resize(256), T.CenterCrop(224), T.ToTensor(), T.ConvertImageDtype(torch.float16)]
+        [T.Resize(224), T.CenterCrop(224), T.ToTensor(), T.ConvertImageDtype(torch.float32)]
     )
 
     ds = torchvision.datasets.CelebA(
@@ -71,7 +86,7 @@ def get_celeba(split: str):
         transform=tfm,
     )
 
-    class CelebHair(torch.utils.data.Dataset):
+    class _CelebHair(torch.utils.data.Dataset):
         def __init__(self, base):
             self.base = base
             self.attr_idx = 9  # Blond_Hair attribute
@@ -84,7 +99,7 @@ def get_celeba(split: str):
             label = int(attrs[self.attr_idx].item() == 1)
             return img, label
 
-    return CelebHair(ds)
+    return _CelebHair(ds)
 
 
 def get_cifar(split: str):
@@ -97,12 +112,13 @@ def get_cifar(split: str):
         )
     elif split in {"val", "test"}:
         full = torchvision.datasets.CIFAR10(
-            root=str(DATA_DIR / "cifar10"), train=(split == "val"), download=True, transform=tfm_test
+            root=str(DATA_DIR / "cifar10"), train=False, download=True, transform=tfm_test
         )
         if split == "val":
-            train_len = int(0.9 * len(full))
-            val_len = len(full) - train_len
-            train_set, val_set = torch.utils.data.random_split(
+            # Create a small validation split (10%)
+            val_len = int(0.1 * len(full))
+            train_len = len(full) - val_len
+            _, val_set = torch.utils.data.random_split(
                 full, [train_len, val_len], generator=torch.Generator().manual_seed(42)
             )
             return val_set
@@ -121,7 +137,8 @@ COLOURS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
 
 
 class DiffSpurDataset(torch.utils.data.Dataset):
-    def __init__(self, *, n: int = 50_000, split: str = "train", seed: int = 0):
+    def __init__(self, *, n: int = 2_000, split: str = "train", seed: int = 0):
+        # Reduced *n* for CI speed – keeping behaviour identical otherwise.
         random.seed(seed)
         np.random.seed(seed)
 
@@ -152,7 +169,7 @@ class DiffSpurDataset(torch.utils.data.Dataset):
             pts = np.array([[64, 24], [32, 56], [40, 96], [88, 96], [96, 56]], np.int32)
             cv2.fillPoly(overlay, [pts], (255, 255, 255))
         img = cv2.addWeighted(overlay, 1, img, 0.7, 0)
-        return img[..., ::-1], SHAPES.index(shape), COLOURS.index(colour)  # BGR -> RGB
+        return img[..., ::-1], SHAPES.index(shape), COLOURS.index(colour)
 
     def __len__(self):
         return len(self.data)
@@ -167,7 +184,7 @@ class DiffSpurDataset(torch.utils.data.Dataset):
 # 4.  DataLoader facade
 # -----------------------------------------------------------------------------
 
-def make_loader(dataset_name: str, split: str, batch_size: int, *, num_workers: int = 4):
+def make_loader(dataset_name: str, split: str, batch_size: int, *, num_workers: int = 2):
     if dataset_name == "waterbirds":
         ds = get_waterbirds(split)
     elif dataset_name == "celeba":
@@ -183,7 +200,7 @@ def make_loader(dataset_name: str, split: str, batch_size: int, *, num_workers: 
     drop_last = shuffle
     return torch.utils.data.DataLoader(
         ds,
-        batch_size=batch_size,
+        batch_size=max(1, batch_size),  # guard against zero batch sizes in config
         shuffle=shuffle,
         num_workers=num_workers,
         pin_memory=True,

@@ -1,90 +1,85 @@
+"""
+main.py – research experiment entry point (python -m src.main)
+"""
 from __future__ import annotations
 
-"""
-src/main.py – experiment orchestrator
-Run with:   python -m src.main
-"""
-
-import os
+import random
 from pathlib import Path
 from typing import Dict
 
 import torch
 import yaml
 
+from .evaluate import MetricLogger
 from .preprocess import build_stream
-from .evaluate import MetricRecorder
-from .train import CLoVeSub, ERRing, EWC, SparCL, TinyAQM
+from .train import CLoVeSub, ERRing, SparCL
 
-ROOT = Path(__file__).resolve().parent.parent
-CFG_DIR = ROOT / "config"
-RESULTS_DIR = ROOT / "results"
-RESULTS_DIR.mkdir(exist_ok=True, parents=True)
+# -----------------------------------------------------------------------------
+#  Registry – extend with new methods if needed
+# -----------------------------------------------------------------------------
 
-METHOD_FACTORY = {
+_METHODS: Dict[str, type] = {
     "clove_sub": CLoVeSub,
     "er_ring": ERRing,
-    "ewc": EWC,
     "sparcl": SparCL,
-    "aqm": TinyAQM,
 }
 
+ROOT = Path(__file__).resolve().parent.parent  # project root (one level up from src)
 
-def _load_yaml(path: Path) -> Dict:
-    """Safely load a YAML configuration file."""
-    with path.open("r", encoding="utf-8") as fh:
-        return yaml.safe_load(fh)
+# -----------------------------------------------------------------------------
+#  Utility helpers
+# -----------------------------------------------------------------------------
 
-
-def _find_default_cfg() -> Path:
-    """Return the path to the default experiment YAML.
-
-    Historically the repo expected a file named ``default.yaml`` but the
-    template ships with ``config.yaml``.  We search for both so that either
-    naming convention works out-of-the-box and users are free to rename their
-    config file without touching any code.
-    """
-    for candidate in (CFG_DIR / "default.yaml", CFG_DIR / "config.yaml"):
-        if candidate.exists():
-            return candidate
-    raise FileNotFoundError(
-        "No experiment configuration file found – expected 'default.yaml' or 'config.yaml' inside the 'config/' folder."
-    )
+def _set_seed(seed: int) -> None:  # noqa: D401
+    random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
 
 
-def _run_one_experiment(exp_cfg: Dict):
-    print("\n====================  EXPERIMENT  ====================")
-    print(exp_cfg.get("description", ""))
-    print("=====================================================\n")
+def _load_config() -> Dict:
+    cfg_path = ROOT / "config" / "config.yaml"
+    return yaml.safe_load(cfg_path.read_text())
 
-    # Build class-incremental streams
-    train_s, val_s, test_s = build_stream(exp_cfg["dataset"])
 
-    # run every method & seed
-    for method_key, method_cfg in exp_cfg["methods"].items():
-        ModelCls = METHOD_FACTORY[method_key]
-        for seed in exp_cfg["seeds"]:
-            torch.manual_seed(seed)
-            torch.cuda.manual_seed_all(seed)
+# -----------------------------------------------------------------------------
+#  Main experiment driver
+# -----------------------------------------------------------------------------
 
-            model = ModelCls(exp_cfg, method_cfg).cuda()
-            recorder = MetricRecorder(exp_cfg, method_key, seed)
+def _run_experiment(exp: Dict) -> None:  # noqa: D401
+    print("\n==== EXPERIMENT ====\n" + exp["description"] + "\n====================\n")
 
-            for task_id, (tr, va, te) in enumerate(zip(train_s, val_s, test_s)):
-                model.before_task(task_id)
-                model.train_task(task_id, tr, va, recorder)
-                model.after_task(task_id)
-                model.evaluate(task_id, te, recorder)
+    # Build continual stream ---------------------------------------------------
+    train_s, val_s, test_s = build_stream(exp["dataset"])
 
-            recorder.close()
+    # Loop over methods & seeds ------------------------------------------------
+    for method_key, method_cfg in exp["methods"].items():
+        algo_cls = _METHODS[method_key]
+        for seed in exp["seeds"]:
+            _set_seed(seed)
+
+            model = algo_cls(exp, method_cfg)
+            if torch.cuda.is_available():
+                model = model.cuda()
+
+            out_dir = ROOT / "results"
+            out_file = out_dir / f"{exp['id']}_{method_key}_seed{seed}.json"
+            logger = MetricLogger(out_file)
+
+            # Task loop ------------------------------------------------------
+            for tid, (tr_loader, val_loader, te_loader) in enumerate(
+                zip(train_s, val_s, test_s)
+            ):
+                model.before_task(tid)
+                model.train_task(tid, tr_loader, val_loader, logger)
+                model.after_task(tid)
+                model.evaluate(tid, te_loader, logger)
+
+            logger.close()
 
 
 # -----------------------------------------------------------------------------
 if __name__ == "__main__":
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
-    cfg_path = _find_default_cfg()
-    cfg = _load_yaml(cfg_path)
-    for exp in cfg["experiments"]:
-        _run_one_experiment(exp)
+    config = _load_config()
+    for experiment in config["experiments"]:
+        _run_experiment(experiment)

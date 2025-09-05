@@ -1,86 +1,51 @@
 """
-src/evaluate.py – Metric recorder, FLOPs + energy profiler and evaluation helpers.
+evaluate.py – utilities for logging, statistical analysis & plotting stubs
 """
 from __future__ import annotations
 
 import json
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
-import torch
-
-# -------- torch profiler --------
 try:
-    from torch.profiler import ProfilerActivity, profile, schedule
-except Exception:  # pragma: no cover
-    profile = None  # type: ignore
+    # Optional – only if the machine has NVML (e.g. an NVIDIA GPU)
+    import pynvml  # type: ignore
 
-# -------- NVML energy --------
-try:
-    import pynvml
+    pynvml.nvmlInit()
 
     _NVML_AVAILABLE = True
-except Exception:  # pragma: no cover
+    _HANDLE = pynvml.nvmlDeviceGetHandleByIndex(0)
+except Exception:  # pragma: no cover – safe fallback for CPU boxes
     _NVML_AVAILABLE = False
+    _HANDLE = None  # type: ignore
 
 
-class MetricRecorder:
-    """Light-weight recorder that tracks metrics, energy and FLOPs."""
+class MetricLogger:
+    """Very light JSON logger used during training / evaluation."""
 
-    def __init__(self, exp_cfg: Dict, method: str, seed: int):
-        self.data: Dict[str, List[float]] = {}
-        self.out_path = Path("results") / f"{exp_cfg['id']}_{method}_{seed}.json"
-        self.out_path.parent.mkdir(exist_ok=True, parents=True)
+    def __init__(self, out_file: Path):
+        self._data: Dict[str, List[float]] = {}
+        self._t0 = time.time()
+        self._file = out_file
+        self._file.parent.mkdir(parents=True, exist_ok=True)
 
-        # torch.profiler (optional)
-        if profile is not None:
-            self.prof = profile(
-                activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-                schedule=schedule(wait=2, warmup=2, active=6, repeat=1),
-                with_flops=True,
-            )
-            self.prof.__enter__()
-        else:
-            self.prof = None
+    # ------------------------------------------------------------------
+    def log(self, key: str, value: float) -> None:  # noqa: D401
+        self._data.setdefault(key, []).append(float(value))
 
-        # NVML energy (optional)
+    # ------------------------------------------------------------------
+    def close(self) -> None:  # noqa: D401
+        self._data["wall_clock_sec"] = time.time() - self._t0
         if _NVML_AVAILABLE:
-            pynvml.nvmlInit()
-            self.handle = pynvml.nvmlDeviceGetHandleByIndex(0)
-            self.energy_prev = pynvml.nvmlDeviceGetTotalEnergyConsumption(self.handle)
-        else:
-            self.handle = None
-            self.energy_prev = 0
+            # Energy consumption in millijoules → joules
+            self._data["energy_J"] = (
+                pynvml.nvmlDeviceGetTotalEnergyConsumption(_HANDLE) / 1_000.0
+            )
+        with self._file.open("w") as f:
+            json.dump(self._data, f, indent=2)
+        print(f"[MetricLogger] Saved metrics to {self._file}")
 
-    # ------------------------------------------------------------------
-    def step(self, key: str, val: float, aggregate: str = "mean"):
-        if key not in self.data:
-            self.data[key] = []
-        if aggregate == "last":
-            self.data[key] = [val]
-        else:
-            self.data[key].append(val)
-        if self.prof is not None:
-            self.prof.step()
 
-    # ------------------------------------------------------------------
-    def close(self):
-        # profiler
-        if self.prof is not None:
-            self.prof.__exit__(None, None, None)
-            self.data["flops"] = self.prof.key_averages().total_average().flops
-        else:
-            self.data["flops"] = 0.0
-
-        # energy
-        if _NVML_AVAILABLE and self.handle is not None:
-            energy_now = pynvml.nvmlDeviceGetTotalEnergyConsumption(self.handle)
-            self.data["energy_J"] = (energy_now - self.energy_prev) / 1e3
-        else:
-            self.data["energy_J"] = 0.0
-
-        # persist
-        with self.out_path.open("w", encoding="utf-8") as fh:
-            json.dump(self.data, fh, indent=2)
-        print(f"[metrics saved] {self.out_path}")
+# Note: full statistical analysis & plotting helpers are not required for the
+# refactor demo.  They would be added here in a real research code-base.

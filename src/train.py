@@ -1,150 +1,343 @@
 """
-src/train.py – Minimal training-loop stubs so that the public
-entry-point (python -m src.main) runs end-to-end even when the real
-research implementations are unavailable.  The classes expose the exact
-interface expected by main.py and therefore can be swapped for the full
-methods later without touching any orchestration code.
-
-NOTE:  • These are NOT research-grade continual-learning algorithms –
-         they are tiny placeholders that simply train a single linear
-         classifier on the entire input vector.
-       • They exist solely to make the repository import-able and the CI
-         pipeline green.  Replace them with your actual methods when you
-         start experimenting.
+train.py – model architectures, buffers and training algorithms
 """
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
+import math
+import random
+from typing import Any, Dict, List, Tuple
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
-
-__all__ = [
-    "CLoVeSub",
-    "ERRing",
-    "EWC",
-    "SparCL",
-    "TinyAQM",
-]
+import torchvision.models as tvm
 
 # -----------------------------------------------------------------------------
-# Helper – very small MLP (actually a single linear layer) ---------------------
+#  Helpers
 # -----------------------------------------------------------------------------
 
+def sparsify_grads(model: nn.Module, theta: float = 0.2) -> None:
+    """Keep top-(1-θ) fraction of the gradients by magnitude.
 
-class _TinyClassifier(nn.Module):
-    """1-layer linear network that flattens the image and classifies it."""
+    A very small and fast variant of the SparCL mask used in the paper.
+    """
+    for p in model.parameters():
+        if p.grad is None:
+            continue
+        g = p.grad.view(-1)
+        k = int((1 - theta) * g.numel())
+        if k <= 0:
+            p.grad.zero_()
+            continue
+        thr = g.abs().kthvalue(k).values.item()
+        mask = g.abs() >= thr
+        p.grad.mul_(mask.view_as(p.grad))
 
-    def __init__(self, num_classes: int):
+
+# -----------------------------------------------------------------------------
+#  Model building blocks
+# -----------------------------------------------------------------------------
+
+try:
+    import geoopt  # type: ignore
+except ImportError:  # pragma: no cover – geoopt is optional on CPU–only boxes
+    geoopt = None
+
+
+class StiefelProjector(nn.Module):
+    """Linear projector whose weight lies on the Stiefel manifold (orthogonal).
+
+    Keeps the last-layer features in a low-rank orthogonal sub-space in order
+    to minimise interference across tasks.
+    """
+
+    def __init__(self, in_dim: int, rank: int = 16):
         super().__init__()
-        # CIFAR-100 images are 3×32×32.  If the user swaps in another
-        # dataset this will still work as long as they override
-        # ``in_features`` via the exp_cfg.
-        self.in_features = 3 * 32 * 32
-        self.linear = nn.Linear(self.in_features, num_classes)
-        # Orthogonal weight init for reproducibility / tiny benefit.
-        nn.init.orthogonal_(self.linear.weight)
-        nn.init.zeros_(self.linear.bias)
+        if geoopt is None:
+            raise ImportError(
+                "geoopt is required for the StiefelProjector – install via `pip install geoopt`."
+            )
+        self.weight = geoopt.ManifoldParameter(  # type: ignore
+            torch.empty(in_dim, rank), manifold=geoopt.Stiefel()
+        )
+        nn.init.orthogonal_(self.weight)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:  # noqa: D401
+        return x @ self.weight  # [B, rank]
+
+
+class VQLite(nn.Module):
+    """Extremely small VQ-VAE encoder, 32× compression, 16-entry codebook."""
+
+    def __init__(self, codebook_size: int = 16, code_dim: int = 32, beta: float = 0.25):
+        super().__init__()
+        self.code_dim = code_dim
+        self.beta = beta
+
+        # ───── Encoder – 32×32 → 8×8 spatial, global-avg pooled ─────
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 32, 4, 2, 1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, 64, 4, 2, 1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, code_dim, 1),
+        )
+        self.register_buffer("codebook", torch.randn(codebook_size, code_dim))
 
     # ------------------------------------------------------------------
-    def forward(self, x: torch.Tensor) -> torch.Tensor:  # type: ignore
-        return self.linear(x.flatten(start_dim=1))
+    def encode(
+        self, x: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:  # (z_q, idx, vq_loss)
+        z_e = self.encoder(x)  # [B, C, 8, 8]
+        z_e = z_e.mean(dim=(-1, -2))  # global average -> [B, C]
+
+        # Vector quantisation
+        dist = ((z_e.unsqueeze(1) - self.codebook.unsqueeze(0)) ** 2).sum(-1)  # [B, K]
+        idx = dist.argmin(dim=-1)
+        z_q = self.codebook[idx]  # [B, C]
+
+        # Commitment loss (straight-through)
+        loss = (z_q.detach() - z_e).pow(2).mean() + self.beta * (
+            z_q - z_e.detach()
+        ).pow(2).mean()
+        z_q = z_e + (z_q - z_e).detach()
+        return z_q, idx, loss
+
+    # ------------------------------------------------------------------
+    def decode(self, _):  # decoder never called in CLoVe-Sub (adapter mode)
+        raise NotImplementedError("Decoder is not required – replay is latent → feature.")
 
 
 # -----------------------------------------------------------------------------
-# Base continual-learning “algorithm” stub -------------------------------------
+#  Replay buffers
 # -----------------------------------------------------------------------------
 
+class LatentBuffer:
+    """Fixed-capacity buffer that stores latent codes instead of raw images."""
 
-class _BaseMethod(nn.Module):
-    """A minimal algorithm skeleton – all real methods inherit from this."""
+    def __init__(self, max_bytes: int, code_dim: int):
+        self.max_bytes = max_bytes
+        self.code_dim = code_dim
+        self.storage: List[Tuple[torch.Tensor, int]] = []
 
-    def __init__(self, exp_cfg: Dict, method_cfg: Dict):
+    # --------------------------------------------------------------
+    def _bytes(self) -> int:
+        return len(self.storage) * self.code_dim * 4  # float32 on disk / RAM
+
+    # --------------------------------------------------------------
+    def add(self, codes: torch.Tensor, labels: torch.Tensor) -> None:
+        for z, y in zip(codes.cpu(), labels.cpu()):
+            while self._bytes() + self.code_dim * 4 > self.max_bytes and self.storage:
+                self.storage.pop(0)  # FIFO eviction
+            self.storage.append((z.clone(), int(y)))
+
+    # --------------------------------------------------------------
+    def sample(self, n: int) -> Tuple[torch.Tensor | None, torch.Tensor | None]:
+        if not self.storage:
+            return None, None
+        batch = random.sample(self.storage, min(n, len(self.storage)))
+        z, y = zip(*batch)
+        return torch.stack(list(z)), torch.tensor(list(y))
+
+
+class ImageBuffer:
+    """Classic rehearsal buffer that stores raw images."""
+
+    def __init__(self, max_imgs: int):
+        self.max_imgs = max_imgs
+        self.storage: List[Tuple[torch.Tensor, int]] = []
+
+    def add(self, imgs: torch.Tensor, labels: torch.Tensor) -> None:
+        for img, y in zip(imgs.cpu(), labels.cpu()):
+            if len(self.storage) >= self.max_imgs:
+                self.storage.pop(0)
+            self.storage.append((img.clone(), int(y)))
+
+    def sample(self, n: int) -> Tuple[torch.Tensor | None, torch.Tensor | None]:
+        if not self.storage:
+            return None, None
+        batch = random.sample(self.storage, min(n, len(self.storage)))
+        x, y = zip(*batch)
+        return torch.stack(list(x)), torch.tensor(list(y))
+
+
+# -----------------------------------------------------------------------------
+#  Generic continual-learning algorithm base-class
+# -----------------------------------------------------------------------------
+
+class _BaseAlgo(nn.Module):
+    """Base class: backbone, head, optimiser, generic training loop."""
+
+    def __init__(self, exp_cfg: Dict[str, Any], method_cfg: Dict[str, Any]):
         super().__init__()
         self.exp_cfg = exp_cfg
         self.method_cfg = method_cfg
-        num_classes: int = exp_cfg["dataset"]["num_classes_total"]
-        self.net = _TinyClassifier(num_classes)
-        self.loss_fn = nn.CrossEntropyLoss()
-        lr: float = exp_cfg.get("optim", {}).get("lr", 0.01)
-        self.optimizer = torch.optim.SGD(self.parameters(), lr=lr)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        self.backbone = tvm.resnet18(weights=None, num_classes=0).to(self.device)
+        self.feat_dim = 512
+        self.head = nn.Linear(self.feat_dim, exp_cfg["dataset"]["num_classes_total"]).to(
+            self.device
+        )
+
+        self.loss_ce = nn.CrossEntropyLoss()
+        self.opt = torch.optim.SGD(
+            self.parameters(), lr=exp_cfg["optim"]["lr"], momentum=0.9
+        )
 
     # ------------------------------------------------------------------
-    # Boiler-plate hooks expected by src.main ---------------------------
-    # ------------------------------------------------------------------
-    def before_task(self, task_id: int):
-        # Real algorithms would set up task-specific buffers / masks here.
-        pass
+    def forward(self, x: torch.Tensor) -> torch.Tensor:  # noqa: D401
+        feat = self.backbone(x)
+        return self.head(feat)
 
     # ------------------------------------------------------------------
-    def train_task(
-        self,
-        task_id: int,
-        train_loader: "DataLoader[Tuple[torch.Tensor, torch.Tensor]]",
-        val_loader: "DataLoader[Tuple[torch.Tensor, torch.Tensor]]",
-        recorder,
-    ):  # noqa: D401 – (docstring one-line style)
-        """Very small supervised training loop (epochs_per_task)."""
-
-        device = next(self.parameters()).device
+    def before_task(self, _tid: int) -> None:  # hooks for Fisher, etc.
         self.train()
-        epochs = self.exp_cfg.get("epochs_per_task", 1)
-        for _ in range(epochs):
-            running_loss: List[float] = []
-            for x, y in train_loader:
-                x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
-                self.optimizer.zero_grad(set_to_none=True)
-                logits = self.net(x)
-                loss = self.loss_fn(logits, y)
-                loss.backward()
-                self.optimizer.step()
-                running_loss.append(loss.item())
-            if running_loss:  # could be empty for mis-configured streams
-                recorder.step("loss_train", sum(running_loss) / len(running_loss))
+
+    def after_task(self, _tid: int) -> None:  # placeholder
+        pass
 
     # ------------------------------------------------------------------
-    def after_task(self, task_id: int):
-        # Real algorithms would consolidate knowledge, do EWC, etc.
-        pass
+    def train_task(self, tid: int, tr_loader, _val_loader, logger):  # noqa: D401
+        epochs = self.exp_cfg["epochs_per_task"]
+        for _ in range(epochs):
+            for x, y in tr_loader:
+                x, y = x.to(self.device), y.to(self.device)
+                self.opt.zero_grad(set_to_none=True)
+                loss = self.loss_ce(self.forward(x), y)
+                loss.backward()
+                self.opt.step()
+            logger.log("train_loss", loss.item())  # type: ignore[arg-type]
 
     # ------------------------------------------------------------------
     @torch.no_grad()
-    def evaluate(self, task_id: int, test_loader: DataLoader, recorder):
+    def evaluate(self, tid: int, test_loader, logger):  # noqa: D401
         self.eval()
-        device = next(self.parameters()).device
-        correct, total = 0, 0
+        correct = 0
+        total = 0
         for x, y in test_loader:
-            x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
-            logits = self.net(x)
-            pred = logits.argmax(dim=1)
+            x, y = x.to(self.device), y.to(self.device)
+            pred = self.forward(x).argmax(dim=1)
             correct += (pred == y).sum().item()
             total += y.numel()
-        acc = (correct / total * 100.0) if total else 0.0
-        recorder.step("acc_task_{:02d}".format(task_id), acc, aggregate="last")
+        acc = 100.0 * correct / total
+        logger.log(f"acc_task_{tid}", acc)
+        self.train()
 
 
 # -----------------------------------------------------------------------------
-# “Algorithms” – they all inherit the minimal skeleton -------------------------
+#  Concrete algorithms
 # -----------------------------------------------------------------------------
 
+class CLoVeSub(_BaseAlgo):
+    """Proposed method – compressed latent rehearsal buffer with adapter."""
 
-class CLoVeSub(_BaseMethod):
-    pass
+    def __init__(self, exp_cfg: Dict[str, Any], method_cfg: Dict[str, Any]):
+        super().__init__(exp_cfg, method_cfg)
+        rank = method_cfg.get("rank", 16)
+        self.projector = StiefelProjector(self.feat_dim, rank).to(self.device)
+        self.vq = VQLite().to(self.device)
+        self.adapter = nn.Sequential(
+            nn.Linear(self.vq.code_dim, 128), nn.ReLU(inplace=True), nn.Linear(128, self.feat_dim)
+        ).to(self.device)
+        self.buffer = LatentBuffer(method_cfg["buffer_bytes"], self.vq.code_dim)
+        self.sparsity = method_cfg.get("sparsity", 0.2)
+
+        # Re-initialise optimiser now that projector / adapter are added.
+        self.opt = torch.optim.SGD(
+            self.parameters(), lr=exp_cfg["optim"]["lr"], momentum=0.9
+        )
+
+    # ------------------------------------------------------------------
+    def forward(
+        self, x: torch.Tensor | None = None, z_lat: torch.Tensor | None = None
+    ) -> torch.Tensor:  # noqa: D401
+        if z_lat is None:
+            feat = self.backbone(x)  # type: ignore[arg-type]
+        else:
+            feat = self.adapter(z_lat.to(self.device))
+        feat_p = self.projector(feat)
+        return self.head(feat_p)
+
+    # ------------------------------------------------------------------
+    def train_task(self, tid: int, tr_loader, _val_loader, logger):  # noqa: D401
+        epochs = self.exp_cfg["epochs_per_task"]
+        for _ in range(epochs):
+            for x, y in tr_loader:
+                x, y = x.to(self.device), y.to(self.device)
+
+                # ─── Encode current batch and store latents ───
+                z_q, _idx, vq_loss = self.vq.encode(x)
+                self.buffer.add(z_q.detach(), y.detach())
+
+                # ─── Sample replay latents ───
+                z_r, y_r = self.buffer.sample(len(x))
+                logits_replay = None
+                if z_r is not None:
+                    z_r, y_r = z_r.to(self.device), y_r.to(self.device)
+                    logits_replay = self.forward(z_lat=z_r)
+
+                # ─── Forward & loss ───
+                logits_cur = self.forward(x=x)
+                loss = self.loss_ce(logits_cur, y) + 0.1 * vq_loss
+                if logits_replay is not None:
+                    loss = loss + self.loss_ce(logits_replay, y_r)
+
+                # ─── Back-prop & sparsity mask ───
+                self.opt.zero_grad(set_to_none=True)
+                loss.backward()
+                sparsify_grads(self.backbone, theta=self.sparsity)
+                self.opt.step()
+            logger.log("train_loss", loss.item())  # type: ignore[arg-type]
 
 
-class ERRing(_BaseMethod):
-    pass
+# -----------------------------------------------------------------------------
+#  Baselines – ER-Ring & SparCL
+# -----------------------------------------------------------------------------
+
+class ERRing(_BaseAlgo):
+    def __init__(self, exp_cfg: Dict[str, Any], method_cfg: Dict[str, Any]):
+        super().__init__(exp_cfg, method_cfg)
+        imgs_per_class = method_cfg.get("imgs_per_class", 15)
+        max_imgs = imgs_per_class * exp_cfg["dataset"]["num_classes_total"]
+        self.buffer = ImageBuffer(max_imgs)
+
+    # ------------------------------------------------------------------
+    def train_task(self, tid: int, tr_loader, _val_loader, logger):  # noqa: D401
+        epochs = self.exp_cfg["epochs_per_task"]
+        for _ in range(epochs):
+            for x, y in tr_loader:
+                self.buffer.add(x, y)
+                x_b, y_b = self.buffer.sample(len(x))
+                if x_b is not None:
+                    x = torch.cat([x, x_b.to(x.device)])  # reuse current device (CPU / GPU)
+                    y = torch.cat([y, y_b.to(y.device)])
+
+                x, y = x.to(self.device), y.to(self.device)
+                self.opt.zero_grad(set_to_none=True)
+                loss = self.loss_ce(self.forward(x), y)
+                loss.backward()
+                self.opt.step()
+            logger.log("train_loss", loss.item())  # type: ignore[arg-type]
 
 
-class EWC(_BaseMethod):
-    pass
+class SparCL(ERRing):
+    """ER-Ring + gradient sparsity mask."""
 
+    def train_task(self, tid: int, tr_loader, _val_loader, logger):  # noqa: D401
+        epochs = self.exp_cfg["epochs_per_task"]
+        for _ in range(epochs):
+            for x, y in tr_loader:
+                self.buffer.add(x, y)
+                x_b, y_b = self.buffer.sample(len(x))
+                if x_b is not None:
+                    x = torch.cat([x, x_b.to(x.device)])
+                    y = torch.cat([y, y_b.to(y.device)])
 
-class SparCL(_BaseMethod):
-    pass
-
-
-class TinyAQM(_BaseMethod):
-    pass
+                x, y = x.to(self.device), y.to(self.device)
+                self.opt.zero_grad(set_to_none=True)
+                loss = self.loss_ce(self.forward(x), y)
+                loss.backward()
+                sparsify_grads(self.backbone, theta=0.2)
+                self.opt.step()
+            logger.log("train_loss", loss.item())  # type: ignore[arg-type]

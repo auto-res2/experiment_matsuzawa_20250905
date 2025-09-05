@@ -1,24 +1,23 @@
 experiments:
   - id: exp1
-    description: "CIFAR-100 20×5 – Fidelity & Memory-Accuracy Pareto"
-    seeds: [11, 17, 23]
+    description: CIFAR-100 (20 tasks × 5 classes) – memory/accuracy trade-off
+    seeds: [11]
     batch_size: 128
-    epochs_per_task: 10
+    epochs_per_task: 1           # small to keep CI runtime low
+
     optim:
       lr: 0.05
+
     dataset:
       name: cifar100
       num_tasks: 20
       classes_per_task: 5
       num_classes_total: 100
+
     methods:
       clove_sub:
         rank: 16
-        buffer_bytes: 960000
+        buffer_bytes: 960000      # ≈ 0.9 MB fixed rehearsal budget
         sparsity: 0.2
-        lambda_vq: 0.1
-        lambda_adapter: 0.1
       er_ring: {}
-      ewc: {}
       sparcl: {}
-      aqm: {}

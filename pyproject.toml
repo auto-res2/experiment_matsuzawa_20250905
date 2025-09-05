@@ -1,41 +1,34 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "clove_sub"
-version = "0.2.0"
-requires-python = ">=3.10,<3.12"
+version = "0.3.0"
+description = "Compressed Latent Orthogonal-Subspace Replay (CLoVe-Sub) – research code-base"
+authors = [
+  { name = "Researcher", email = "research@example.com" }
+]
+requires-python = ">=3.9"
+readme = "README.md"
+license = { text = "MIT" }
+
+# -----------------------------------------------------------------------------
+#  Core (runtime) dependencies – minimal list
+# -----------------------------------------------------------------------------
 
 dependencies = [
-  # ---------------------------------------------------------------------
-  # Core deep-learning stack
-  #   • We explicitly pin to the CUDA-11.8 build of PyTorch 2.1.x to ensure
-  #     compatibility with the Tesla T4 GPU available in the execution
-  #     environment.  Newer PyTorch releases default to CUDA-12 wheels which
-  #     are not supported on that hardware and unnecessarily bloat the  CI
-  #     download size.
-  #   • Torch 2.1.x wheels were built against NumPy 1.x, therefore importing
-  #     them with NumPy ≥2 raises “compiled against NumPy 1.x” run-time
-  #     errors.  We consequently cap NumPy to <2.0.
-  # ---------------------------------------------------------------------
-  "torch>=2.1.0,<2.2.0",          # cu118 wheel
-  "torchvision>=0.16.0,<0.17.0",  # version family matched to torch 2.1.x
-  "timm>=0.9.5,<1.2.0",
-
-  # Geometry / manifold optimisation
-  "geoopt>=0.5.0,<0.6.0",
-
-  # Scientific Python stack (NumPy hard-capped <2.0 for binary ABI compat)
-  "numpy>=1.26,<2.0",
-  "pandas>=2.1,<2.4",
-  "matplotlib",
-  "PyYAML",
-
-  # Evaluation helpers
-  "torchmetrics>=1.3,<1.9",
-  "pynvml>=11.5,<13.0",
-
-  # Extended optimiser zoo (note the correct PyPI name)
-  "pytorch-optimizer>=3.0.0,<4.0.0",
+  "torch~=2.0",            # deep-learning framework
+  "torchvision~=0.15",     # datasets & models
+  "pyyaml>=6.0",           # config loader
 ]
 
-[build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
+[project.optional-dependencies]
+extra = [
+  "geoopt>=0.5",           # orthogonal manifold projector (optional but recommended)
+  "pynvml>=11.4",          # energy logging (optional)
+]
+
+[tool.setuptools.package-dir]
+# Source layout: only 'src' is a package root.
+"" = "src"

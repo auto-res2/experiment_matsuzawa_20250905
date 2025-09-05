@@ -1,1 +1,32 @@
-# Please list the required python packages.
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "cld_cd_refactor"
+version = "0.1.0"
+description = "Refactored project structure for CLD-CD experiments"
+requires-python = ">=3.8"
+
+# --------------------------------------------------------------------
+# Dependencies – keep alphabetical for easier diff & to avoid cycles
+# --------------------------------------------------------------------
+dependencies = [
+    "diffusers>=0.22.0",
+    "matplotlib>=3.7",
+    "notears>=0.1",
+    "numpy>=1.23",
+    "opencv-python-headless>=4.8",
+    "peft>=0.4.0",
+    "PyYAML>=6.0",
+    "scipy>=1.10",
+    "seaborn>=0.12",
+    "torch>=2.0",
+    "torchmetrics>=1.2",
+    "torchvision>=0.15",
+    "tqdm>=4.66",
+    "transformers>=4.33",
+    "wilds>=2.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

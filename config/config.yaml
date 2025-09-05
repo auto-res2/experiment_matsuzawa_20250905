@@ -1,0 +1,73 @@
+experiments:
+  - name: exp1_waterbirds
+    dataset_name: waterbirds
+    seed: 0
+    latent_dims_keep: 10
+    notears_lambda1: 0.01
+    dro_radius: 0.2
+    fourier_lambda: 0.2
+    training:
+      epochs: 200
+      batch_size: 256
+      lr: 0.0003
+      weight_decay: 0.0001
+    diffusion:
+      lora_rank: 8
+      lora_lr: 0.0001
+      steps: 2000
+      ddim_steps: 20
+      cfg_scale: 7.5
+  - name: exp1_celeba
+    dataset_name: celeba
+    seed: 0
+    latent_dims_keep: 10
+    notears_lambda1: 0.01
+    dro_radius: 0.2
+    fourier_lambda: 0.2
+    training:
+      epochs: 200
+      batch_size: 256
+      lr: 0.0003
+      weight_decay: 0.0001
+    diffusion:
+      lora_rank: 8
+      lora_lr: 0.0001
+      steps: 2000
+      ddim_steps: 20
+      cfg_scale: 7.5
+  - name: exp2_diffspur
+    dataset_name: diffspur
+    seed: 0
+    latent_dims_keep: 6
+    notears_lambda1: 0.01
+    dro_radius: 0.0
+    fourier_lambda: 0.0
+    training:
+      epochs: 0
+      batch_size: 0
+      lr: 0.0
+      weight_decay: 0.0
+    diffusion:
+      lora_rank: 8
+      lora_lr: 0.0001
+      steps: 1000
+      ddim_steps: 20
+      cfg_scale: 7.5
+  - name: exp3_cifar_full
+    dataset_name: cifar10
+    seed: 0
+    latent_dims_keep: 6
+    notears_lambda1: 0.01
+    dro_radius: 0.2
+    fourier_lambda: 0.2
+    training:
+      epochs: 200
+      batch_size: 512
+      lr: 0.1
+      weight_decay: 0.0005
+    diffusion:
+      lora_rank: 8
+      lora_lr: 0.0001
+      steps: 1000
+      ddim_steps: 20
+      cfg_scale: 7.5

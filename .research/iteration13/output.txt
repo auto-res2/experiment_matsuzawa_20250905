@@ -1,0 +1,9 @@
+=== uv sync start Fri Sep  5 14:37:16 UTC 2025 ===
+=== uv install end Fri Sep  5 14:37:49 UTC 2025 ===
+=== experiment start Fri Sep  5 14:37:49 UTC 2025 ===
+
+==== EXPERIMENT ====
+CIFAR-100 (20 tasks × 5 classes) – memory/accuracy trade-off
+====================
+
+[StiefelProjector] geoopt not installed – falling back to unconstrained parameter with QR re-projection. Install geoopt for true manifold optimisation.

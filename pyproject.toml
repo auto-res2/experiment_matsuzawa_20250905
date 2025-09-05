@@ -6,28 +6,31 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 
-[project.dependencies]
-torch = "==2.1.0"
-torchvision = "==0.16.0"
-#wild robustness & causal
-wilds = "==2.0.0"
-notears-torch = "==0.3.5"
+dependencies = [
+    # Core deep-learning stack (CUDA builds assumed where applicable)
+    "torch==2.1.0",
+    "torchvision==0.16.0",
 
-# generative & LoRA
-transformers = "==4.35.2"
-diffusers = "==0.27.0"
-peft = "==0.7.1"
-safetensors = "==0.3.3"
+    # WILDS benchmark & causal-discovery helper
+    "wilds==2.0.0",
+    "notears-torch==0.3.5",
 
-# misc
-omegaconf = "==2.3.0"
-pyyaml = "==6.0.1"
-matplotlib = "==3.8.0"
-seaborn = "==0.13.0"
-opencv-python-headless = "==4.8.1.78"
-tqdm = "==4.66.2"
-ptflops = "==0.7.3"
-torchmetrics = "==1.2.0"
+    # Generative diffusion + LoRA fine-tuning
+    "transformers==4.35.2",
+    "diffusers==0.27.0",
+    "peft==0.7.1",
+    "safetensors==0.3.3",
+
+    # Data handling & utilities
+    "omegaconf==2.3.0",
+    "pyyaml==6.0.1",
+    "matplotlib==3.8.0",
+    "seaborn==0.13.0",
+    "opencv-python-headless==4.8.1.78",
+    "tqdm==4.66.2",
+    "ptflops==0.7.3",
+    "torchmetrics==1.2.0",
+]
 
 [build-system]
 requires = ["setuptools", "wheel"]

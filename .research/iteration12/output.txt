@@ -1,0 +1,6 @@
+=== uv sync start Fri Sep  5 16:19:41 UTC 2025 ===
+=== uv install end Fri Sep  5 16:20:06 UTC 2025 ===
+=== experiment start Fri Sep  5 16:20:06 UTC 2025 ===
+
+===== Experiment-1 – Fixed-Budget Class-Incremental Learning on ImageNet-128 | Budget: 50 kB | Seed 0 =====
+INFO: Using synthetic ImageNet data because the real dataset is unavailable.

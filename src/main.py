@@ -25,9 +25,9 @@ from .train import (
 from .evaluate import plot_line
 
 # ---------------------------------------------------------------------------
-#  All experiment figures are stored under iteration8 (updated per instructions)
+#  All experiment figures are stored under iteration9 (updated per instructions)
 # ---------------------------------------------------------------------------
-IMG_DIR = Path(".research/iteration8/images")
+IMG_DIR = Path(".research/iteration9/images")
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 

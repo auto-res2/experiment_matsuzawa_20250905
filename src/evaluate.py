@@ -15,10 +15,10 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, mutual_info_score
 
 # ──────────────────────────────────────────────────────────────────────────────
-#  Figure output directory (iteration *8*)
+#  Figure output directory (iteration *9*)
 # ──────────────────────────────────────────────────────────────────────────────
 
-_IMAGES_DIR = Path(".research/iteration8/images")
+_IMAGES_DIR = Path(".research/iteration9/images")
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -31,6 +31,8 @@ def accuracy(logits, labels):
 
 def group_distance_ratio(emb, labels):
     """Average inter-class distance divided by average intra-class distance."""
+    if emb is None:
+        return 0.0
     with torch.no_grad():
         labels_np = labels.cpu().numpy()
         emb_cpu = emb.cpu()
@@ -51,6 +53,8 @@ def group_distance_ratio(emb, labels):
 
 def instance_information_gain(emb, labels, n_clusters: int):
     """Normalized mutual information between KMeans clusters and ground truth."""
+    if emb is None:
+        return 0.0
     with torch.no_grad():
         kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=0).fit(emb.cpu())
         mi = mutual_info_score(labels.cpu().numpy(), kmeans.labels_)

@@ -1,0 +1,234 @@
+=== uv sync start Fri Sep  5 13:31:19 UTC 2025 ===
+=== uv install end Fri Sep  5 13:31:43 UTC 2025 ===
+=== experiment start Fri Sep  5 13:31:43 UTC 2025 ===
+
+======================  Running exp1  ======================
+
+Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to data/cifar100/cifar-100-python.tar.gz
+Extracting data/cifar100/cifar-100-python.tar.gz to data/cifar100
+Files already downloaded and verified
+Seed 11 – Task 00 | Accuracy: 88.00%
+Seed 11 – Task 01 | Accuracy: 88.50%
+Seed 11 – Task 02 | Accuracy: 88.50%
+Seed 11 – Task 03 | Accuracy: 78.00%
+Seed 11 – Task 04 | Accuracy: 92.00%
+Seed 11 – Task 05 | Accuracy: 77.50%
+Seed 11 – Task 06 | Accuracy: 76.50%
+Seed 11 – Task 07 | Accuracy: 82.00%
+Seed 11 – Task 08 | Accuracy: 94.00%
+Seed 11 – Task 09 | Accuracy: 85.50%
+Seed 11 – Task 10 | Accuracy: 95.00%
+Seed 11 – Task 11 | Accuracy: 86.00%
+Seed 11 – Task 12 | Accuracy: 97.00%
+Seed 11 – Task 13 | Accuracy: 86.00%
+Seed 11 – Task 14 | Accuracy: 86.50%
+Seed 11 – Task 15 | Accuracy: 94.50%
+Seed 11 – Task 16 | Accuracy: 90.00%
+Seed 11 – Task 17 | Accuracy: 82.50%
+Seed 11 – Task 18 | Accuracy: 91.50%
+Seed 11 – Task 19 | Accuracy: 87.00%
+Seed 11 – Task 20 | Accuracy: 90.00%
+Seed 11 – Task 21 | Accuracy: 77.00%
+Seed 11 – Task 22 | Accuracy: 80.50%
+Seed 11 – Task 23 | Accuracy: 96.50%
+Seed 11 – Task 24 | Accuracy: 96.00%
+Seed 11 – Task 25 | Accuracy: 86.00%
+Seed 11 – Task 26 | Accuracy: 99.50%
+Seed 11 – Task 27 | Accuracy: 93.00%
+Seed 11 – Task 28 | Accuracy: 94.50%
+Seed 11 – Task 29 | Accuracy: 90.00%
+Seed 11 – Task 30 | Accuracy: 97.50%
+Seed 11 – Task 31 | Accuracy: 96.50%
+Seed 11 – Task 32 | Accuracy: 68.50%
+Seed 11 – Task 33 | Accuracy: 92.50%
+Seed 11 – Task 34 | Accuracy: 95.50%
+Seed 11 – Task 35 | Accuracy: 98.50%
+Seed 11 – Task 36 | Accuracy: 82.00%
+Seed 11 – Task 37 | Accuracy: 88.00%
+Seed 11 – Task 38 | Accuracy: 95.50%
+Seed 11 – Task 39 | Accuracy: 80.50%
+Seed 11 – Task 40 | Accuracy: 86.50%
+Seed 11 – Task 41 | Accuracy: 90.00%
+Seed 11 – Task 42 | Accuracy: 86.50%
+Seed 11 – Task 43 | Accuracy: 77.00%
+Seed 11 – Task 44 | Accuracy: 88.00%
+Seed 11 – Task 45 | Accuracy: 90.50%
+Seed 11 – Task 46 | Accuracy: 93.50%
+Seed 11 – Task 47 | Accuracy: 98.00%
+Seed 11 – Task 48 | Accuracy: 95.00%
+Seed 11 – Task 49 | Accuracy: 90.00%
+Seed 17 – Task 00 | Accuracy: 89.00%
+Seed 17 – Task 01 | Accuracy: 86.50%
+Seed 17 – Task 02 | Accuracy: 88.00%
+Seed 17 – Task 03 | Accuracy: 78.50%
+Seed 17 – Task 04 | Accuracy: 87.00%
+Seed 17 – Task 05 | Accuracy: 67.00%
+Seed 17 – Task 06 | Accuracy: 79.50%
+Seed 17 – Task 07 | Accuracy: 81.50%
+Seed 17 – Task 08 | Accuracy: 95.50%
+Seed 17 – Task 09 | Accuracy: 81.50%
+Seed 17 – Task 10 | Accuracy: 95.00%
+Seed 17 – Task 11 | Accuracy: 91.50%
+Seed 17 – Task 12 | Accuracy: 95.50%
+Seed 17 – Task 13 | Accuracy: 79.50%
+Seed 17 – Task 14 | Accuracy: 89.50%
+Seed 17 – Task 15 | Accuracy: 94.00%
+Seed 17 – Task 16 | Accuracy: 87.00%
+Seed 17 – Task 17 | Accuracy: 82.50%
+Seed 17 – Task 18 | Accuracy: 94.00%
+Seed 17 – Task 19 | Accuracy: 83.00%
+Seed 17 – Task 20 | Accuracy: 88.50%
+Seed 17 – Task 21 | Accuracy: 80.00%
+Seed 17 – Task 22 | Accuracy: 77.00%
+Seed 17 – Task 23 | Accuracy: 95.50%
+Seed 17 – Task 24 | Accuracy: 95.00%
+Seed 17 – Task 25 | Accuracy: 85.00%
+Seed 17 – Task 26 | Accuracy: 99.50%
+Seed 17 – Task 27 | Accuracy: 87.00%
+Seed 17 – Task 28 | Accuracy: 93.00%
+Seed 17 – Task 29 | Accuracy: 91.00%
+Seed 17 – Task 30 | Accuracy: 98.50%
+Seed 17 – Task 31 | Accuracy: 98.00%
+Seed 17 – Task 32 | Accuracy: 71.00%
+Seed 17 – Task 33 | Accuracy: 91.50%
+Seed 17 – Task 34 | Accuracy: 94.00%
+Seed 17 – Task 35 | Accuracy: 98.00%
+Seed 17 – Task 36 | Accuracy: 84.00%
+Seed 17 – Task 37 | Accuracy: 93.00%
+Seed 17 – Task 38 | Accuracy: 97.00%
+Seed 17 – Task 39 | Accuracy: 78.50%
+Seed 17 – Task 40 | Accuracy: 89.00%
+Seed 17 – Task 41 | Accuracy: 88.50%
+Seed 17 – Task 42 | Accuracy: 86.00%
+Seed 17 – Task 43 | Accuracy: 72.50%
+Seed 17 – Task 44 | Accuracy: 88.00%
+Seed 17 – Task 45 | Accuracy: 89.50%
+Seed 17 – Task 46 | Accuracy: 95.50%
+Seed 17 – Task 47 | Accuracy: 97.50%
+Seed 17 – Task 48 | Accuracy: 98.50%
+Seed 17 – Task 49 | Accuracy: 83.50%
+Seed 23 – Task 00 | Accuracy: 90.00%
+Seed 23 – Task 01 | Accuracy: 85.50%
+Seed 23 – Task 02 | Accuracy: 87.00%
+Seed 23 – Task 03 | Accuracy: 76.50%
+Seed 23 – Task 04 | Accuracy: 81.50%
+Seed 23 – Task 05 | Accuracy: 71.50%
+Seed 23 – Task 06 | Accuracy: 79.50%
+Seed 23 – Task 07 | Accuracy: 74.50%
+Seed 23 – Task 08 | Accuracy: 91.50%
+Seed 23 – Task 09 | Accuracy: 81.50%
+Seed 23 – Task 10 | Accuracy: 95.00%
+Seed 23 – Task 11 | Accuracy: 87.00%
+Seed 23 – Task 12 | Accuracy: 90.00%
+Seed 23 – Task 13 | Accuracy: 78.00%
+Seed 23 – Task 14 | Accuracy: 80.00%
+Seed 23 – Task 15 | Accuracy: 94.50%
+Seed 23 – Task 16 | Accuracy: 85.50%
+Seed 23 – Task 17 | Accuracy: 80.00%
+Seed 23 – Task 18 | Accuracy: 88.50%
+Seed 23 – Task 19 | Accuracy: 87.50%
+Seed 23 – Task 20 | Accuracy: 93.50%
+Seed 23 – Task 21 | Accuracy: 78.50%
+Seed 23 – Task 22 | Accuracy: 76.00%
+Seed 23 – Task 23 | Accuracy: 93.50%
+Seed 23 – Task 24 | Accuracy: 92.50%
+Seed 23 – Task 25 | Accuracy: 83.00%
+Seed 23 – Task 26 | Accuracy: 99.50%
+Seed 23 – Task 27 | Accuracy: 91.00%
+Seed 23 – Task 28 | Accuracy: 93.50%
+Seed 23 – Task 29 | Accuracy: 89.50%
+Seed 23 – Task 30 | Accuracy: 97.50%
+Seed 23 – Task 31 | Accuracy: 97.00%
+Seed 23 – Task 32 | Accuracy: 69.50%
+Seed 23 – Task 33 | Accuracy: 92.00%
+Seed 23 – Task 34 | Accuracy: 95.50%
+Seed 23 – Task 35 | Accuracy: 98.00%
+Seed 23 – Task 36 | Accuracy: 77.50%
+Seed 23 – Task 37 | Accuracy: 88.00%
+Seed 23 – Task 38 | Accuracy: 95.50%
+Seed 23 – Task 39 | Accuracy: 80.00%
+Seed 23 – Task 40 | Accuracy: 93.00%
+Seed 23 – Task 41 | Accuracy: 88.00%
+Seed 23 – Task 42 | Accuracy: 88.50%
+Seed 23 – Task 43 | Accuracy: 72.50%
+Seed 23 – Task 44 | Accuracy: 89.50%
+Seed 23 – Task 45 | Accuracy: 89.50%
+Seed 23 – Task 46 | Accuracy: 95.50%
+Seed 23 – Task 47 | Accuracy: 98.50%
+Seed 23 – Task 48 | Accuracy: 95.50%
+Seed 23 – Task 49 | Accuracy: 80.50%
+
+=====  Numerical Results (mean ± std across seeds)  =====
+ task  acc_mean  acc_std
+    0    0.8900   0.0082
+    1    0.8683   0.0125
+    2    0.8783   0.0062
+    3    0.7767   0.0085
+    4    0.8683   0.0429
+    5    0.7200   0.0430
+    6    0.7850   0.0141
+    7    0.7933   0.0342
+    8    0.9367   0.0165
+    9    0.8283   0.0189
+   10    0.9500   0.0000
+   11    0.8817   0.0239
+   12    0.9417   0.0301
+   13    0.8117   0.0347
+   14    0.8533   0.0397
+   15    0.9433   0.0024
+   16    0.8750   0.0187
+   17    0.8167   0.0118
+   18    0.9133   0.0225
+   19    0.8583   0.0201
+   20    0.9067   0.0209
+   21    0.7850   0.0122
+   22    0.7783   0.0193
+   23    0.9517   0.0125
+   24    0.9450   0.0147
+   25    0.8467   0.0125
+   26    0.9950   0.0000
+   27    0.9033   0.0249
+   28    0.9367   0.0062
+   29    0.9017   0.0062
+   30    0.9783   0.0047
+   31    0.9717   0.0062
+   32    0.6967   0.0103
+   33    0.9200   0.0041
+   34    0.9500   0.0071
+   35    0.9817   0.0024
+   36    0.8117   0.0272
+   37    0.8967   0.0236
+   38    0.9600   0.0071
+   39    0.7967   0.0085
+   40    0.8950   0.0268
+   41    0.8883   0.0085
+   42    0.8700   0.0108
+   43    0.7400   0.0212
+   44    0.8850   0.0071
+   45    0.8983   0.0047
+   46    0.9483   0.0094
+   47    0.9800   0.0041
+   48    0.9633   0.0155
+   49    0.8467   0.0397
+[Figure saved] .research/iteration4/images/accuracy_exp1.pdf
+
+======================  Running exp2  ======================
+
+[Skipped] exp2: 
+Dataset 'miniimagenet' requires manual download or special
+credentials that are not available inside this execution sandbox.
+Please place the dataset at 'data/miniimagenet/' and rerun.
+
+
+
+======================  Running exp3  ======================
+
+[Skipped] exp3: 
+Dataset 'imagenet100' requires manual download or special
+credentials that are not available inside this execution sandbox.
+Please place the dataset at 'data/imagenet100/' and rerun.
+
+
+
+[Results saved] .research/iteration4/results.json
+=== experiment end Fri Sep  5 13:43:46 UTC 2025 ===

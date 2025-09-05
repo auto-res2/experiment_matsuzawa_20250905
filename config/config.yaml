@@ -1,52 +1,24 @@
-# config/config.yaml – experiment definitions used by src.main
-
 experiments:
-  exp1:
-    id: exp1
-    description: "Memory-Accuracy Pareto on 50-Task CIFAR-100"
+  - id: exp1
+    description: "CIFAR-100 20×5 – Fidelity & Memory-Accuracy Pareto"
+    seeds: [11, 17, 23]
+    batch_size: 128
+    epochs_per_task: 10
+    optim:
+      lr: 0.05
     dataset:
       name: cifar100
-      num_tasks: 50
-      classes_per_task: 2
-    budget_mb: 0.9
-    epochs_per_task: 10
-    batch_size: 128
-    optimiser:
-      lr: 0.05
-      momentum: 0.9
-      weight_decay: 5e-4
-    seeds: [11, 17, 23]
-
-  exp2:
-    id: exp2
-    description: "Compute & Energy Profiling on miniImageNet"
-    dataset:
-      name: miniimagenet
-      url: "https://github.com/yaoyao-liu/mini-imagenet-tools"
       num_tasks: 20
       classes_per_task: 5
-    budget_mb: 0.96
-    epochs_per_task: 5
-    batch_size: 128
-    optimiser:
-      lr: 0.05
-      momentum: 0.9
-      weight_decay: 5e-4
-    seeds: [11, 17, 23]
-
-  exp3:
-    id: exp3
-    description: "Scalability & Robustness on ImageNet-100"
-    dataset:
-      name: imagenet100
-      url: "https://huggingface.co/datasets/clane9/imagenet-100"
-      num_tasks: 10
-      classes_per_task: 10
-    budget_mb: 1.0
-    epochs_per_task: 5
-    batch_size: 128
-    optimiser:
-      lr: 0.05
-      momentum: 0.9
-      weight_decay: 5e-4
-    seeds: [11, 17, 23]
+      num_classes_total: 100
+    methods:
+      clove_sub:
+        rank: 16
+        buffer_bytes: 960000
+        sparsity: 0.2
+        lambda_vq: 0.1
+        lambda_adapter: 0.1
+      er_ring: {}
+      ewc: {}
+      sparcl: {}
+      aqm: {}

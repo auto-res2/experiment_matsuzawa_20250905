@@ -1,86 +1,66 @@
-"""src/preprocess.py – data downloading & continual-learning task split"""
+"""
+src/preprocess.py – dataset download & class-incremental stream builder
+Currently supports CIFAR-100 only (20×5 split by default).
+"""
 from __future__ import annotations
 
-import textwrap
 from pathlib import Path
 from typing import List, Tuple
 
 import torch
-import torch.utils.data as td
 import torchvision
-from torchvision.transforms.functional import to_tensor
-
-__all__ = [
-    "get_data_stream",
-]
+from torch.utils.data import Dataset, random_split
+from torchvision import transforms as T
+from torchvision.datasets import CIFAR100
 
 
-def _build_cifar100_stream(
-    num_tasks: int,
-    classes_per_task: int,
-    root: Path,
-) -> Tuple[List[td.Dataset], List[td.Dataset]]:
-    """Download CIFAR-100 (if necessary) and split it into sequential tasks."""
-
-    train_set = torchvision.datasets.CIFAR100(root=root, train=True, download=True)
-    test_set = torchvision.datasets.CIFAR100(root=root, train=False, download=True)
-
-    # ------------------------------------------------------------------
-    #  Create the class-incremental split
-    # ------------------------------------------------------------------
-    assert num_tasks * classes_per_task == 100, "Invalid task split for CIFAR-100"
-
-    permuted_classes = list(range(100))  # could be randomised → reproducibility
-    task_cls = [
-        permuted_classes[i * classes_per_task : (i + 1) * classes_per_task]
-        for i in range(num_tasks)
-    ]
-
-    def _subset(dataset, cls_subset):
-        """Return a ``TensorDataset`` containing only ``cls_subset`` classes.
-
-        The original CIFAR-100 targets (0‒99) are remapped to the consecutive
-        range 0‒(classes_per_task-1) so that they are compatible with the
-        task-specific heads (each head outputs ``classes_per_task`` logits).
-        """
-        label_map = {orig: new for new, orig in enumerate(sorted(cls_subset))}
-        idx = [j for j, (_, y) in enumerate(dataset) if y in cls_subset]
-
-        imgs = torch.stack([to_tensor(dataset[j][0]) for j in idx])  # → [N,3,32,32]
-        labels = torch.tensor([label_map[dataset[j][1]] for j in idx])
-        return td.TensorDataset(imgs, labels)
-
-    train_stream = [_subset(train_set, c) for c in task_cls]
-    test_stream = [_subset(test_set, c) for c in task_cls]
-
-    return train_stream, test_stream
+class ToHalf(torchvision.transforms.Lambda):
+    def __init__(self):
+        super().__init__(lambda x: x.half())
 
 
-# -----------------------------------------------------------------------------
-#  Public entry point – other modules only import this one function
-# -----------------------------------------------------------------------------
-
-def get_data_stream(dataset_cfg: dict) -> Tuple[List[td.Dataset], List[td.Dataset]]:
-    """Return (train_stream, test_stream) according to *dataset_cfg* dict."""
-
-    name = dataset_cfg["name"].lower()
+def build_stream(cfg: dict) -> Tuple[List[Dataset], List[Dataset], List[Dataset]]:
+    name = cfg["name"].lower()
     if name == "cifar100":
-        return _build_cifar100_stream(
-            num_tasks=dataset_cfg["num_tasks"],
-            classes_per_task=dataset_cfg["classes_per_task"],
-            root=Path("data") / "cifar100",
-        )
+        return _cifar100_stream(cfg)
+    raise RuntimeError(f"Dataset {name} not implemented.")
 
-    # ------------------------------------------------------------------
-    #  For datasets that cannot be downloaded automatically we raise a
-    #  descriptive error so the user can fix it instead of silently failing.
-    # ------------------------------------------------------------------
-    raise RuntimeError(
-        textwrap.dedent(
-            f"""
-            Dataset '{dataset_cfg['name']}' requires manual download or special
-            credentials that are not available inside this execution sandbox.
-            Please place the dataset at 'data/{dataset_cfg['name']}/' and rerun.
-            """
-        )
-    )
+
+# -----------------------------------------------------------------------------
+#  CIFAR-100   20 tasks × 5 classes (default)
+# -----------------------------------------------------------------------------
+
+def _cifar100_stream(cfg):
+    root = Path("data") / "cifar100"
+    train = CIFAR100(root=root, train=True, download=True)
+    test = CIFAR100(root=root, train=False, download=True)
+
+    train.transform = T.Compose([
+        T.RandomHorizontalFlip(),
+        T.RandomCrop(32, 4),
+        T.ToTensor(),
+        ToHalf(),
+    ])
+    test.transform = T.Compose([T.ToTensor(), ToHalf()])
+
+    num_tasks = cfg["num_tasks"]
+    cls_per_task = cfg["classes_per_task"]
+    assert num_tasks * cls_per_task == 100
+
+    tasks = [list(range(i * cls_per_task, (i + 1) * cls_per_task)) for i in range(num_tasks)]
+
+    def _subset(dataset, cls):
+        idx = [i for i, (_, y) in enumerate(dataset) if y in cls]
+        return torch.utils.data.Subset(dataset, idx)
+
+    train_stream, val_stream, test_stream = [], [], []
+    for cls in tasks:
+        full = _subset(train, cls)
+        val_len = int(0.1 * len(full))
+        train_len = len(full) - val_len
+        tr_split, val_split = random_split(full, [train_len, val_len])
+        train_stream.append(tr_split)
+        val_stream.append(val_split)
+        test_stream.append(_subset(test, cls))
+
+    return train_stream, val_stream, test_stream

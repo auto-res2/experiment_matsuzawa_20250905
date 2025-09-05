@@ -25,8 +25,10 @@ from .train import (
 )
 from .evaluate import plot_line
 
-# fixed image directory -------------------------------------------------------
-IMG_DIR = Path(".research/iteration2/images")  # Updated path
+# ---------------------------------------------------------------------------
+#  All experiment figures are stored under iteration3 (see instructions)
+# ---------------------------------------------------------------------------
+IMG_DIR = Path(".research/iteration3/images")
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -46,7 +48,9 @@ def experiment_depth_scalability(cfg):
         bank = ChebFilterBank(data, cfg["model"]["bands"])
         for depth in depth_grid:
             hidden = (
-                cfg["model"]["hidden_dim_large"] if depth <= 32 else cfg["model"]["hidden_dim_small"]
+                cfg["model"]["hidden_dim_large"]
+                if depth <= 32
+                else cfg["model"]["hidden_dim_small"]
             )
             # AFN ----------------------------------------------------------------
             afn_accs = []
@@ -155,7 +159,9 @@ def experiment_frequency_usage(cfg):
         high_mass = w[:, -1]
         r_deg = np.corrcoef(high_mass, 1.0 / (deg + 1e-5))[0, 1]
         r_curv = np.corrcoef(high_mass, np.abs(curv))[0, 1]
-        print(f"Layer {l:2d}: corr(high_mass, 1/deg) = {r_deg:.3f}, corr(high_mass, |curv|) = {r_curv:.3f}")
+        print(
+            f"Layer {l:2d}: corr(high_mass, 1/deg) = {r_deg:.3f}, corr(high_mass, |curv|) = {r_curv:.3f}"
+        )
 
     # scatter plot -----------------------------------------------------------
     import matplotlib.pyplot as plt

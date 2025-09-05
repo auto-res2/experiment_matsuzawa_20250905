@@ -59,6 +59,10 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 @lru_cache(maxsize=None)
 def load_dataset(name: str) -> Data:
+    """Load a dataset and augment it with degree, curvature and Laplacian data.
+
+    The Ollivier–Ricci curvature computation is cached to speed-up subsequent runs.
+    """
     name_l = name.lower()
     root = DATA_DIR / name_l
     if name_l in {"cora", "citeseer", "pubmed"}:
@@ -70,41 +74,54 @@ def load_dataset(name: str) -> Data:
     else:
         raise RuntimeError(f"Unknown dataset {name}")
 
-    # feature normalisation
+    # feature normalisation --------------------------------------------------
     data.x = data.x / (data.x.sum(1, keepdim=True) + 1e-12)
 
-    # Pre-process graph
+    # make the graph undirected and add self-loops ---------------------------
     data.edge_index = to_undirected(data.edge_index)
     data.edge_index, _ = add_self_loops(data.edge_index, num_nodes=data.num_nodes)
 
-    # degree & curvature ------------------------------------------------------
-    deg = torch.bincount(data.edge_index[0]).float()
+    # degree -----------------------------------------------------------------
+    deg = torch.bincount(data.edge_index[0], minlength=data.num_nodes).float()
     data.deg = deg
 
+    # Ollivier–Ricci curvature ----------------------------------------------
     curv_file = CACHE_DIR / f"{name_l}_edge_curv.npy"
     if curv_file.exists():
         edge_curv = np.load(curv_file)
+        edges_ordered = np.load(curv_file.with_suffix("_edges.npy"))
     else:
         print(f"Computing Ollivier–Ricci curvature for {name} (one-off)…")
         g = nx.Graph()
-        g.add_nodes_from(range(data.num_nodes))
-        edges = data.edge_index.t().cpu().numpy()
-        g.add_edges_from(edges)
+        # ensure *consistent* Python-int node types throughout ----------------
+        g.add_nodes_from(range(int(data.num_nodes)))
+        # convert edge index to a list of Python-int tuples (avoids np.int64 keys)
+        edges_ordered = [tuple(map(int, e)) for e in data.edge_index.t().tolist()]
+        g.add_edges_from(edges_ordered)
+
+        # run curvature computation
         orc = OllivierRicci(g, alpha=0.5, verbose="ERROR")
         orc.compute_ricci_curvature()
-        edge_curv = np.array([orc.G[u][v]["ricciCurvature"] for u, v in g.edges()])
+
+        # curvature for each edge (same order as *edges_ordered*)
+        edge_curv = np.array([orc.G[u][v]["ricciCurvature"] for u, v in edges_ordered])
+        # cache both curvature values and the corresponding edge list so that
+        # ordering is reproduced exactly the next time we load from disk.
         np.save(curv_file, edge_curv)
+        np.save(curv_file.with_suffix("_edges.npy"), np.asarray(edges_ordered, dtype=np.int64))
+
     data.edge_curv = torch.tensor(edge_curv, dtype=torch.float)
 
-    node_curv = torch.zeros(data.num_nodes)
-    for (u, v), c in zip(data.edge_index.t().tolist(), edge_curv):
+    # node-level curvature: mean of incident edge curvatures ------------------
+    node_curv = torch.zeros(data.num_nodes, dtype=torch.float)
+    for (u, v), c in zip(edges_ordered, edge_curv):
         node_curv[u] += c
         node_curv[v] += c
     deg_clamped = deg.clone()
-    deg_clamped[deg_clamped == 0] = 1
+    deg_clamped[deg_clamped == 0] = 1.0
     data.node_curv = node_curv / deg_clamped
 
-    # Laplacian --------------------------------------------------------------
+    # Laplacian (normalised) -------------------------------------------------
     ei, ew = get_laplacian(data.edge_index, normalization="sym")
     data.lap_edge_index, data.lap_edge_weight = ei, ew
 
@@ -119,7 +136,9 @@ def apply_meta_attack(data: Data, perturb_ratio: float, seed: int) -> Data:
     if Metattack is None:
         raise RuntimeError("deeprobust is required for MetaAttack.")
     set_seed(seed)
-    adj = torch_geometric.utils.to_scipy_sparse_matrix(data.edge_index, num_nodes=data.num_nodes)
+    adj = torch_geometric.utils.to_scipy_sparse_matrix(
+        data.edge_index, num_nodes=data.num_nodes
+    )
     features = data.x.numpy()
     labels = data.y.numpy()
     attacker = Metattack(
@@ -131,7 +150,13 @@ def apply_meta_attack(data: Data, perturb_ratio: float, seed: int) -> Data:
         device="cpu",
     )
     idx_train = data.train_mask.nonzero(as_tuple=True)[0].numpy()
-    attacker.attack(adj, features, labels, idx_train, n_perturbations=int(perturb_ratio * (adj.nnz // 2)))
+    attacker.attack(
+        adj,
+        features,
+        labels,
+        idx_train,
+        n_perturbations=int(perturb_ratio * (adj.nnz // 2)),
+    )
     modified_adj = attacker.modified_adj
     edge_idx_ptb = torch_geometric.utils.from_scipy_sparse_matrix(modified_adj)[0]
     data_ptb = data.clone()

@@ -6,16 +6,15 @@ from typing import Dict, List
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import torch  # Added missing import
+import torch  # ensure torch is available for metric computations
 from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, mutual_info_score
 
 matplotlib.use("Agg")
 
-# Update images directory to iteration2 as per instructions
-_IMAGES_DIR = Path(".research/iteration2/images")
+# Save every figure to the iteration *3* directory as requested
+_IMAGES_DIR = Path(".research/iteration3/images")
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
-
 
 # ──────────────────────────────────────────────────────────────────────────────
 #  Metrics
@@ -68,7 +67,12 @@ def plot_line(
         plt.plot(xs, ys, marker="o", label=label)
         for x, y in zip(xs, ys):
             plt.annotate(
-                f"{y:.2f}", (x, y), textcoords="offset points", xytext=(0, 5), ha="center", fontsize=8
+                f"{y:.2f}",
+                (x, y),
+                textcoords="offset points",
+                xytext=(0, 5),
+                ha="center",
+                fontsize=8,
             )
     plt.title(title)
     plt.xlabel(xlabel)

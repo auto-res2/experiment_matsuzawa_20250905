@@ -1,0 +1,112 @@
+=== uv sync start Fri Sep  5 16:14:19 UTC 2025 ===
+=== uv install end Fri Sep  5 16:14:46 UTC 2025 ===
+=== experiment start Fri Sep  5 16:14:46 UTC 2025 ===
+
+===== Experiment-1 – Fixed-Budget Class-Incremental Learning on ImageNet-128 | Budget: 50 kB | Seed 0 =====
+WARNING: ImageNet tar archives not found in data/imagenet. Please download them manually from https://www.image-net.org/download and place them under the given directory.
+Skipping Experiment-1 because ImageNet archives are missing.
+Experiment-1 results (JSON):
+{
+  "seed": 0,
+  "budget_kb": 50,
+  "skipped": true,
+  "reason": "imagenet_not_found"
+}
+
+===== Experiment-1 – Fixed-Budget Class-Incremental Learning on ImageNet-128 | Budget: 100 kB | Seed 0 =====
+WARNING: ImageNet tar archives not found in data/imagenet. Please download them manually from https://www.image-net.org/download and place them under the given directory.
+Skipping Experiment-1 because ImageNet archives are missing.
+Experiment-1 results (JSON):
+{
+  "seed": 0,
+  "budget_kb": 100,
+  "skipped": true,
+  "reason": "imagenet_not_found"
+}
+
+===== Experiment-1 – Fixed-Budget Class-Incremental Learning on ImageNet-128 | Budget: 50 kB | Seed 1 =====
+WARNING: ImageNet tar archives not found in data/imagenet. Please download them manually from https://www.image-net.org/download and place them under the given directory.
+Skipping Experiment-1 because ImageNet archives are missing.
+Experiment-1 results (JSON):
+{
+  "seed": 1,
+  "budget_kb": 50,
+  "skipped": true,
+  "reason": "imagenet_not_found"
+}
+
+===== Experiment-1 – Fixed-Budget Class-Incremental Learning on ImageNet-128 | Budget: 100 kB | Seed 1 =====
+WARNING: ImageNet tar archives not found in data/imagenet. Please download them manually from https://www.image-net.org/download and place them under the given directory.
+Skipping Experiment-1 because ImageNet archives are missing.
+Experiment-1 results (JSON):
+{
+  "seed": 1,
+  "budget_kb": 100,
+  "skipped": true,
+  "reason": "imagenet_not_found"
+}
+
+===== Experiment-1 – Fixed-Budget Class-Incremental Learning on ImageNet-128 | Budget: 50 kB | Seed 2 =====
+WARNING: ImageNet tar archives not found in data/imagenet. Please download them manually from https://www.image-net.org/download and place them under the given directory.
+Skipping Experiment-1 because ImageNet archives are missing.
+Experiment-1 results (JSON):
+{
+  "seed": 2,
+  "budget_kb": 50,
+  "skipped": true,
+  "reason": "imagenet_not_found"
+}
+
+===== Experiment-1 – Fixed-Budget Class-Incremental Learning on ImageNet-128 | Budget: 100 kB | Seed 2 =====
+WARNING: ImageNet tar archives not found in data/imagenet. Please download them manually from https://www.image-net.org/download and place them under the given directory.
+Skipping Experiment-1 because ImageNet archives are missing.
+Experiment-1 results (JSON):
+{
+  "seed": 2,
+  "budget_kb": 100,
+  "skipped": true,
+  "reason": "imagenet_not_found"
+}
+
+===== Experiment-1 processing finished =====
+{
+  "all": [
+    {
+      "seed": 0,
+      "budget_kb": 50,
+      "skipped": true,
+      "reason": "imagenet_not_found"
+    },
+    {
+      "seed": 0,
+      "budget_kb": 100,
+      "skipped": true,
+      "reason": "imagenet_not_found"
+    },
+    {
+      "seed": 1,
+      "budget_kb": 50,
+      "skipped": true,
+      "reason": "imagenet_not_found"
+    },
+    {
+      "seed": 1,
+      "budget_kb": 100,
+      "skipped": true,
+      "reason": "imagenet_not_found"
+    },
+    {
+      "seed": 2,
+      "budget_kb": 50,
+      "skipped": true,
+      "reason": "imagenet_not_found"
+    },
+    {
+      "seed": 2,
+      "budget_kb": 100,
+      "skipped": true,
+      "reason": "imagenet_not_found"
+    }
+  ]
+}
+=== experiment end Fri Sep  5 16:14:52 UTC 2025 ===

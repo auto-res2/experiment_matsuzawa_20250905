@@ -6,5 +6,82 @@
     "rehearsal buffer compression",
     "sparse memory representation",
     "generative replay memory"
+  ],
+  "research_study_list": [
+    {
+      "title": "Continual Learning in Low-rank Orthogonal Subspaces"
+    },
+    {
+      "title": "Contextual Transformation Networks for Online Continual Learning"
+    },
+    {
+      "title": "Improving Task-free Continual Learning by Distributionally Robust Memory Evolution"
+    },
+    {
+      "title": "Improving Task-free Continual Learning by Distributionally Robust Memory Evolution"
+    },
+    {
+      "title": "SparCL: Sparse Continual Learning on the Edge"
+    },
+    {
+      "title": "Online Learned Continual Compression with Adaptive Quantization Modules"
+    },
+    {
+      "title": "Vector Quantization Prompting for Continual Learning"
+    },
+    {
+      "title": "Mitigating Forgetting in Online Continual Learning with  Neuron Calibration"
+    },
+    {
+      "title": "Uncertainty-guided Continual Learning with Bayesian Neural Networks"
+    },
+    {
+      "title": "Lifelong Domain Adaptation via Consolidated Internal Distribution"
+    },
+    {
+      "title": "Impossibility Results for Grammar-Compressed Linear Algebra"
+    },
+    {
+      "title": "Online Learned Continual Compression with Adaptive Quantization Modules"
+    },
+    {
+      "title": "Analysis of Stochastic Processes through Replay Buffers"
+    },
+    {
+      "title": "Analysis of Stochastic Processes through Replay Buffers"
+    },
+    {
+      "title": "On Efficient Constructions of Checkpoints"
+    },
+    {
+      "title": "On Sparse Modern Hopfield Model"
+    },
+    {
+      "title": "Kanerva++: Extending the Kanerva Machine With Differentiable, Locally Block Allocated Latent Memory"
+    },
+    {
+      "title": "Meta-Learning Sparse Implicit Neural Representations"
+    },
+    {
+      "title": "Fuzzy Tiling Activations: A Simple Approach to Learning Sparse Representations Online"
+    },
+    {
+      "title": "Multigrid Neural Memory"
+    },
+    {
+      "title": "Coherent Temporal Synthesis for Incremental Action Segmentation"
+    },
+    {
+      "title": "Associative Memories via Predictive Coding"
+    },
+    {
+      "title": "Kanerva++: Extending the Kanerva Machine With Differentiable, Locally Block Allocated Latent Memory"
+    },
+    {
+      "title": "Synthetic Experience Replay"
+    },
+    {
+      "title": "Incremental Learning of Structured Memory via Closed-Loop Transcription"
+    }
   ]
 }

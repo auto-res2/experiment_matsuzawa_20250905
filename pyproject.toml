@@ -19,7 +19,10 @@ dependencies = [
   "PyYAML",
   "torchmetrics>=1.3,<1.9",
   "pynvml>=11.5,<13.0",
-  "torch-optimizer>=3.0.0,<4.0.0",
+  # Fix: use the correct package name ("pytorch-optimizer") – version 3.x is
+  # provided under this name on PyPI, whereas the legacy "torch-optimizer"
+  # package only goes up to 0.3.x and caused dependency resolution failure.
+  "pytorch-optimizer>=3.0.0,<4.0.0",
 ]
 
 [build-system]

@@ -31,27 +31,32 @@ class AttributeMiner:
 
     def __init__(self, k: int = 25):
         self.k = k
-        # A small convnet that operates on the Grad-CAM heat-maps could be added
-        # here, however for the purpose of the demo a simple cosine-similarity
-        # based k-means clustering suffices.
+        # NOTE: _proj will be created lazily inside _heatmap on **the same device**
+        # as the current input. This prevents device-mismatch errors when switching
+        # between CPU and GPU during different stages of the test-suite.
+        self._proj: torch.Tensor | None = None  # initialised lazily
 
     # --------------------------------------------------------------------- #
     # Internal helpers                                                     #
     # --------------------------------------------------------------------- #
+    def _get_proj(self, ref: torch.Tensor) -> torch.Tensor:
+        """Return a fixed random projection tensor that lives on ref.device."""
+        if self._proj is None or self._proj.device != ref.device or self._proj.dtype != ref.dtype:
+            # Create a deterministic but random-looking projection
+            gen = torch.Generator(device=ref.device)
+            gen.manual_seed(0)  # fixed seed so CI is fully deterministic
+            self._proj = torch.randn(
+                1, 1, 7, 7, dtype=ref.dtype, device=ref.device, generator=gen
+            )
+            # No gradients needed – treat as a constant tensor
+        return self._proj
+
     def _heatmap(self, x: torch.Tensor) -> torch.Tensor:  # noqa: D401 – private helper
-        """Return a dummy Grad-CAM heat-map (placeholder)."""
-        # NOTE: The "real" implementation would make use of torch-cam. For the
-        # CI run we do not rely on heavy CAM computation – instead we return a
-        # learnable projection (fixed random matrix) in order to obtain a stable
-        # deterministic output that *resembles* a heat-map. This is sufficient
-        # for unit-testing and avoids GPU/VRAM overhead.
-        if not hasattr(self, "_proj"):
-            # lazily create a random projection so that output dims are stable
-            self._proj = nn.Parameter(torch.randn(1, 1, 7, 7), requires_grad=False)  # type: ignore[attr-defined]
+        """Return a dummy Grad-CAM heat-map (placeholder implementation)."""
         with torch.no_grad():
             # naive global average pooling to (B, 1, 1, 1) followed by broadcast
             g = x.mean(dim=(2, 3), keepdim=True)
-            heatmap = g * self._proj  # (B, 1, 7, 7)
+            heatmap = g * self._get_proj(x)  # (B, 1, 7, 7)
             return heatmap.squeeze(1)  # -> (B, 7, 7)
 
     # --------------------------------------------------------------------- #
@@ -131,7 +136,7 @@ class Trainer:
         self.model.eval()
         correct = total = 0
         for x, y, *_ in self.val_loader:  # wilds returns (x, y, metadata)
-            x = x.to(DEVICE)
+            x = x.to(DEVICE, dtype=DTYPE)
             y = y.to(DEVICE)
             logits, _ = self.model(x)
             pred = logits.argmax(1)
@@ -147,7 +152,7 @@ class Trainer:
         val_acc_history: List[float] = []
         for epoch in range(1, self.cfg["epochs"] + 1):
             for x, y, *_ in self.train_loader:  # wilds returns (x, y, metadata)
-                x = x.to(DEVICE)
+                x = x.to(DEVICE, dtype=DTYPE)
                 y = y.to(DEVICE)
                 logits, _ = self.model(x)
                 loss = self.criterion(logits, y)

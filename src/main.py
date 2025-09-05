@@ -49,7 +49,7 @@ def _skip_result(seed: int, budget_kb: int, reason: str) -> Dict[str, float]:
 
 def _persist_individual_result(res: Dict[str, float]):
     """Save individual experiment result (regardless of skipped or not)."""
-    out_dir = Path(".research") / "iteration7"
+    out_dir = Path(".research") / "iteration8"
     out_dir.mkdir(parents=True, exist_ok=True)
     res_path = out_dir / f"experiment1_seed{res['seed']}_budget{res['budget_kb']}.json"
     save_json(res, res_path)
@@ -148,8 +148,8 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
             f"Replay mem: {model.byte_size()/1024:.1f} kB"
         )
 
-    avg_acc = sum(acc_per_task) / len(acc_per_task)
-    forgetting = max(acc_per_task) - acc_per_task[-1]
+    avg_acc = sum(acc_per_task) / len(acc_per_task) if acc_per_task else 0.0
+    forgetting = max(acc_per_task) - acc_per_task[-1] if acc_per_task else 0.0
 
     fig_path = plot_line(
         list(range(len(mem_curve))),
@@ -184,7 +184,7 @@ def main():
             results_all.append(res)
 
     # Even if all runs were skipped, we persist a summary for reproducibility
-    summary_path = Path(".research") / "iteration7" / "exp1_summary.json"
+    summary_path = Path(".research") / "iteration8" / "exp1_summary.json"
     save_json({"all": results_all}, summary_path)
     print("\n===== Experiment-1 processing finished =====")
     print(json.dumps({"all": results_all}, indent=2))

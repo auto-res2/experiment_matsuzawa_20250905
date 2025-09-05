@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import List, Tuple
+import warnings
 
 import torch
 import torch.nn as nn
@@ -36,9 +37,23 @@ def _get_feature_extractor() -> Tuple[nn.Module, int]:
     The final 512-D feature vector is projected down to 256-D as specified
     in the YAML config.
     """
-    backbone = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+    # ------------------------------------------------------------------
+    # Attempt to load *pre-trained* weights.  If this fails (e.g. because the
+    # execution environment is completely off-line) we fall back to random
+    # initialisation but continue with a clear warning rather than crashing.
+    # ------------------------------------------------------------------
+    try:
+        backbone = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+    except Exception as e:  # pragma: no cover – only hit in off-line CI
+        warnings.warn(
+            f"Could not load pre-trained ResNet-18 weights (reason: {e}). "
+            "Proceeding with randomly initialised weights instead.",
+            RuntimeWarning,
+        )
+        backbone = models.resnet18(weights=None)
+
     # Remove the final fully-connected layer.
-    backbone_layers = list(backbone.children())[:-1]  # Global average-pool output → (B, 512, 1, 1)
+    backbone_layers = list(backbone.children())[:-1]  # Global average-pool → (B,512,1,1)
     feature_extractor = nn.Sequential(*backbone_layers, nn.Flatten())  # (B, 512)
     out_dim = 512
     proj_dim = CONFIG["models"]["backbone_imagenet"]["feature_dim"]

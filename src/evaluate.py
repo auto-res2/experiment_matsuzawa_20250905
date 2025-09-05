@@ -15,10 +15,10 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, mutual_info_score
 
 # ──────────────────────────────────────────────────────────────────────────────
-#  Figure output directory (iteration *7*)
+#  Figure output directory (iteration *8*)
 # ──────────────────────────────────────────────────────────────────────────────
 
-_IMAGES_DIR = Path(".research/iteration7/images")
+_IMAGES_DIR = Path(".research/iteration8/images")
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────────────────────────

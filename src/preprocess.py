@@ -57,6 +57,11 @@ CACHE_DIR = DATA_DIR / "processed"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def _edge_cache_path(curv_file: Path) -> Path:
+    """Return the companion cache path storing the ordered edge list."""
+    return curv_file.parent / f"{curv_file.stem}_edges.npy"
+
+
 @lru_cache(maxsize=None)
 def load_dataset(name: str) -> Data:
     """Load a dataset and augment it with degree, curvature and Laplacian data.
@@ -87,9 +92,10 @@ def load_dataset(name: str) -> Data:
 
     # Ollivier–Ricci curvature ----------------------------------------------
     curv_file = CACHE_DIR / f"{name_l}_edge_curv.npy"
-    if curv_file.exists():
+    edges_file = _edge_cache_path(curv_file)
+    if curv_file.exists() and edges_file.exists():
         edge_curv = np.load(curv_file)
-        edges_ordered = np.load(curv_file.with_suffix("_edges.npy"))
+        edges_ordered = np.load(edges_file)
     else:
         print(f"Computing Ollivier–Ricci curvature for {name} (one-off)…")
         # Build graph without self-loops for curvature computation -------------
@@ -113,7 +119,7 @@ def load_dataset(name: str) -> Data:
         )
         # cache
         np.save(curv_file, edge_curv)
-        np.save(curv_file.with_suffix("_edges.npy"), np.asarray(edges_ordered, dtype=np.int64))
+        np.save(edges_file, np.asarray(edges_ordered, dtype=np.int64))
 
     data.edge_curv = torch.tensor(edge_curv, dtype=torch.float)
 

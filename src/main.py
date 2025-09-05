@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 """
 src/main.py – experiment orchestrator
 Run with:   python -m src.main
 """
-from __future__ import annotations
 
 import os
 from pathlib import Path
@@ -30,8 +31,25 @@ METHOD_FACTORY = {
 
 
 def _load_yaml(path: Path) -> Dict:
+    """Safely load a YAML configuration file."""
     with path.open("r", encoding="utf-8") as fh:
         return yaml.safe_load(fh)
+
+
+def _find_default_cfg() -> Path:
+    """Return the path to the default experiment YAML.
+
+    Historically the repo expected a file named ``default.yaml`` but the
+    template ships with ``config.yaml``.  We search for both so that either
+    naming convention works out-of-the-box and users are free to rename their
+    config file without touching any code.
+    """
+    for candidate in (CFG_DIR / "default.yaml", CFG_DIR / "config.yaml"):
+        if candidate.exists():
+            return candidate
+    raise FileNotFoundError(
+        "No experiment configuration file found – expected 'default.yaml' or 'config.yaml' inside the 'config/' folder."
+    )
 
 
 def _run_one_experiment(exp_cfg: Dict):
@@ -66,6 +84,7 @@ if __name__ == "__main__":
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-    cfg = _load_yaml(CFG_DIR / "default.yaml")
+    cfg_path = _find_default_cfg()
+    cfg = _load_yaml(cfg_path)
     for exp in cfg["experiments"]:
         _run_one_experiment(exp)

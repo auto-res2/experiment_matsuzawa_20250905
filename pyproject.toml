@@ -29,5 +29,19 @@ cuda = [
     "pynvml; platform_system=='Linux' and extra=='cuda'",
 ]
 
+# ----------------------------------------------------------------------
+#  Setuptools configuration – explicit package discovery & data files
+# ----------------------------------------------------------------------
+[tool.setuptools]
+# Tell setuptools that all Python packages live under the ``src``
+# directory so that they are discovered correctly when building the
+# wheel/editable installation.
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Include YAML config files inside the final wheel (so that the code can
+# locate them at run-time) irrespective of the exact module they live in.
 [tool.setuptools.package-data]
-"" = ["config/*.yaml"]
+"*" = ["config/*.yaml"]

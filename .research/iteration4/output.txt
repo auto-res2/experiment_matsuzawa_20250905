@@ -1,0 +1,5 @@
+=== uv sync start Fri Sep  5 09:53:32 UTC 2025 ===
+=== uv install end Fri Sep  5 09:54:06 UTC 2025 ===
+=== experiment start Fri Sep  5 09:54:06 UTC 2025 ===
+Running EXP-1 (memory/accuracy curve)…
+[EXP-1] budget=2MB  method=hcer        ACC= 2.98  wall= 3.1 min

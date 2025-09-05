@@ -260,6 +260,13 @@ class CLoVeSub(_BaseAlgo):
     def __init__(self, exp_cfg: Dict[str, Any], method_cfg: Dict[str, Any]):
         super().__init__(exp_cfg, method_cfg)
         rank = method_cfg.get("rank", 16)
+
+        # Replace the classification head to match the projected feature size
+        # (rank) instead of the original backbone feature dimension (512).
+        # This must happen BEFORE the optimiser is reinstantiated so that the
+        # new head's parameters are included.
+        self.head = nn.Linear(rank, exp_cfg["dataset"]["num_classes_total"]).to(self.device)
+
         self.projector = StiefelProjector(self.feat_dim, rank).to(self.device)
         self.vq = VQLite().to(self.device)
         self.adapter = nn.Sequential(
@@ -268,7 +275,7 @@ class CLoVeSub(_BaseAlgo):
         self.buffer = LatentBuffer(method_cfg["buffer_bytes"], self.vq.code_dim)
         self.sparsity = method_cfg.get("sparsity", 0.2)
 
-        # Re-initialise optimiser now that projector / adapter are added.
+        # Re-initialise optimiser now that projector / adapter / new head are added.
         self.opt = torch.optim.SGD(
             self.parameters(), lr=exp_cfg["optim"]["lr"], momentum=0.9
         )

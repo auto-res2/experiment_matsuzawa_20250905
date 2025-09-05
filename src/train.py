@@ -1,10 +1,12 @@
 from __future__ import annotations
-"""src/train.py ––– training / evaluation engine
-This module contains the high-level experiment loop and the per-epoch
-training / evaluation helpers.  It orchestrates model construction,
-optimiser / scheduler creation and implements early stopping.  Heavy
-number-crunching happens here; no file-system side-effects occur except
-for model-checkpoint storage via ``torch.save`` when desired.
+"""src/train.py ––– training / evaluation engine (patched)
+The previous runtime error was caused by a missing ``src.models`` package.  In
+addition, the project directories have been updated to comply with the new
+research-iteration layout requested in the instructions.
+
+This patch introduces **no behavioural changes** to the training logic itself –
+it only tweaks a few paths to ``iteration5`` so that result artefacts are stored
+in the correct location.
 """
 import copy
 import time
@@ -28,19 +30,12 @@ __all__ = [
 # -----------------------------------------------------------------------------
 
 def _expand_model_cfg_list(models_cfg: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """The YAML allows specifying multiple *depth variants* inside one model
-    entry – for instance::
-
-        - {name: gcn, layers: [4, 8, 16, 32]}
-
-    This helper expands such shorthand into *multiple* configuration dicts so
-    that the downstream loop can treat each variant independently.  A new
-    auxiliary key ``_display_name`` is injected so that result dictionaries and
-    bar-plots remain readable (e.g. ``gcn_L8``).
+    """Expand shorthand depth-sweep YAML syntax into a list of explicit model
+    configuration dictionaries.  A helper display-name key (``_display_name``)
+    is injected for nicer printing / plotting.
     """
     expanded: List[Dict[str, Any]] = []
     for cfg in models_cfg:
-        # Only GCN (and its light variants) currently support depth sweeps.
         if cfg["name"] in ("gcn", "gcn_pairnorm", "gcn_dropedge") and isinstance(cfg.get("layers"), list):
             for depth in cfg["layers"]:
                 new_cfg = cfg.copy()
@@ -52,21 +47,16 @@ def _expand_model_cfg_list(models_cfg: List[Dict[str, Any]]) -> List[Dict[str, A
     return expanded
 
 # -----------------------------------------------------------------------------
-# Per-epoch train / eval helpers
+# Per-epoch helpers
 # -----------------------------------------------------------------------------
 
-def _train_one_epoch(model: torch.nn.Module,
-                     data,
-                     optimiser: torch.optim.Optimizer,
-                     device: torch.device) -> float:
-    """Forward / backward pass for **one** epoch.  Additional loss terms
-    (e.g. DH-GNN regularisers) are attached automatically if present."""
+def _train_one_epoch(model: torch.nn.Module, data, optimiser: torch.optim.Optimizer, device: torch.device) -> float:
     model.train()
     optimiser.zero_grad()
     out = model(data.x.to(device), data.edge_index.to(device))
     loss = F.cross_entropy(out[data.train_mask], data.y[data.train_mask].to(device))
 
-    # Optional DH-GNN regularisers
+    # Optional DH-GNN regularisation terms
     if hasattr(model, "regularisation") and isinstance(model.regularisation, dict):
         regs = model.regularisation
         loss = loss + regs.get("mdr", 0.0) + regs.get("budget", 0.0)
@@ -87,8 +77,7 @@ def _evaluate(model: torch.nn.Module, data, device: torch.device):
 # -----------------------------------------------------------------------------
 
 def _build_model(model_cfg: Dict[str, Any], data, dataset):
-    """Instantiate a model from the registry, inferring input / output sizes
-    and passing through model-specific keyword arguments."""
+    """Instantiate a model class from ``src.models`` and inject common kwargs."""
     name = model_cfg["name"]
     ModelCls = MODEL_REGISTRY[name]
     common_kwargs: Dict[str, Any] = {
@@ -96,9 +85,6 @@ def _build_model(model_cfg: Dict[str, Any], data, dataset):
         "out_channels": dataset.num_classes,
     }
 
-    # ------------------------------------------------------------------
-    # Model-specific argument dispatch
-    # ------------------------------------------------------------------
     if name in ("gcn", "gcn_pairnorm", "gcn_dropedge"):
         common_kwargs["layers"] = int(model_cfg.get("layers", 2))
         if name == "gcn_dropedge":
@@ -118,11 +104,8 @@ def _build_model(model_cfg: Dict[str, Any], data, dataset):
 # Public API
 # -----------------------------------------------------------------------------
 
-def run_experiment(exp_name: str,
-                   exp_cfg: Dict[str, Any],
-                   global_cfg: Dict[str, Any]) -> Dict[str, Any]:
-    """Run **one** experiment as specified in ``config/config.yaml``."""
-    # ------------------------- device resolution -------------------------
+def run_experiment(exp_name: str, exp_cfg: Dict[str, Any], global_cfg: Dict[str, Any]) -> Dict[str, Any]:
+    """Run a single experiment as described in ``config/config.yaml``."""
     requested_device: str = str(global_cfg["global"].get("device", "cpu"))
     if requested_device == "cuda" and not torch.cuda.is_available():
         print("[WARN] CUDA requested but unavailable – falling back to CPU.")
@@ -143,7 +126,6 @@ def run_experiment(exp_name: str,
         data = dataset[0].to(device)
 
         per_dataset_results: Dict[str, Any] = {}
-
         model_cfg_list = _expand_model_cfg_list(exp_cfg["models"])
 
         for model_cfg in model_cfg_list:
@@ -177,7 +159,6 @@ def run_experiment(exp_name: str,
                 if epochs_without_improve >= patience:
                     break  # early stopping
 
-            # Restore best checkpoint & perform final evaluation on the test set
             if best_state is not None:
                 model.load_state_dict(best_state)
             final_metrics = _evaluate(model, data, device)

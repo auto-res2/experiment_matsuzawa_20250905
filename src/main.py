@@ -1,12 +1,5 @@
 from __future__ import annotations
-"""src/main.py ––– project entry-point
-This script orchestrates the full experimental pipeline:
-    1. directory bootstrap (.research/iteration4/…)
-    2. configuration loading (YAML)
-    3. experiment execution (train.py)
-    4. result / figure persistence
-    5. stdout JSON echo for CI verification
-"""
+"""src/main.py ––– project entry-point (patched for iteration5 layout)"""
 import json
 import sys
 import textwrap
@@ -21,16 +14,16 @@ from .evaluate import generate_all_figures
 from .utils import banner, set_global_seed
 
 # ---------------------------------------------------------------------------
-# 0.  Reproducibility & deterministic behaviour
+# 0.  Reproducibility
 # ---------------------------------------------------------------------------
 set_global_seed(42)
 print(banner("Dynamic Halting GNN – Reproducible Experiment Suite"))
 
 # ---------------------------------------------------------------------------
-# 1.  Directory bootstrap (.research/iteration4/*)
+# 1.  Directory bootstrap (.research/iteration5/*)
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-RESEARCH_DIR = PROJECT_ROOT / ".research" / "iteration4"
+RESEARCH_DIR = PROJECT_ROOT / ".research" / "iteration5"
 IMAGES_DIR = RESEARCH_DIR / "images"
 
 for d in (RESEARCH_DIR, IMAGES_DIR):
@@ -53,7 +46,7 @@ with open(CONFIG_PATH, "r", encoding="utf8") as f:
 print(f"[INFO] Configuration loaded from {CONFIG_PATH}")
 
 # ---------------------------------------------------------------------------
-# 3.  Main loop over experiments
+# 3.  Helpers
 # ---------------------------------------------------------------------------
 
 def _save_json(d: Dict[str, Any], path: Path):
@@ -77,7 +70,7 @@ def main() -> None:
         _save_json(results, json_out_path)
         all_results[exp_name] = results
 
-        # ---- CLI verification ------------------------------------------------
+        # ---- CLI verification ------------------------------------------
         print("\n=====  EXPERIMENT DESCRIPTION  =====")
         print(textwrap.fill(exp_cfg["description"], width=100))
 
@@ -85,12 +78,12 @@ def main() -> None:
         print(json.dumps(results, indent=2))
         print(f"[INFO] Individual result saved → {json_out_path}")
 
-        # ---- figure generation -----------------------------------------------
+        # ---- figure generation -----------------------------------------
         generate_all_figures(exp_name, results, IMAGES_DIR)
 
-    # ---------------------------------------------------------------------
-    # Final combined JSON dump (useful for GitHub Actions artefact check)   
-    # ---------------------------------------------------------------------
+    # -----------------------------------------------------------------
+    # Combined JSON dump (checked in CI)
+    # -----------------------------------------------------------------
     final_path = RESEARCH_DIR / "all_experiments.json"
     _save_json(all_results, final_path)
 

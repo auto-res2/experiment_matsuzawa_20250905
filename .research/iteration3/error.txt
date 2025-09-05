@@ -1,0 +1,11 @@
+Downloading cpython-3.11.13-linux-x86_64-gnu (download) (27.7MiB)
+ Downloading cpython-3.11.13-linux-x86_64-gnu (download)
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 126 packages in 1.30s
+error: Distribution `proxsuite==0.7.2.post1 @ registry+https://pypi.org/simple` can't be installed because it doesn't have a source distribution or wheel for the current platform
+
+hint: You're using CPython 3.11 (`cp311`), but `proxsuite` (v0.7.2.post1) only has wheels with the following Python ABI tag: `cp310`
+error: Distribution `proxsuite==0.7.2.post1 @ registry+https://pypi.org/simple` can't be installed because it doesn't have a source distribution or wheel for the current platform
+
+hint: You're using CPython 3.11 (`cp311`), but `proxsuite` (v0.7.2.post1) only has wheels with the following Python ABI tag: `cp310`

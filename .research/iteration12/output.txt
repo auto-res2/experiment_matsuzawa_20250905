@@ -1,0 +1,8 @@
+=== uv sync start Fri Sep  5 14:34:02 UTC 2025 ===
+=== uv install end Fri Sep  5 14:34:35 UTC 2025 ===
+=== experiment start Fri Sep  5 14:34:35 UTC 2025 ===
+
+==== EXPERIMENT ====
+CIFAR-100 (20 tasks × 5 classes) – memory/accuracy trade-off
+====================
+

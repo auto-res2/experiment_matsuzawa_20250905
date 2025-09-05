@@ -1,0 +1,53 @@
+experiments:
+  - id: exp1_waterbirds
+    description: |
+      Experiment 1 – Waterbirds worst-group accuracy with GCID vs baselines.
+    dataset:
+      name: waterbirds
+      wilds_key: waterbirds
+      url: https://nlp.stanford.edu/data/dro/waterbird_complete95_forest2water2.tar.gz
+    backbone: convnext_tiny.in12k
+    epochs: 10
+    batch_size: 32
+    lr: 3e-4
+    k_clusters: 25
+    guidance_scale: 7.5
+    diffusion_steps: 25
+    lambda_kl: 2.0
+    lambda_cos: 0.5
+    lambda_dro: 0.2
+
+  - id: exp1_celeba
+    description: |
+      Experiment 1 – CelebA-Hair balanced accuracy with GCID vs baselines.
+    dataset:
+      name: celeba_hair
+      wilds_key: celeba
+      url: https://mmlab.ie.cuhk.edu.hk/projects/CelebA.html
+    backbone: convnext_tiny.in12k
+    epochs: 10
+    batch_size: 32
+    lr: 3e-4
+    k_clusters: 30
+    guidance_scale: 7.5
+    diffusion_steps: 25
+    lambda_kl: 2.0
+    lambda_cos: 0.5
+    lambda_dro: 0.2
+
+  - id: exp2_mini_imagenet_bg
+    description: |
+      Experiment 2 – Mini-ImageNet synthetic background shift.
+    dataset:
+      name: mini_imagenet_bg
+      url: https://huggingface.co/datasets/timm/mini-imagenet
+    backbone: vit_base_patch16_224
+    epochs: 5
+    batch_size: 64
+    lr: 5e-4
+    k_clusters: 40
+    guidance_scale: 6.0
+    diffusion_steps: 25
+    lambda_kl: 2.0
+    lambda_cos: 0.5
+    lambda_dro: 0.2

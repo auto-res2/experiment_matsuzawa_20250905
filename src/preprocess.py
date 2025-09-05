@@ -24,7 +24,8 @@ DTYPE = torch.float16 if DEVICE.type == "cuda" else torch.float32
 ROOT = Path.cwd()
 DATA_DIR = ROOT / "data"
 OUTPUT_DIR = ROOT / "outputs"
-FIG_DIR = ROOT / ".research" / "iteration1" / "images"
+# Updated per instructions – all images must be saved under .research/iteration2/images
+FIG_DIR = ROOT / ".research" / "iteration2" / "images"
 for d in (DATA_DIR, OUTPUT_DIR, FIG_DIR):
     d.mkdir(parents=True, exist_ok=True)
 

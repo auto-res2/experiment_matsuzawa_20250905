@@ -5,18 +5,19 @@ description = "GCID – Generative Causal Interventions with Diffusion"
 requires-python = ">=3.10"
 readme = "README.md"
 
-[project.dependencies]
-torch = "*"
-torchvision = "*"
-wilds = "*"
-timm = "*"
-faiss-gpu = "*"
-torchcam = "*"
-diffusers = "*"
-transformers = "*"
-matplotlib = "*"
-seaborn = "*"
-PyYAML = "*"
+dependencies = [
+    "torch",
+    "torchvision",
+    "wilds",
+    "timm",
+    "faiss-gpu",
+    "torchcam",
+    "diffusers",
+    "transformers",
+    "matplotlib",
+    "seaborn",
+    "PyYAML",
+]
 
 [build-system]
 requires = ["setuptools>=61.0"]

@@ -36,7 +36,7 @@ if torch.cuda.is_available():
 # Experiment-1 (ImageNet-128) --------------------------------------------------
 # -----------------------------------------------------------------------------
 
-_RESEARCH_ROOT = Path(".research") / "iteration12"
+_RESEARCH_ROOT = Path(".research") / "iteration13"
 
 
 def _skip_result(seed: int, budget_kb: int, reason: str) -> Dict[str, Any]:
@@ -81,8 +81,12 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, Any]:
         num_classes=1000,
     ).to(device)
 
-    opt_cfg = CONFIG["global"]["optimiser"]
-    optimiser = torch.optim.AdamW(model.parameters(), **opt_cfg)
+    raw_opt_cfg = CONFIG["global"]["optimiser"]
+    # Strip keys that are **not** accepted by torch.optim.AdamW, but keep the full
+    # dictionary around for auxiliary settings such as grad clipping.
+    adamw_kwargs = {k: v for k, v in raw_opt_cfg.items() if k not in {"name", "grad_clip"}}
+    optimiser = torch.optim.AdamW(model.parameters(), **adamw_kwargs)
+    grad_clip_val = raw_opt_cfg.get("grad_clip", 1.0)
 
     scaler = (
         torch.cuda.amp.GradScaler(enabled=CONFIG["global"]["mixed_precision"])
@@ -118,14 +122,14 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, Any]:
             if scaler is not None:
                 scaler.scale(loss).backward()
                 torch.nn.utils.clip_grad_norm_(
-                    model.parameters(), opt_cfg["grad_clip"]
+                    model.parameters(), grad_clip_val
                 )
                 scaler.step(optimiser)
                 scaler.update()
             else:
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(
-                    model.parameters(), opt_cfg["grad_clip"]
+                    model.parameters(), grad_clip_val
                 )
                 optimiser.step()
 

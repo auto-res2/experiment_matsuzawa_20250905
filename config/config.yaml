@@ -1,7 +1,7 @@
 global:
   framework: PyTorch
   torch_version: ">=2.1.0,<2.2.0"
-  torchvision_version: ">=0.18.0,<0.19.0"
+  torchvision_version: ">=0.16.0,<0.17.0"  # aligned with torch 2.1.x
   device: cuda
   mixed_precision: true
   optimiser:

@@ -53,16 +53,41 @@ class StiefelProjector(nn.Module):
 
     def __init__(self, in_dim: int, rank: int = 16):
         super().__init__()
-        if geoopt is None:
-            raise ImportError(
-                "geoopt is required for the StiefelProjector – install via `pip install geoopt`."
-            )
-        self.weight = geoopt.ManifoldParameter(  # type: ignore
-            torch.empty(in_dim, rank), manifold=geoopt.Stiefel()
-        )
-        nn.init.orthogonal_(self.weight)
 
+        # geoopt available  ➜ use proper manifold parameter
+        if geoopt is not None:
+            self.weight = geoopt.ManifoldParameter(  # type: ignore[attr-defined]
+                torch.empty(in_dim, rank), manifold=geoopt.Stiefel()  # type: ignore[attr-defined]
+            )
+            nn.init.orthogonal_(self.weight)
+            self._use_geoopt = True
+        # geoopt NOT available  ➜ fall back to unconstrained parameter
+        else:
+            self.weight = nn.Parameter(torch.empty(in_dim, rank))
+            nn.init.orthogonal_(self.weight)
+            self.register_buffer("_warned", torch.tensor(0, dtype=torch.uint8), persistent=False)
+            self._use_geoopt = False
+
+    # ------------------------------------------------------------------
+    def _retract(self) -> None:
+        """Re-orthogonalise the weight (QR retraction) – cheap for small ranks."""
+        # Only called when geoopt is unavailable.
+        with torch.no_grad():
+            # QR guarantees orthogonal columns; keep leading `rank` columns.
+            q, _ = torch.linalg.qr(self.weight.data, mode="reduced")
+            self.weight.data.copy_(q[:, : self.weight.shape[1]])
+
+    # ------------------------------------------------------------------
     def forward(self, x: torch.Tensor) -> torch.Tensor:  # noqa: D401
+        if not self._use_geoopt:
+            # First forward call prints a warning exactly once.
+            if self._warned.item() == 0:
+                print(
+                    "[StiefelProjector] geoopt not installed – falling back to "
+                    "unconstrained parameter with QR re-projection. Install geoopt "
+                    "for true manifold optimisation.")
+                self._warned.fill_(1)
+            self._retract()
         return x @ self.weight  # [B, rank]
 
 

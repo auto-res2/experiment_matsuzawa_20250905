@@ -1,7 +1,3 @@
-"""
-main.py – orchestrates all experiments using the refactored modules
-Run with:  python -m src.main
-"""
 from __future__ import annotations
 
 import math
@@ -30,7 +26,7 @@ from .train import (
 from .evaluate import plot_line
 
 # fixed image directory -------------------------------------------------------
-IMG_DIR = Path(".research/iteration1/images")
+IMG_DIR = Path(".research/iteration2/images")  # Updated path
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 

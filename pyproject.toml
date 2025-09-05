@@ -7,16 +7,18 @@ name = "afngnn-research"
 version = "0.1.0"
 description = "Adaptive Frequency-band Node-wise GNN experimental suite"
 requires-python = ">=3.9"
-authors = [{name = "Researcher"}]
+authors = [{ name = "Researcher" }]
 
-[project.dependencies]
-torch = ">=2.0"
-torch-geometric = "*"
-PyYAML = "*"
-matplotlib = "*"
-seaborn = "*"
-scikit-learn = "*"
-requests = "*"
-networkx = "*"
-GraphRicciCurvature = "==0.5.3.2"
-deeprobust = "*"
+# Proper PEP 621 dependencies list (array)
+dependencies = [
+    "torch>=2.0",
+    "torch-geometric",
+    "PyYAML",
+    "matplotlib",
+    "seaborn",
+    "scikit-learn",
+    "requests",
+    "networkx",
+    "GraphRicciCurvature==0.5.3.2",
+    "deeprobust",
+]

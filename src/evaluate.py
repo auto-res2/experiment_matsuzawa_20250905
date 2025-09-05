@@ -1,6 +1,3 @@
-"""
-evaluate.py – evaluation metrics and plotting helpers
-"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -9,12 +6,14 @@ from typing import Dict, List
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import torch  # Added missing import
 from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, mutual_info_score
 
 matplotlib.use("Agg")
 
-_IMAGES_DIR = Path(".research/iteration1/images")
+# Update images directory to iteration2 as per instructions
+_IMAGES_DIR = Path(".research/iteration2/images")
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 

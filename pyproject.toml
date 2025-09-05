@@ -1,1 +1,22 @@
-# Please list the required python packages.
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[project]
+name = "dhgnn-research"
+version = "0.1.0"
+description = "Dynamic Halting GNN – research code refactored into a modular package"
+readme = "README.md"
+authors = [{name = "Researcher", email = "research@lab.ai"}]
+requires-python = ">=3.9"
+
+# --------------------------------------------------------------------------
+# Direct runtime dependencies (GPU-ready wheels assumed pre-installed)
+# --------------------------------------------------------------------------
+[project.dependencies]
+torch = "*"                     # CUDA build should already be present in env
+torch-geometric = "*"
+ogb = "*"
+pyyaml = "*"
+matplotlib = "*"
+seaborn = "*"
+scipy = "*"

@@ -6,5 +6,82 @@
     "lifelong learning parameter pruning",
     "continual learning coreset selection",
     "continual learning knowledge distillation"
+  ],
+  "research_study_list": [
+    {
+      "title": "Online Learned Continual Compression with Adaptive Quantization Modules"
+    },
+    {
+      "title": "Remember the Past: Distilling Datasets into Addressable Memories for Neural Networks"
+    },
+    {
+      "title": "Contextual Transformation Networks for Online Continual Learning"
+    },
+    {
+      "title": "Forget-free Continual Learning with Winning Subnetworks"
+    },
+    {
+      "title": "Forget-free Continual Learning with Winning Subnetworks"
+    },
+    {
+      "title": "Incremental few-shot learning via vector quantization in deep embedded space"
+    },
+    {
+      "title": "Online Learned Continual Compression with Adaptive Quantization Modules"
+    },
+    {
+      "title": "The Quantization Model of Neural Scaling"
+    },
+    {
+      "title": "Transformers learn through gradual rank increase"
+    },
+    {
+      "title": "ClimbQ: Class Imbalanced Quantization Enabling Robustness on Efficient Inferences"
+    },
+    {
+      "title": "Long Live the Lottery: The Existence of Winning Tickets in Lifelong Learning"
+    },
+    {
+      "title": "Task Difficulty Aware Parameter Allocation & Regularization for Lifelong Learning"
+    },
+    {
+      "title": "Neural Topic Modeling with Continual Lifelong Learning"
+    },
+    {
+      "title": "In value-based deep reinforcement learning, a pruned network is a good network"
+    },
+    {
+      "title": "Lifelong Language Pretraining with Distribution-Specialized Experts"
+    },
+    {
+      "title": "Probabilistic Bilevel Coreset Selection"
+    },
+    {
+      "title": "Probabilistic Bilevel Coreset Selection"
+    },
+    {
+      "title": "Coresets via Bilevel Optimization for Continual Learning and Streaming"
+    },
+    {
+      "title": "Bilevel Coreset Selection in Continual Learning: A New Formulation and Algorithm"
+    },
+    {
+      "title": "Coverage-centric Coreset Selection for High Pruning Rates"
+    },
+    {
+      "title": "Rethinking Momentum Knowledge Distillation in Online Continual Learning"
+    },
+    {
+      "title": "Heterogeneous Continual Learning"
+    },
+    {
+      "title": "Prototype-Sample Relation Distillation: Towards Replay-Free Continual Learning"
+    },
+    {
+      "title": "Preserving Linear Separability in Continual Learning by Backward Feature Projection"
+    },
+    {
+      "title": "Provable Contrastive Continual Learning"
+    }
   ]
 }

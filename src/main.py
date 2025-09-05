@@ -17,7 +17,8 @@ from typing import Dict, Any, List
 # ----------------- third-party -----------------------------------
 import yaml
 import torch
-from torch_geometric.nn import GCN, GCN2, GCNConv, Sequential
+from torch_geometric.nn import GCNConv, Sequential  # Sequential lives here
+from torch_geometric.nn.models import GCN, GCN2      # GCN / GCNII models live under .models
 
 # ----------------- project modules -------------------------------
 from .preprocess import (

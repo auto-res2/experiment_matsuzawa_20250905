@@ -1,0 +1,6 @@
+{
+  "seed": 2,
+  "budget_kb": 100,
+  "skipped": true,
+  "reason": "imagenet_not_found"
+}

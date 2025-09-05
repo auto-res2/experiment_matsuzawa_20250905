@@ -17,8 +17,56 @@ from typing import Dict, Any, List
 # ----------------- third-party -----------------------------------
 import yaml
 import torch
+import torch.nn.functional as F
 from torch_geometric.nn import GCNConv, Sequential  # Sequential lives here
-from torch_geometric.nn.models import GCN, GCN2      # GCN / GCNII models live under .models
+
+# -----------------------------------------------------------------
+#  Robust import of reference models (GCN/GCNII)                    
+# -----------------------------------------------------------------
+try:
+    from torch_geometric.nn.models import GCN, GCN2  # noqa: WPS433 – third-party optional import
+except (ImportError, AttributeError):
+    # The high-level model wrappers were removed in recent PyG versions.
+    # We fall back to lightweight re-implementations to keep the code working.
+    try:
+        from torch_geometric.nn.models import GCN  # type: ignore
+    except (ImportError, AttributeError):
+        GCN = None  # type: ignore
+
+    from torch_geometric.nn.conv import GCN2Conv
+
+    class GCN2(torch.nn.Module):  # type: ignore
+        """Minimal re-implementation of GCNII (a.k.a. GCN2 in PyG)."""
+
+        def __init__(
+            self,
+            num_layers: int,
+            in_channels: int,
+            hidden_channels: int,
+            out_channels: int,
+            dropout: float = 0.5,
+            alpha: float = 0.1,
+            lamda: float = 0.5,
+        ) -> None:
+            super().__init__()
+            self.dropout = float(dropout)
+            self.lin_in = torch.nn.Linear(in_channels, hidden_channels)
+            self.convs = torch.nn.ModuleList(
+                [GCN2Conv(hidden_channels, alpha, lamda, num_layers) for _ in range(num_layers)]
+            )
+            self.lin_out = torch.nn.Linear(hidden_channels, out_channels)
+            self.log_softmax = torch.nn.LogSoftmax(dim=-1)
+
+        def forward(self, x, edge_index):  # noqa: D401 – standard forward signature
+            x0 = x  # initial representation for residual fusion
+            x = F.dropout(x, p=self.dropout, training=self.training)
+            x = self.lin_in(x).relu()
+            for conv in self.convs:
+                x = F.dropout(x, p=self.dropout, training=self.training)
+                x = conv(x, x0, edge_index).relu()
+            x = F.dropout(x, p=self.dropout, training=self.training)
+            x = self.lin_out(x)
+            return self.log_softmax(x)
 
 # ----------------- project modules -------------------------------
 from .preprocess import (
@@ -50,10 +98,17 @@ set_seed(SEED)
 def _build_model(model_name: str, data, depth: int) -> torch.nn.Module:
     """Return an instantiated model given its string identifier."""
     hidden = CONFIG["global"]["hidden_dim"]
-    out_dim = int(data.y.max()) + 1
+    out_dim = int(data.y.max().item()) + 1
     in_dim = data.x.size(-1)
 
     if model_name == "GCN":
+        if GCN is None:
+            # fallback to a shallow manual implementation if import failed
+            layers = []
+            dims = [in_dim] + [hidden] * (depth - 1) + [out_dim]
+            for i in range(depth):
+                layers.append(GCNConv(dims[i], dims[i + 1]))
+            return Sequential("x, edge_index", [(l, "x, edge_index -> x") for l in layers], torch.nn.LogSoftmax(dim=-1))
         return GCN(
             in_channels=in_dim,
             hidden_channels=hidden,

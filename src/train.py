@@ -27,7 +27,8 @@ from .preprocess import (  # local utilities / constants
 REQ = {
     "wilds": "wilds (pip install wilds)",
     "timm": "timm (pip install timm)",
-    "faiss": "faiss-gpu (conda install faiss-gpu ‑c pytorch)",
+    # switched to CPU variant – compatible wheels exist for Python ≥3.11
+    "faiss": "faiss-cpu (pip install faiss-cpu)",
     "torchcam": "torchcam (pip install torchcam)",
     "diffusers": "diffusers[torch] (pip install diffusers[torch])",
     "transformers": "transformers (pip install transformers)",
@@ -104,6 +105,8 @@ class AttributeMiner:
     def mine(self, dataset, limit: int = 2_000) -> Tuple[List[int], faiss.Kmeans]:  # type: ignore[valid-type]
         """Return cluster-id per sampled element & the fitted k-means object."""
         import random
+
+        # Prepare feature matrix ------------------------------------------------
         heatmaps: List[torch.Tensor] = []
         sample_idxs = random.sample(range(len(dataset)), k=min(limit, len(dataset)))
         for idx in sample_idxs:
@@ -112,7 +115,10 @@ class AttributeMiner:
             heatmaps.append(self._heatmap(img).cpu())
         maps = torch.stack(heatmaps).view(len(heatmaps), -1).numpy().astype("float32")
         faiss.normalize_L2(maps)
-        km = faiss.Kmeans(d=maps.shape[1], k=self.k, niter=20, gpu=True, verbose=True)
+
+        # Decide whether FAISS has GPU support ----------------------------------
+        has_gpu = hasattr(faiss, "StandardGpuResources") and torch.cuda.is_available()
+        km = faiss.Kmeans(d=maps.shape[1], k=self.k, niter=20, gpu=has_gpu, verbose=True)
         km.train(maps)
         _, I = km.index.search(maps, 1)  # noqa: N806 – FAISS style
         return I.squeeze().tolist(), km
@@ -185,7 +191,7 @@ class Trainer:
             correct += (pred == y).sum().item()
             total += y.size(0)
         self.model.train()
-        return correct / total
+        return correct / total if total > 0 else 0.0
 
     # --------------------------------------------------------------------- #
     # public API                                                            #

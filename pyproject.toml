@@ -10,7 +10,8 @@ dependencies = [
     "torchvision",
     "wilds",
     "timm",
-    "faiss-gpu",
+    # switched to CPU build due to lack of GPU wheels for Python 3.11
+    "faiss-cpu>=1.7.4",
     "torchcam",
     "diffusers",
     "transformers",

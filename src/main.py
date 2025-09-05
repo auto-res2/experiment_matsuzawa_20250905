@@ -47,6 +47,16 @@ def _skip_result(seed: int, budget_kb: int, reason: str) -> Dict[str, float]:
     }
 
 
+def _persist_individual_result(res: Dict[str, float]):
+    """Save individual experiment result (regardless of skipped or not)."""
+    out_dir = Path(".research") / "iteration6"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    res_path = out_dir / f"experiment1_seed{res['seed']}_budget{res['budget_kb']}.json"
+    save_json(res, res_path)
+    print("Experiment-1 results (JSON):")
+    print(json.dumps(res, indent=2))
+
+
 def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
     desc = CONFIG["experiments"]["exp1"]["description"]
     print(f"\n===== Experiment-1 – {desc} | Budget: {budget_kb} kB | Seed {seed} =====")
@@ -62,7 +72,9 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
     except FileNotFoundError as e:
         print("WARNING:", e)
         print("Skipping Experiment-1 because ImageNet archives are missing.")
-        return _skip_result(seed, budget_kb, "imagenet_not_found")
+        res = _skip_result(seed, budget_kb, "imagenet_not_found")
+        _persist_individual_result(res)
+        return res
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = DFBDModel(
@@ -156,16 +168,7 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
         "forgetting": forgetting,
     }
 
-    # ------------------------------------------------------------------
-    # Store experiment artefacts under .research/iteration5
-    # ------------------------------------------------------------------
-    out_dir = Path(".research") / "iteration5"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    res_path = out_dir / f"experiment1_seed{seed}_budget{budget_kb}.json"
-    save_json(results, res_path)
-
-    print("Experiment-1 results (JSON):")
-    print(json.dumps(results, indent=2))
+    _persist_individual_result(results)
     return results
 
 # -----------------------------------------------------------------------------
@@ -181,7 +184,7 @@ def main():
             results_all.append(res)
 
     # Even if all runs were skipped, we persist a summary for reproducibility
-    summary_path = Path(".research") / "iteration5" / "exp1_summary.json"
+    summary_path = Path(".research") / "iteration6" / "exp1_summary.json"
     save_json({"all": results_all}, summary_path)
     print("\n===== Experiment-1 processing finished =====")
     print(json.dumps({"all": results_all}, indent=2))

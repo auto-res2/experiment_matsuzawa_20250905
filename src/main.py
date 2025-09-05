@@ -1,5 +1,9 @@
 from __future__ import annotations
-"""src/main.py ––– project entry-point (patched for iteration12 layout)"""
+"""src/main.py ––––– project entry-point (patched for *iteration13* layout).
+This patch only adjusts the research/artifact output paths so that they now
+point to `.research/iteration13/` as required in the instructions.  No runtime
+behaviour besides the directory change is affected.
+"""
 import json
 import sys
 import textwrap
@@ -20,10 +24,10 @@ set_global_seed(42)
 print(banner("Dynamic Halting GNN – Reproducible Experiment Suite"))
 
 # ---------------------------------------------------------------------------
-# 1.  Directory bootstrap (.research/iteration12/*)
+# 1.  Directory bootstrap (.research/iteration13/*)
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-RESEARCH_DIR = PROJECT_ROOT / ".research" / "iteration12"
+RESEARCH_DIR = PROJECT_ROOT / ".research" / "iteration13"
 IMAGES_DIR = RESEARCH_DIR / "images"
 
 for d in (RESEARCH_DIR, IMAGES_DIR):

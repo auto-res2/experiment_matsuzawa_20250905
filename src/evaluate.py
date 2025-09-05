@@ -1,7 +1,7 @@
 """src/evaluate.py
 --------------------------------------------------------------------
 Plotting and evaluation helpers live here.
-All figures are written under `.research/iteration1/images` as required.
+All figures are written under `.research/iteration2/images` as required.
 """
 from pathlib import Path
 from typing import List
@@ -11,8 +11,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402 – after backend set
 
-
-IMG_DIR = Path(".research/iteration1/images")
+# ----------------------------------------------------------------------------
+# Image output directory (updated to iteration2 as per specification)          
+# ----------------------------------------------------------------------------
+IMG_DIR = Path(".research/iteration2/images")
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 

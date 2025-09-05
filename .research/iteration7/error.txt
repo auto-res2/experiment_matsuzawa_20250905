@@ -1,0 +1,14 @@
+Downloading cpython-3.11.13-linux-x86_64-gnu (download) (27.7MiB)
+ Downloading cpython-3.11.13-linux-x86_64-gnu (download)
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+  × No solution found when resolving dependencies for split (markers:
+  │ python_full_version == '3.11.*'):
+  ╰─▶ Because only torch-optimizer<=0.3.0 is available and your project
+      depends on torch-optimizer>=3.0.0,<4.0.0, we can conclude that your
+      project's requirements are unsatisfiable.
+  × No solution found when resolving dependencies for split (markers:
+  │ python_full_version == '3.11.*'):
+  ╰─▶ Because only torch-optimizer<=0.3.0 is available and your project
+      depends on torch-optimizer>=3.0.0,<4.0.0, we can conclude that your
+      project's requirements are unsatisfiable.

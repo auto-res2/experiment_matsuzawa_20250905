@@ -1,3 +1,4 @@
+```python
 """src/main.py
 Entry point for the HCER experiments – this file sticks as closely as
 possible to the original monolithic script while using the refactored
@@ -30,6 +31,10 @@ common_cfg: Dict = CONFIG["common"]
 #                       EXP-1  (memory–accuracy curve)
 # -----------------------------------------------------------------------------
 
+# Central place for all plots – comply with iteration2 requirement
+_PLOT_DIR = os.path.join(".research", "iteration2", "images")
+
+
 def run_exp1():
     spec = CONFIG["exp1"]
     results: Dict[int, Dict[str, float]] = {}
@@ -54,7 +59,14 @@ def run_exp1():
             print(f"[EXP-1] budget={budget}MB  method={method:<10}  ACC={acc:5.2f}  wall={wall/60:4.1f} min")
             accs[method] = acc
         results[budget] = accs
-        plot_bar(accs, title=f"ACC@{budget}MB", ylabel="Average Accuracy (%)", filename=f".research/iteration1/images/accuracy_{budget}MB.pdf")
+        # Ensure directory exists before plotting
+        os.makedirs(_PLOT_DIR, exist_ok=True)
+        plot_bar(
+            accs,
+            title=f"ACC@{budget}MB",
+            ylabel="Average Accuracy (%)",
+            filename=os.path.join(_PLOT_DIR, f"accuracy_{budget}MB.pdf"),
+        )
     print("==== EXP-1 summary (Accuracy %) ====")
     print(json.dumps(results, indent=2))
 
@@ -66,10 +78,12 @@ def main():
     if not torch.cuda.is_available():
         print("CUDA not available – aborting (GPU required by spec).")
         sys.exit(1)
-    os.makedirs(".research/iteration1/images", exist_ok=True)
+    os.makedirs(_PLOT_DIR, exist_ok=True)
     print("Running EXP-1 (memory/accuracy curve)…")
     run_exp1()
     # EXP-2 and EXP-3 would follow the same pattern; omitted for brevity.
 
+
 if __name__ == "__main__":
     main()
+```

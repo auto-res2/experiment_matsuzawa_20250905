@@ -1,0 +1,125 @@
+Downloading cpython-3.11.13-linux-x86_64-gnu (download) (27.7MiB)
+ Downloading cpython-3.11.13-linux-x86_64-gnu (download)
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 61 packages in 236ms
+   Building clove-sub @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+Downloading triton (85.1MiB)
+Downloading hf-xet (3.0MiB)
+Downloading networkx (1.9MiB)
+Downloading setuptools (1.1MiB)
+Downloading matplotlib (8.3MiB)
+Downloading pillow (6.3MiB)
+Downloading nvidia-cublas-cu12 (391.6MiB)
+Downloading nvidia-cusparse-cu12 (186.9MiB)
+Downloading nvidia-nccl-cu12 (200.1MiB)
+Downloading nvidia-cufft-cu12 (116.0MiB)
+Downloading torch (639.2MiB)
+Downloading numpy (17.4MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (22.6MiB)
+Downloading fonttools (4.7MiB)
+Downloading nvidia-cuda-cupti-cu12 (13.5MiB)
+Downloading sympy (6.0MiB)
+Downloading nvidia-cudnn-cu12 (697.8MiB)
+Downloading torchvision (6.5MiB)
+Downloading nvidia-cusolver-cu12 (118.4MiB)
+Downloading nvidia-nvjitlink-cu12 (37.9MiB)
+Downloading pandas (12.5MiB)
+Downloading timm (2.1MiB)
+Downloading kiwisolver (1.4MiB)
+Downloading nvidia-curand-cu12 (53.9MiB)
+ Downloading kiwisolver
+ Downloading timm
+ Downloading setuptools
+ Downloading hf-xet
+ Downloading networkx
+ Downloading fonttools
+ Downloading pillow
+ Downloading torchvision
+      Built clove-sub @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+ Downloading nvidia-cuda-cupti-cu12
+ Downloading matplotlib
+ Downloading numpy
+ Downloading nvidia-cuda-nvrtc-cu12
+ Downloading pandas
+ Downloading sympy
+ Downloading nvidia-nvjitlink-cu12
+ Downloading nvidia-curand-cu12
+ Downloading triton
+ Downloading nvidia-cufft-cu12
+ Downloading nvidia-cusolver-cu12
+ Downloading nvidia-cusparse-cu12
+ Downloading nvidia-nccl-cu12
+ Downloading nvidia-cublas-cu12
+ Downloading nvidia-cudnn-cu12
+ Downloading torch
+Prepared 52 packages in 23.55s
+Installed 52 packages in 995ms
+ + certifi==2025.8.3
+ + charset-normalizer==3.4.3
+ + clove-sub==0.1.0 (from file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905)
+ + contourpy==1.3.3
+ + cycler==0.12.1
+ + filelock==3.19.1
+ + fonttools==4.59.2
+ + fsspec==2025.9.0
+ + hf-xet==1.1.9
+ + huggingface-hub==0.34.4
+ + idna==3.10
+ + jinja2==3.1.6
+ + kiwisolver==1.4.9
+ + lightning-utilities==0.15.2
+ + markupsafe==3.0.2
+ + matplotlib==3.10.6
+ + mpmath==1.3.0
+ + networkx==3.5
+ + numpy==1.26.4
+ + nvidia-cublas-cu12==12.1.3.1
+ + nvidia-cuda-cupti-cu12==12.1.105
+ + nvidia-cuda-nvrtc-cu12==12.1.105
+ + nvidia-cuda-runtime-cu12==12.1.105
+ + nvidia-cudnn-cu12==8.9.2.26
+ + nvidia-cufft-cu12==11.0.2.54
+ + nvidia-curand-cu12==10.3.2.106
+ + nvidia-cusolver-cu12==11.4.5.107
+ + nvidia-cusparse-cu12==12.1.0.106
+ + nvidia-nccl-cu12==2.18.1
+ + nvidia-nvjitlink-cu12==12.9.86
+ + nvidia-nvtx-cu12==12.1.105
+ + packaging==25.0
+ + pandas==2.2.3
+ + pillow==11.3.0
+ + pyparsing==3.2.3
+ + python-dateutil==2.9.0.post0
+ + pytz==2025.2
+ + pyyaml==6.0.2
+ + requests==2.32.5
+ + safetensors==0.6.2
+ + setuptools==80.9.0
+ + six==1.17.0
+ + sympy==1.14.0
+ + timm==0.9.16
+ + torch==2.1.2
+ + torchmetrics==1.8.2
+ + torchvision==0.16.2
+ + tqdm==4.67.1
+ + triton==2.1.0
+ + typing-extensions==4.15.0
+ + tzdata==2025.2
+ + urllib3==2.5.0
+  0%|          | 0/169001437 [00:00<?, ?it/s]  0%|          | 491520/169001437 [00:00<00:34, 4886266.64it/s]  1%|          | 1376256/169001437 [00:00<00:23, 7019786.24it/s]  1%|▏         | 2523136/169001437 [00:00<00:18, 8958929.49it/s]  2%|▏         | 3997696/169001437 [00:00<00:14, 11197924.40it/s]  3%|▎         | 5898240/169001437 [00:00<00:11, 13985373.30it/s]  5%|▍         | 8257536/169001437 [00:00<00:09, 17153674.64it/s]  6%|▋         | 10649600/169001437 [00:00<00:08, 19330978.12it/s]  8%|▊         | 13434880/169001437 [00:00<00:07, 21958514.64it/s] 10%|▉         | 16187392/169001437 [00:00<00:06, 23622367.08it/s] 11%|█▏        | 19431424/169001437 [00:01<00:05, 26312985.26it/s] 14%|█▍        | 23986176/169001437 [00:01<00:04, 32074564.09it/s] 16%|█▌        | 27328512/169001437 [00:01<00:04, 32465759.64it/s] 18%|█▊        | 30703616/169001437 [00:01<00:04, 32687721.65it/s] 20%|██        | 34111488/169001437 [00:01<00:04, 33001648.46it/s] 23%|██▎       | 38207488/169001437 [00:01<00:03, 35356676.15it/s] 25%|██▍       | 41746432/169001437 [00:01<00:03, 33489577.53it/s] 27%|██▋       | 46465024/169001437 [00:01<00:03, 37387402.39it/s] 30%|██▉       | 50266112/169001437 [00:01<00:03, 35248288.36it/s] 32%|███▏      | 53968896/169001437 [00:01<00:03, 35621906.92it/s] 35%|███▍      | 58556416/169001437 [00:02<00:02, 38461901.13it/s] 37%|███▋      | 62521344/169001437 [00:02<00:02, 38777845.95it/s] 39%|███▉      | 66453504/169001437 [00:02<00:02, 38454099.93it/s] 42%|████▏     | 70516736/169001437 [00:02<00:02, 39082604.71it/s] 44%|████▍     | 74612736/169001437 [00:02<00:02, 39625379.38it/s] 47%|████▋     | 78610432/169001437 [00:02<00:02, 38712999.27it/s] 49%|████▉     | 83623936/169001437 [00:02<00:02, 41881755.95it/s] 52%|█████▏    | 87851008/169001437 [00:02<00:02, 40077761.87it/s] 54%|█████▍    | 91914240/169001437 [00:02<00:02, 35927670.29it/s] 57%|█████▋    | 95617024/169001437 [00:03<00:02, 35104638.41it/s] 59%|█████▊    | 99188736/169001437 [00:03<00:02, 32813190.25it/s] 61%|██████    | 102760448/169001437 [00:03<00:01, 33462030.80it/s] 63%|██████▎   | 106168320/169001437 [00:03<00:02, 29440820.14it/s] 65%|██████▍   | 109248512/169001437 [00:03<00:02, 24393299.90it/s] 66%|██████▌   | 111902720/169001437 [00:03<00:02, 21653232.23it/s] 68%|██████▊   | 114229248/169001437 [00:03<00:02, 20125577.59it/s] 69%|██████▉   | 116359168/169001437 [00:04<00:02, 19101689.73it/s] 70%|███████   | 118358016/169001437 [00:04<00:02, 17835628.92it/s] 71%|███████   | 120193024/169001437 [00:04<00:02, 17054232.35it/s] 72%|███████▏  | 121929728/169001437 [00:04<00:02, 16929074.53it/s] 73%|███████▎  | 123699200/169001437 [00:04<00:02, 17043156.56it/s] 74%|███████▍  | 125435904/169001437 [00:04<00:02, 16509651.08it/s] 75%|███████▌  | 127107072/169001437 [00:04<00:02, 15605716.59it/s] 76%|███████▌  | 128843776/169001437 [00:04<00:02, 15939825.33it/s] 77%|███████▋  | 130449408/169001437 [00:04<00:02, 15489441.46it/s] 78%|███████▊  | 132153344/169001437 [00:05<00:02, 15884569.79it/s] 79%|███████▉  | 133791744/169001437 [00:05<00:02, 16015683.52it/s] 80%|████████  | 135462912/169001437 [00:05<00:02, 16193030.78it/s] 81%|████████  | 137134080/169001437 [00:05<00:01, 16267428.63it/s] 82%|████████▏ | 138870784/169001437 [00:05<00:01, 16529901.08it/s] 83%|████████▎ | 140541952/169001437 [00:05<00:01, 15802424.18it/s] 84%|████████▍ | 142147584/169001437 [00:05<00:01, 15166257.47it/s] 85%|████████▌ | 143851520/169001437 [00:05<00:01, 15564897.98it/s] 86%|████████▋ | 145948672/169001437 [00:05<00:01, 17091601.73it/s] 88%|████████▊ | 148307968/169001437 [00:06<00:01, 18909512.11it/s] 89%|████████▉ | 150306816/169001437 [00:06<00:00, 19208806.86it/s] 90%|█████████ | 152338432/169001437 [00:06<00:00, 19525975.19it/s] 91%|█████████▏| 154304512/169001437 [00:06<00:00, 19486507.60it/s] 92%|█████████▏| 156270592/169001437 [00:06<00:00, 19300784.24it/s] 94%|█████████▎| 158400512/169001437 [00:06<00:00, 19748096.06it/s] 95%|█████████▌| 160759808/169001437 [00:06<00:00, 20875795.32it/s] 96%|█████████▋| 162856960/169001437 [00:06<00:00, 20696827.87it/s] 98%|█████████▊| 164986880/169001437 [00:06<00:00, 20778668.99it/s] 99%|█████████▉| 167641088/169001437 [00:06<00:00, 22326697.86it/s]100%|██████████| 169001437/169001437 [00:06<00:00, 24183163.80it/s]
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 167, in <module>
+    main()
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 152, in main
+    df = _run_experiment(key, exp_cfg)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 79, in _run_experiment
+    optimiser = torch.optim.SGD(
+                ^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/.venv/lib/python3.11/site-packages/torch/optim/sgd.py", line 17, in __init__
+    if weight_decay < 0.0:
+       ^^^^^^^^^^^^^^^^^^
+TypeError: '<' not supported between instances of 'str' and 'float'

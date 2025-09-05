@@ -1,0 +1,9 @@
+=== uv sync start Fri Sep  5 13:27:13 UTC 2025 ===
+=== uv install end Fri Sep  5 13:27:39 UTC 2025 ===
+=== experiment start Fri Sep  5 13:27:39 UTC 2025 ===
+
+======================  Running exp1  ======================
+
+Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to data/cifar100/cifar-100-python.tar.gz
+Extracting data/cifar100/cifar-100-python.tar.gz to data/cifar100
+Files already downloaded and verified

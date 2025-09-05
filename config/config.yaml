@@ -1,0 +1,32 @@
+global:
+  device: auto  # "auto" chooses CUDA if available, else CPU
+  mixed_precision: true
+  epochs: 1000
+  early_stop_patience: 100
+  clip_grad: 1.0
+  hidden_dim: 64
+  optim:
+    lr_grid: [0.01, 0.005, 0.001]
+    weight_decay_grid: [0.0, 0.0001, 0.0005]
+  dropout_grid: [0.0, 0.3, 0.5]
+
+experiment_1:
+  name: Depth-Scaling Benchmark
+  datasets: [Cora, Chameleon, ogbn-arxiv]
+  depths: [2, 8, 16, 32, 64, 128]
+  models: [GCN, DropEdge, GCNII, CURVONet]
+
+# Place-holders for further experiments (not executed to save time)
+experiment_2:
+  name: Curvature Stress-Test (Synthetic CSBM)
+  graphs: 5
+  kappa_shifts: [-2, -1, 0, 1, 2]
+  models: [CURVONet, CURVONet_NoGate, DropEdge, DGN]
+  layers: 16
+
+experiment_3:
+  name: Robustness & Efficiency (ogbn-products-sub)
+  perturbations: [feature_noise, edge_del, shortcut]
+  models: [CURVONet, BORF_GCN, ContraNorm_GCN, DropEdge]
+  layers: 32
+  sampled_nodes: 200000

@@ -1,5 +1,5 @@
 from __future__ import annotations
-"""src/main.py ––– project entry-point (patched to use iteration10 layout)"""
+"""src/main.py ––– project entry-point (patched to use iteration11 layout)"""
 import json
 import sys
 import textwrap
@@ -20,10 +20,10 @@ set_global_seed(42)
 print(banner("Dynamic Halting GNN – Reproducible Experiment Suite"))
 
 # ---------------------------------------------------------------------------
-# 1.  Directory bootstrap (.research/iteration10/*)
+# 1.  Directory bootstrap (.research/iteration11/*)
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-RESEARCH_DIR = PROJECT_ROOT / ".research" / "iteration10"
+RESEARCH_DIR = PROJECT_ROOT / ".research" / "iteration11"
 IMAGES_DIR = RESEARCH_DIR / "images"
 
 for d in (RESEARCH_DIR, IMAGES_DIR):

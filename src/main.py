@@ -35,7 +35,7 @@ common_cfg: Dict = CONFIG["common"]
 
 # All plots must be saved under this directory as required by the
 # evaluation harness.
-_PLOT_DIR = os.path.join(".research", "iteration4", "images")
+_PLOT_DIR = os.path.join(".research", "iteration5", "images")
 
 
 def run_exp1():

@@ -87,7 +87,20 @@ class ERMemory(BaseMemory):
             "y": torch.tensor([self.labels[i] for i in idx]),
         }
 
-    def update(self, x: torch.Tensor, y: torch.Tensor):
+    # ---------------------------------------------------------------------
+    # NOTE: make the signature flexible so that it can be called with the
+    # same keyword arguments used for HCERMemory (features / labels / losses)
+    # without breaking – we simply ignore unsupported keys.
+    # ---------------------------------------------------------------------
+    def update(self, x: torch.Tensor | None = None, y: torch.Tensor | None = None, **kwargs):
+        if x is None:
+            # Fallback to optional mapping from "features" (not relevant for ER)
+            x = kwargs.get("x") or kwargs.get("features")
+        if y is None:
+            y = kwargs.get("y") or kwargs.get("labels")
+        if x is None or y is None:
+            raise ValueError("ERMemory.update expects images and labels – none were provided.")
+
         for xi, yi in zip(x, y):
             self.n_seen += 1
             if len(self.images) < self.capacity:
@@ -268,7 +281,10 @@ class ContinualTrainer:
         self.backbone.train(); self.fc.train()
         for _ in range(epochs):
             for batch in train_loader:
-                x, y = batch[0].to(self.device), batch[1].to(self.device)
+                # Keep a copy of the raw incoming data (before replay) for ERMemory
+                x_orig, y_orig = batch[0], batch[1]
+                x, y = x_orig.to(self.device), y_orig.to(self.device)
+
                 # add replay ------------------------------------------------
                 replay = self.memory.sample(n=x.size(0) // 2)
                 if replay:
@@ -286,11 +302,16 @@ class ContinualTrainer:
                 # memory update --------------------------------------
                 with torch.no_grad():
                     losses_per_sample = nn.functional.cross_entropy(logits, y, reduction="none")
-                    self.memory.update(
-                        features=feats.detach().cpu(),
-                        labels=y.detach().cpu(),
-                        losses=losses_per_sample.detach().cpu(),
-                    )
+                    if isinstance(self.memory, ERMemory):
+                        # ER expects raw images & labels only
+                        self.memory.update(x=x_orig, y=y_orig)
+                    else:
+                        # HCER (and other future variants) accept feature-level info
+                        self.memory.update(
+                            features=feats.detach().cpu(),
+                            labels=y.detach().cpu(),
+                            losses=losses_per_sample.detach().cpu(),
+                        )
 
     # -----------------------------------------------------------------
     def evaluate(self, test_loader) -> float:

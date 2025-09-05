@@ -1,0 +1,32 @@
+Downloading cpython-3.11.13-linux-x86_64-gnu (download) (27.7MiB)
+ Downloading cpython-3.11.13-linux-x86_64-gnu (download)
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+  × No solution found when resolving dependencies for split (markers:
+  │ python_full_version >= '3.11'):
+  ╰─▶ Because torchvision==0.18.0 depends on torch==2.3.0 and only the
+      following versions of torchvision are available:
+          torchvision<=0.18.0
+          torchvision==0.18.1
+          torchvision>0.19.0
+      we can conclude that torchvision>=0.18.0,<0.18.1 depends on
+      torch==2.3.0.
+      And because torchvision==0.18.1 depends on torch==2.3.1, we can conclude
+      that torchvision>=0.18.0,<0.19.0 depends on torch>=2.3.0,<=2.3.1.
+      And because your project depends on torch>=2.1.0,<2.2.0 and
+      torchvision>=0.18.0,<0.19.0, we can conclude that your project's
+      requirements are unsatisfiable.
+  × No solution found when resolving dependencies for split (markers:
+  │ python_full_version >= '3.11'):
+  ╰─▶ Because torchvision==0.18.0 depends on torch==2.3.0 and only the
+      following versions of torchvision are available:
+          torchvision<=0.18.0
+          torchvision==0.18.1
+          torchvision>0.19.0
+      we can conclude that torchvision>=0.18.0,<0.18.1 depends on
+      torch==2.3.0.
+      And because torchvision==0.18.1 depends on torch==2.3.1, we can conclude
+      that torchvision>=0.18.0,<0.19.0 depends on torch>=2.3.0,<=2.3.1.
+      And because your project depends on torch>=2.1.0,<2.2.0 and
+      torchvision>=0.18.0,<0.19.0, we can conclude that your project's
+      requirements are unsatisfiable.

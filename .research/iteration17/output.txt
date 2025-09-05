@@ -1,0 +1,12 @@
+=== uv sync start Fri Sep  5 14:47:13 UTC 2025 ===
+=== uv install end Fri Sep  5 14:47:47 UTC 2025 ===
+=== experiment start Fri Sep  5 14:47:47 UTC 2025 ===
+
+==== EXPERIMENT ====
+CIFAR-100 (20 tasks × 5 classes) – memory/accuracy trade-off
+====================
+
+[MetricLogger] Saved metrics to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/results/exp1_clove_sub_seed11.json
+[MetricLogger] Saved metrics to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/results/exp1_er_ring_seed11.json
+[MetricLogger] Saved metrics to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/results/exp1_sparcl_seed11.json
+=== experiment end Fri Sep  5 14:48:34 UTC 2025 ===

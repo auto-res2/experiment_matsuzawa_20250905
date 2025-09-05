@@ -1,34 +1,33 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "clove_sub"
-version = "0.3.0"
-description = "Compressed Latent Orthogonal-Subspace Replay (CLoVe-Sub) – research code-base"
-authors = [
-  { name = "Researcher", email = "research@example.com" }
-]
-requires-python = ">=3.9"
+version = "0.1.0"
+description = "Compressed Latent Orthogonal-Subspace replay (CLoVe-Sub) continual-learning benchmark"
+authors = [{ name = "Researcher", email = "author@example.com" }]
 readme = "README.md"
-license = { text = "MIT" }
-
-# -----------------------------------------------------------------------------
-#  Core (runtime) dependencies – minimal list
-# -----------------------------------------------------------------------------
-
+license = { text = "Apache-2.0" }
+requires-python = ">=3.9"
 dependencies = [
-  "torch~=2.0",            # deep-learning framework
-  "torchvision~=0.15",     # datasets & models
-  "pyyaml>=6.0",           # config loader
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+    "timm>=0.9.5,<1.1",
+    "geoopt>=0.5,<0.7",
+    "numpy",
+    "scipy",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "requests",
+    "PyYAML",
 ]
 
 [project.optional-dependencies]
-extra = [
-  "geoopt>=0.5",           # orthogonal manifold projector (optional but recommended)
-  "pynvml>=11.4",          # energy logging (optional)
+cuda = [
+    "pynvml; platform_system=='Linux' and extra=='cuda'",
 ]
 
-[tool.setuptools.package-dir]
-# Source layout: only 'src' is a package root.
-"" = "src"
+[tool.setuptools.package-data]
+"" = ["config/*.yaml"]

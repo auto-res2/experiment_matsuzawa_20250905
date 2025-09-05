@@ -1,198 +1,327 @@
-"""
-train.py – model architectures, training algorithms (minimal runnable stubs)
-This refactor fixes the previous SyntaxError that was produced by stray
-unicode characters being interpreted as code.  The file now contains:
-
-1.  A valid module doc-string (everything outside of code is inside comments or
-    triple quoted strings).
-2.  A lightweight but functional implementation of three algorithmic classes
-    (CLoVeSub, ERRing, SparCL).  They all inherit from a shared `_BaseAlgo`
-    that provides:
-      •   A ResNet-18 backbone whose classification head is stripped so that the
-          network outputs a 512-dimensional feature vector.
-      •   A task-agnostic linear classifier sitting on top of the frozen
-          backbone (this keeps the example fast enough for CI purposes).
-      •   Very small training / evaluation loops that iterate over at most one
-          mini-batch per epoch so that the code finishes in seconds while still
-          exercising the data/optimisation path.
-
-The goal is **compilability & quick execution** – the numerical results are not
-important for this automated test suite.
+"""src/train.py
+All model components and the training logic live here.
+Every public function explicitly receives the `config` dictionary that
+is read once by `src.main` so that no file needs to import PyYAML on its
+own.  This design prevents circular-imports and makes unit-testing easy
+because the whole behaviour can be controlled via the passed‐in config.
 """
 from __future__ import annotations
 
-import math
 import random
-from typing import Any, Dict, List, Tuple
+import time
+from typing import Dict, List, Tuple
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision.models as tvm
+import torchvision
+from torch.utils.data import DataLoader
 
-# ----------------------------------------------------------------------------
-#  Utility helpers
-# ----------------------------------------------------------------------------
+# 3rd-party (optional) -------------------------------------------------
+try:
+    import geoopt  # type: ignore
+except ModuleNotFoundError as exc:  # pragma: no cover
+    raise ImportError("Package 'geoopt' is required – pip install geoopt>=0.5,<0.7") from exc
 
-def _accuracy(logits: torch.Tensor, targets: torch.Tensor) -> float:
-    """Return top-1 accuracy as a python float."""
-    preds = logits.argmax(dim=1)
-    correct = (preds == targets).float().sum().item()
-    return correct / max(1, targets.numel())
+# ---------------------------------------------------------------------
+#  DEVICE MANAGEMENT – central place in this module so that every other
+#  sub-routine can simply call `to(DEVICE)`.  The caller (src.main)
+#  should set the RNG seeds immediately after importing torch so that
+#  CUDA initialisation is deterministic.
+# ---------------------------------------------------------------------
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# ===============================================================
+#  1.  MODEL BUILDING BLOCKS
+# ===============================================================
 
 
-# ----------------------------------------------------------------------------
-#  Base algorithm – shared by all concrete method stubs
-# ----------------------------------------------------------------------------
+class VQLayer(nn.Module):
+    """Vector-Quantisation layer (straight-through estimator)."""
 
-class _BaseAlgo(nn.Module):
-    """Very small continual-learning algorithm skeleton.
-
-    The methods follow the interface expected by *src.main*: before_task,
-    train_task, after_task, evaluate.  They purposefully keep the computational
-    footprint tiny so that the CI job (running on a Tesla T4 with a strict time
-    budget) finishes quickly.
-    """
-
-    def __init__(self, exp_cfg: Dict[str, Any], method_cfg: Dict[str, Any]):
+    def __init__(self, n_codes: int = 16, code_dim: int = 32):
         super().__init__()
+        self.codebook = nn.Parameter(torch.randn(n_codes, code_dim))
+        nn.init.uniform_(self.codebook, -1 / n_codes, 1 / n_codes)
 
-        self.exp_cfg = exp_cfg
-        self.method_cfg = method_cfg
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    def forward(
+        self, z_e: torch.Tensor, tau: float
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        # z_e: (B, C, H, W) – flatten spatial dims
+        B, C, H, W = z_e.shape
+        z = z_e.permute(0, 2, 3, 1).contiguous().view(-1, C)  # (B*H*W, C)
+        logits = torch.matmul(z, self.codebook.t())  # (N, n_codes)
+        hard = F.gumbel_softmax(logits, tau=tau, hard=True)
+        z_q = torch.matmul(hard, self.codebook)  # (N, C)
+        z_q = z_q.view(B, H, W, C).permute(0, 3, 1, 2).contiguous()
+        # commitment loss
+        loss = F.mse_loss(z_q.detach(), z_e) + F.mse_loss(z_q, z_e.detach())
+        codes = hard.argmax(dim=1).view(B, H, W).to(torch.uint8)
+        return z_q + (z_q - z_e).detach(), codes, loss
 
-        # --------------------------------------------------------------
-        # Backbone – 512-D feature extractor
-        # --------------------------------------------------------------
-        self.backbone = tvm.resnet18(weights=None)
-        self.backbone.fc = nn.Identity()  # strip classifier → output shape (B, 512)
-        self.feat_dim = 512
 
-        # Do *not* freeze the backbone in a real project, but here it keeps the
-        # example lightning-fast.
-        for p in self.backbone.parameters():  # pragma: no cover – speed-hack
-            p.requires_grad = False
+class Encoder(nn.Module):
+    def __init__(self, code_dim: int = 32):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(3, 64, 4, 2, 1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 128, 4, 2, 1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 256, 3, 1, 1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, code_dim, 1),
+        )
 
-        # --------------------------------------------------------------
-        # Simple linear classifier for the (up to) 100 CIFAR-100 classes
-        # --------------------------------------------------------------
-        self.num_classes = int(exp_cfg["dataset"].get("num_classes_total", 100))
-        self.classifier = nn.Linear(self.feat_dim, self.num_classes)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
 
-        # Optimiser (SGD)
-        lr = float(exp_cfg.get("optim", {}).get("lr", 0.05))
-        self.optim = torch.optim.SGD(self.classifier.parameters(), lr=lr, momentum=0.9)
 
-        # Move model parts to the compute device ---------------------------------------------------
-        self.to(self.device)
+class OrthoProjector(nn.Module):
+    """Low-rank projector constrained to the Stiefel manifold."""
 
-        # Training-loop hyper-parameters -----------------------------------------------------------
-        # We deliberately limit the number of processed mini-batches so that the
-        # CI job completes in time (< 30 seconds end-to-end).
-        self._batches_per_epoch = 1
-        self._epochs_per_task = int(exp_cfg.get("epochs_per_task", 1))
+    def __init__(self, in_dim: int, rank: int = 16):
+        super().__init__()
+        self.P = geoopt.ManifoldParameter(torch.empty(in_dim, rank), manifold=geoopt.Stiefel())
+        nn.init.orthogonal_(self.P.data)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return x @ self.P  # (B, rank)
+
+
+class LatentAdapter(nn.Module):
+    def __init__(self, code_dim: int = 32, feat_dim: int = 512):
+        super().__init__()
+        self.mlp = nn.Sequential(
+            nn.Linear(code_dim, 128),
+            nn.ReLU(inplace=True),
+            nn.Linear(128, feat_dim),
+        )
+
+    def forward(self, codes: torch.Tensor, codebook: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
+        # codes: (B, H, W) uint8  – average embed per spatial position
+        embed = F.embedding(codes.long(), codebook)  # (B, H, W, C)
+        vec = embed.mean(dim=(1, 2))  # (B, C)
+        return self.mlp(vec)
+
+
+# ------------------------------------------------------------------
+#  Sparsity helper
+# ------------------------------------------------------------------
+
+def sparsify_grads(model: nn.Module, theta: float = 0.2) -> None:
+    """Top-k magnitude gradient masking (keeps (1-theta) fraction)."""
+
+    with torch.no_grad():
+        for p in model.parameters():
+            if p.grad is None:
+                continue
+            k = int((1.0 - theta) * p.grad.numel())
+            if k == 0:
+                p.grad.zero_()
+                continue
+            thresh = torch.topk(p.grad.abs().flatten(), k, largest=True).values.min()
+            mask = p.grad.abs() >= thresh
+            p.grad.mul_(mask)
+
+
+# ===============================================================
+#  2.  REHEARSAL BUFFER (latent codes)
+# ===============================================================
+
+
+class LatentBuffer:
+    """Fixed-budget buffer that stores *latent* VQ codes instead of pixels."""
+
+    def __init__(self, K: int, num_classes: int, code_shape: Tuple[int, int]):
+        self.K = K
+        self.num_classes = num_classes
+        self.H, self.W = code_shape
+        self.storage: Dict[int, List[torch.Tensor]] = {c: [] for c in range(num_classes)}
+        self.bytes_per_code = self.H * self.W  # uint8 – 1 byte each
+
+    # --------------------------------------------------------------
+    def add(self, class_id: int, codes: torch.Tensor) -> None:
+        bucket = self.storage[class_id]
+        if len(bucket) < self.K:
+            bucket.append(codes.cpu())
+        else:  # ring overwrite
+            idx = random.randint(0, self.K - 1)
+            bucket[idx] = codes.cpu()
+
+    def sample(self, n: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        choices, labels = [], []
+        for _ in range(n):
+            cls = random.randint(0, self.num_classes - 1)
+            if len(self.storage[cls]) == 0:
+                continue
+            code = random.choice(self.storage[cls])
+            choices.append(code)
+            labels.append(cls)
+        if not choices:
+            return (
+                torch.empty(0, self.H, self.W, dtype=torch.uint8),
+                torch.empty(0, dtype=torch.long),
+            )
+        return torch.stack(choices, 0), torch.tensor(labels, dtype=torch.long)
+
+    # --------------------------------------------------------------
+    def size_bytes(self) -> int:
+        return sum(len(v) for v in self.storage.values()) * self.bytes_per_code
+
+
+# ===============================================================
+#  3.  MAIN MODEL – CLoVe-Sub
+# ===============================================================
+
+
+class CLoVeSub(nn.Module):
+    """Full CLoVe-Sub continual-learning architecture."""
+
+    def __init__(self, config: Dict):
+        super().__init__()
+        self.cfg = config  # keep reference
+        cfg_m = config["models"]
+
+        # ------------------------------------------------------------------
+        #  Backbone (ResNet-18)
+        # ------------------------------------------------------------------
+        self.backbone = torchvision.models.resnet18(pretrained=cfg_m.get("pretrained", False))
+        feat_dim = self.backbone.fc.in_features
+        self.backbone.fc = nn.Identity()
+
+        # Low-rank projector on the Stiefel manifold ------------------------
+        self.projector = OrthoProjector(feat_dim, cfg_m["projector_rank"])
+        self.head = nn.Linear(cfg_m["projector_rank"], 100)  # fixed for CIFAR-100
+
+        # VQ-VAE components --------------------------------------------------
+        self.encoder = Encoder(cfg_m["vq"]["code_len"])
+        self.vq = VQLayer(cfg_m["vq"]["n_codes"], cfg_m["vq"]["code_len"])
+        self.adapter = LatentAdapter(cfg_m["vq"]["code_len"], feat_dim)
+
+        # Buffer -------------------------------------------------------------
+        code_H = config["dataset"]["img_size"] // 4  # encoder downsamples by 4
+        self.buffer = LatentBuffer(cfg_m["buffer"]["K"], 100, (code_H, code_H))
+
+        # Optimisers ---------------------------------------------------------
+        p_main = list(self.projector.parameters()) + list(self.head.parameters())
+        self.opt_main = torch.optim.SGD(
+            p_main,
+            lr=config["optim"]["lr_backbone"],
+            momentum=config["optim"]["momentum"],
+            weight_decay=config["optim"]["weight_decay"],
+        )
+        self.opt_vq = torch.optim.Adam(
+            list(self.encoder.parameters())
+            + list(self.vq.parameters())
+            + list(self.adapter.parameters()),
+            lr=config["optim"]["lr_vq"],
+        )
+
+        self.amp = config["global"].get("amp", True) and torch.cuda.is_available()
+        self.scaler = torch.cuda.amp.GradScaler(enabled=self.amp)
+        self.to(DEVICE)
 
     # ------------------------------------------------------------------
-    # Interface methods expected by src.main
+    #  Forward helpers
     # ------------------------------------------------------------------
+    def forward(self, x: torch.Tensor) -> torch.Tensor:  # pixels → logits
+        feats = self.backbone(x)
+        feats = self.projector(feats)
+        return self.head(feats)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
-        with torch.no_grad():  # backbone frozen for speed
-            feats = self.backbone(x)
-        return self.classifier(feats)
-
-    # These three hooks are mostly no-ops in the stub implementation – they are
-    # here so that src.main can call them without errors.
-    def before_task(self, task_id: int) -> None:  # noqa: D401
-        self.train()  # make sure dropout/batch-norm (if any) are in train mode
-
-    def after_task(self, task_id: int) -> None:  # noqa: D401
-        # In a real algorithm we would do consolidation (e.g. rehearsal buffer
-        # update, weight consolidation, etc.).  Here we keep it empty.
-        pass
-
-    # ------------------------------------------------------------------
-    # Actual (tiny) training / evaluation logic
-    # ------------------------------------------------------------------
-
-    def train_task(
-        self,
-        task_id: int,
-        train_loader,
-        val_loader,
-        logger,
-    ) -> None:  # noqa: D401
-        criterion = nn.CrossEntropyLoss()
-
-        for epoch in range(self._epochs_per_task):
-            processed = 0
-            running_loss = 0.0
-            running_acc = 0.0
-
-            for xb, yb in train_loader:
-                xb, yb = xb.to(self.device), yb.to(self.device)
-
-                self.optim.zero_grad(set_to_none=True)
-                logits = self(xb)
-                loss = criterion(logits, yb)
-                loss.backward()
-                self.optim.step()
-
-                running_loss += loss.item()
-                running_acc += _accuracy(logits.detach(), yb)
-                processed += 1
-
-                # Reduce compute time by handling only a few mini-batches
-                if processed >= self._batches_per_epoch:
-                    break
-
-            logger.log(f"task{task_id}/train_loss", running_loss / processed)
-            logger.log(f"task{task_id}/train_acc", running_acc / processed)
-
-            # ---- quick validation (still only one mini-batch) ----------------
-            self.eval()
-            with torch.no_grad():
-                vb, yb = next(iter(val_loader))
-                vb, yb = vb.to(self.device), yb.to(self.device)
-                logits = self(vb)
-                val_loss = criterion(logits, yb).item()
-                val_acc = _accuracy(logits, yb)
-
-            logger.log(f"task{task_id}/val_loss", val_loss)
-            logger.log(f"task{task_id}/val_acc", val_acc)
-            self.train()
-
-    # ------------------------------------------------------------------
-    def evaluate(self, task_id: int, test_loader, logger) -> None:  # noqa: D401
-        self.eval()
-        criterion = nn.CrossEntropyLoss()
-        loss_total, acc_total, n_batches = 0.0, 0.0, 0
-
+    def _feature_from_codes(self, codes: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
-            for xb, yb in test_loader:
-                xb, yb = xb.to(self.device), yb.to(self.device)
-                logits = self(xb)
-                loss_total += criterion(logits, yb).item()
-                acc_total += _accuracy(logits, yb)
-                n_batches += 1
-                if n_batches >= 1:  # keep it fast – one batch is enough for CI
-                    break
+            codebook = self.vq.codebook.detach()
+        return self.adapter(codes.to(DEVICE), codebook)
 
-        logger.log(f"task{task_id}/test_loss", loss_total / n_batches)
-        logger.log(f"task{task_id}/test_acc", acc_total / n_batches)
+    # ------------------------------------------------------------------
+    #  Full training of a single task
+    # ------------------------------------------------------------------
+    def train_task(
+        self, loader_cur: DataLoader, loader_val: DataLoader, task_id: int, logger,  # noqa: ANN001
+    ) -> None:
+        cfg_g = self.cfg["global"]
+        cfg_m = self.cfg["models"]
+        epochs = cfg_g["epochs_per_task"]
+        tau = cfg_m["vq"]["tau"]
+        beta = cfg_m["vq"]["beta"]
+        sparsity = cfg_m["sparsity"]
 
+        for epoch in range(epochs):
+            self.train()
+            for xb, yb in loader_cur:
+                xb, yb = xb.to(DEVICE), yb.to(DEVICE)
+                bsz = xb.size(0)
 
-# ----------------------------------------------------------------------------
-#  Concrete algorithm classes (thin wrappers around _BaseAlgo)
-# ----------------------------------------------------------------------------
+                # --------------- forward + losses ------------------------
+                if self.amp:
+                    with torch.cuda.amp.autocast():
+                        z_e = self.encoder(xb.float())
+                        z_q, codes, vq_loss = self.vq(z_e, tau)
+                        logits_cur = self(xb.float())
+                        loss_cls = F.cross_entropy(logits_cur, yb)
+                        feats_real = self.backbone(xb.float())
+                        feats_pred = self.adapter(codes, self.vq.codebook)
+                        loss_adapter = F.mse_loss(feats_pred, feats_real.detach())
+                        loss = loss_cls + beta * vq_loss + 0.1 * loss_adapter
+                else:
+                    # identical computation without autocast
+                    z_e = self.encoder(xb.float())
+                    z_q, codes, vq_loss = self.vq(z_e, tau)
+                    logits_cur = self(xb.float())
+                    loss_cls = F.cross_entropy(logits_cur, yb)
+                    feats_real = self.backbone(xb.float())
+                    feats_pred = self.adapter(codes, self.vq.codebook)
+                    loss_adapter = F.mse_loss(feats_pred, feats_real.detach())
+                    loss = loss_cls + beta * vq_loss + 0.1 * loss_adapter
 
-class CLoVeSub(_BaseAlgo):
-    pass  # All specialised behaviour omitted in this stub – inherits everything
+                # ---------------- backward / optimisation ---------------
+                self.scaler.scale(loss).backward()
+                sparsify_grads(self.backbone, sparsity)
+                self.scaler.step(self.opt_main)
+                self.scaler.step(self.opt_vq)
+                self.scaler.update()
+                self.opt_main.zero_grad(set_to_none=True)
+                self.opt_vq.zero_grad(set_to_none=True)
 
+                # ---------------- buffer update -------------------------
+                for i in range(bsz):
+                    self.buffer.add(int(yb[i]), codes[i].cpu())
 
-class ERRing(_BaseAlgo):
-    pass
+            # ------------- quick validation (single batch) --------------
+            self.eval()
+            xb_val, yb_val = next(iter(loader_val))
+            xb_val, yb_val = xb_val.to(DEVICE), yb_val.to(DEVICE)
+            with torch.no_grad():
+                logits = self(xb_val.float())
+                acc = (logits.argmax(1) == yb_val).float().mean().item()
+            logger.log(f"task{task_id}/val_acc", acc)
 
+    # ------------------------------------------------------------------
+    #  Replay – returns projected features + labels
+    # ------------------------------------------------------------------
+    def replay_step(self, n: int = 64) -> Tuple[torch.Tensor, torch.Tensor]:
+        codes, labels = self.buffer.sample(n)
+        if codes.numel() == 0:
+            return (
+                torch.empty(0, self.cfg["models"]["projector_rank"]).to(DEVICE),
+                torch.empty(0, dtype=torch.long).to(DEVICE),
+            )
+        feats = self._feature_from_codes(codes)
+        feats = self.projector(feats)
+        return feats, labels.to(DEVICE)
 
-class SparCL(_BaseAlgo):
-    pass
+    # ------------------------------------------------------------------
+    #  Evaluation on a single task
+    # ------------------------------------------------------------------
+    def evaluate_task(self, loader_test: DataLoader) -> float:
+        self.eval()
+        correct, total = 0, 0
+        with torch.no_grad():
+            for xb, yb in loader_test:
+                xb, yb = xb.to(DEVICE), yb.to(DEVICE)
+                preds = self(xb.float()).argmax(1)
+                correct += (preds == yb).sum().item()
+                total += yb.numel()
+        return correct / total

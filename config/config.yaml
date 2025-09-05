@@ -1,23 +1,32 @@
-experiments:
-  - id: exp1
-    description: CIFAR-100 (20 tasks × 5 classes) – memory/accuracy trade-off
-    seeds: [11]
-    batch_size: 128
-    epochs_per_task: 1           # small to keep CI runtime low
+global:
+  batch_size: 128
+  epochs_per_task: 10
+  seeds: [11, 17, 23]
+  amp: true
 
-    optim:
-      lr: 0.05
+dataset:
+  name: cifar100
+  url: https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz
+  num_tasks: 20
+  classes_per_task: 5
+  img_size: 32
 
-    dataset:
-      name: cifar100
-      num_tasks: 20
-      classes_per_task: 5
-      num_classes_total: 100
+models:
+  backbone: resnet18
+  pretrained: false
+  projector_rank: 16
+  vq:
+    code_len: 32
+    n_codes: 16
+    beta: 0.25
+    tau: 0.5
+  buffer:
+    K: 3
+    budget_bytes: 960000        # 0.96 MB
+  sparsity: 0.2
 
-    methods:
-      clove_sub:
-        rank: 16
-        buffer_bytes: 960000      # ≈ 0.9 MB fixed rehearsal budget
-        sparsity: 0.2
-      er_ring: {}
-      sparcl: {}
+optim:
+  lr_backbone: 0.05
+  lr_vq: 0.0003
+  weight_decay: 0.0005
+  momentum: 0.9

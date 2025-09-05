@@ -64,8 +64,8 @@ def save_json(obj: Dict[str, Any], path: str | Path) -> None:
 # Plotting ---------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
-# Centralised research directory (iteration11)
-_RESEARCH_IMG_DIR = Path(".research") / "iteration11" / "images"
+# Centralised research directory (iteration12)
+_RESEARCH_IMG_DIR = Path(".research") / "iteration12" / "images"
 
 
 def _annotate(ax: plt.Axes):
@@ -101,7 +101,7 @@ def plot_line(
     ax.set_ylabel(ylabel)
     ax.legend()
     # ------------------------------------------------------------------
-    # All research artefacts for iteration11
+    # All research artefacts for iteration12
     # ------------------------------------------------------------------
     _RESEARCH_IMG_DIR.mkdir(parents=True, exist_ok=True)
     outfile = _RESEARCH_IMG_DIR / filename
@@ -125,7 +125,7 @@ def evaluate(model: torch.nn.Module, loader: torch.utils.data.DataLoader, device
             correct += (preds == y).sum().item()
             total += y.size(0)
     model.train()
-    return correct / total
+    return correct / total if total > 0 else 0.0
 
 
 __all__ = [

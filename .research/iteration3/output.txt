@@ -1,0 +1,7 @@
+=== uv sync start Fri Sep  5 13:35:01 UTC 2025 ===
+=== uv install end Fri Sep  5 13:35:37 UTC 2025 ===
+=== experiment start Fri Sep  5 13:35:37 UTC 2025 ===
+No module named 'torch_sparse'
+
+EXPERIMENT 1 — DEPTH-SCALABILITY BENCHMARK
+Computing Ollivier–Ricci curvature for Cora (one-off)…

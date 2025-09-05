@@ -6,5 +6,82 @@
     "episodic memory pruning",
     "sparse rehearsal strategies",
     "knowledge distillation continual learning"
+  ],
+  "research_study_list": [
+    {
+      "title": "Continual Learning in Low-rank Orthogonal Subspaces"
+    },
+    {
+      "title": "Contextual Transformation Networks for Online Continual Learning"
+    },
+    {
+      "title": "Improving Task-free Continual Learning by Distributionally Robust Memory Evolution"
+    },
+    {
+      "title": "Improving Task-free Continual Learning by Distributionally Robust Memory Evolution"
+    },
+    {
+      "title": "SparCL: Sparse Continual Learning on the Edge"
+    },
+    {
+      "title": "Online Learned Continual Compression with Adaptive Quantization Modules"
+    },
+    {
+      "title": "Remember the Past: Distilling Datasets into Addressable Memories for Neural Networks"
+    },
+    {
+      "title": "Contextual Transformation Networks for Online Continual Learning"
+    },
+    {
+      "title": "Forget-free Continual Learning with Winning Subnetworks"
+    },
+    {
+      "title": "Forget-free Continual Learning with Winning Subnetworks"
+    },
+    {
+      "title": "Model-Based Episodic Memory Induces Dynamic Hybrid Controls"
+    },
+    {
+      "title": "Predicting Event Memorability from Contextual Visual Semantics"
+    },
+    {
+      "title": "Kanerva++: Extending the Kanerva Machine With Differentiable, Locally Block Allocated Latent Memory"
+    },
+    {
+      "title": "Spatially-Aware Transformers for Embodied Agents"
+    },
+    {
+      "title": "General Sequential Episodic Memory Model"
+    },
+    {
+      "title": "Policy Rehearsing: Training Generalizable Policies for Reinforcement Learning"
+    },
+    {
+      "title": "The State of Sparse Training in Deep Reinforcement Learning"
+    },
+    {
+      "title": "The State of Sparse Training in Deep Reinforcement Learning"
+    },
+    {
+      "title": "A simple but strong baseline for online continual learning: Repeated Augmented Rehearsal"
+    },
+    {
+      "title": "Learning to Rehearse in Long Sequence Memorization"
+    },
+    {
+      "title": "Rethinking Momentum Knowledge Distillation in Online Continual Learning"
+    },
+    {
+      "title": "Heterogeneous Continual Learning"
+    },
+    {
+      "title": "Prototype-Sample Relation Distillation: Towards Replay-Free Continual Learning"
+    },
+    {
+      "title": "Preserving Linear Separability in Continual Learning by Backward Feature Projection"
+    },
+    {
+      "title": "Provable Contrastive Continual Learning"
+    }
   ]
 }

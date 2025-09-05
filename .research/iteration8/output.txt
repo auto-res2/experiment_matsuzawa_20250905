@@ -1,0 +1,23 @@
+=== uv sync start Fri Sep  5 13:40:18 UTC 2025 ===
+=== uv install end Fri Sep  5 13:40:54 UTC 2025 ===
+=== experiment start Fri Sep  5 13:40:54 UTC 2025 ===
+
+>>> Running exp1_waterbirds  seed=0
+
+===============================================================================
+Experiment: exp1_waterbirds
+Experiment 1 – Waterbirds worst-group accuracy with GCID vs baselines.
+
+===============================================================================
+
+Downloading dataset to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0...
+You can also download the dataset manually at https://wilds.stanford.edu/downloads.
+Downloading https://worksheets.codalab.org/rest/bundles/0x505056d5cdea4e4eaa0e242cbfe2daa4/contents/blob/ to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0/archive.tar.gz
+Clustering 2000 points in 147D to 25 clusters, redo 1 times, 20 iterations
+  Preprocessing in 0.00 s
+  Iteration 0 (0.00 s, search 0.00 s): objective=3.59943 imbalance=1.505 nsplit=0         Iteration 1 (0.00 s, search 0.00 s): objective=2.6027 imbalance=1.419 nsplit=0         Iteration 2 (0.00 s, search 0.00 s): objective=2.33394 imbalance=1.432 nsplit=0         Iteration 3 (0.00 s, search 0.00 s): objective=2.18817 imbalance=1.471 nsplit=0         Iteration 4 (0.00 s, search 0.00 s): objective=2.08534 imbalance=1.495 nsplit=0         Iteration 5 (0.00 s, search 0.00 s): objective=2.01092 imbalance=1.516 nsplit=0         Iteration 6 (0.00 s, search 0.00 s): objective=1.95993 imbalance=1.529 nsplit=0         Iteration 7 (0.00 s, search 0.00 s): objective=1.93959 imbalance=1.544 nsplit=0         Iteration 8 (0.00 s, search 0.00 s): objective=1.92732 imbalance=1.552 nsplit=0         Iteration 9 (0.01 s, search 0.00 s): objective=1.91821 imbalance=1.555 nsplit=0         Iteration 10 (0.01 s, search 0.01 s): objective=1.91008 imbalance=1.555 nsplit=0         Iteration 11 (0.01 s, search 0.01 s): objective=1.90397 imbalance=1.552 nsplit=0         Iteration 12 (0.01 s, search 0.01 s): objective=1.89665 imbalance=1.559 nsplit=0         Iteration 13 (0.01 s, search 0.01 s): objective=1.8917 imbalance=1.555 nsplit=0         Iteration 14 (0.01 s, search 0.01 s): objective=1.88869 imbalance=1.557 nsplit=0         Iteration 15 (0.01 s, search 0.01 s): objective=1.88755 imbalance=1.556 nsplit=0         Iteration 16 (0.01 s, search 0.01 s): objective=1.88615 imbalance=1.557 nsplit=0         Iteration 17 (0.01 s, search 0.01 s): objective=1.88507 imbalance=1.557 nsplit=0         Iteration 18 (0.01 s, search 0.01 s): objective=1.88361 imbalance=1.552 nsplit=0         Iteration 19 (0.01 s, search 0.01 s): objective=1.88163 imbalance=1.551 nsplit=0       
+Extracting /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0/archive.tar.gz to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0
+
+It took 0.26 minutes to download and uncompress the dataset.
+
+[Miner] derived 25 clusters for 2000 samples.

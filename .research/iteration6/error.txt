@@ -1,0 +1,159 @@
+Downloading cpython-3.11.13-linux-x86_64-gnu (download) (27.7MiB)
+ Downloading cpython-3.11.13-linux-x86_64-gnu (download)
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 73 packages in 259ms
+   Building gcid @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+Downloading pandas (11.8MiB)
+Downloading tokenizers (3.2MiB)
+Downloading hf-xet (3.0MiB)
+Downloading scipy (33.7MiB)
+Downloading scikit-learn (9.3MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading nvidia-cudnn-cu12 (674.0MiB)
+Downloading nvidia-nccl-cu12 (307.4MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading setuptools (1.1MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading networkx (1.9MiB)
+Downloading sympy (6.0MiB)
+Downloading pillow (6.3MiB)
+Downloading timm (2.4MiB)
+Downloading diffusers (3.9MiB)
+Downloading faiss-cpu (30.0MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading triton (148.3MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading matplotlib (8.3MiB)
+Downloading kiwisolver (1.4MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading torchvision (8.2MiB)
+Downloading numpy (17.4MiB)
+Downloading fonttools (4.7MiB)
+Downloading torch (846.9MiB)
+Downloading transformers (11.1MiB)
+ Downloading nvidia-cufile-cu12
+ Downloading kiwisolver
+ Downloading timm
+ Downloading setuptools
+ Downloading tokenizers
+ Downloading hf-xet
+ Downloading networkx
+ Downloading diffusers
+ Downloading fonttools
+      Built gcid @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+ Downloading pillow
+ Downloading torchvision
+ Downloading matplotlib
+ Downloading sympy
+ Downloading nvidia-cuda-cupti-cu12
+ Downloading scikit-learn
+ Downloading transformers
+ Downloading numpy
+ Downloading pandas
+ Downloading faiss-cpu
+ Downloading nvidia-nvjitlink-cu12
+ Downloading scipy
+ Downloading nvidia-curand-cu12
+ Downloading nvidia-cuda-nvrtc-cu12
+ Downloading triton
+ Downloading nvidia-cufft-cu12
+ Downloading nvidia-cusolver-cu12
+ Downloading nvidia-cusparse-cu12
+ Downloading nvidia-cusparselt-cu12
+ Downloading nvidia-nccl-cu12
+ Downloading nvidia-cublas-cu12
+ Downloading nvidia-cudnn-cu12
+ Downloading torch
+Prepared 69 packages in 33.17s
+Installed 69 packages in 1.58s
+ + certifi==2025.8.3
+ + charset-normalizer==3.4.3
+ + contourpy==1.3.3
+ + cycler==0.12.1
+ + diffusers==0.35.1
+ + faiss-cpu==1.12.0
+ + filelock==3.19.1
+ + fonttools==4.59.2
+ + fsspec==2025.9.0
+ + gcid==0.1.0 (from file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905)
+ + hf-xet==1.1.9
+ + huggingface-hub==0.34.4
+ + idna==3.10
+ + importlib-metadata==8.7.0
+ + jinja2==3.1.6
+ + joblib==1.5.2
+ + kiwisolver==1.4.9
+ + littleutils==0.2.4
+ + markupsafe==3.0.2
+ + matplotlib==3.10.6
+ + mpmath==1.3.0
+ + networkx==3.5
+ + numpy==1.26.4
+ + nvidia-cublas-cu12==12.8.4.1
+ + nvidia-cuda-cupti-cu12==12.8.90
+ + nvidia-cuda-nvrtc-cu12==12.8.93
+ + nvidia-cuda-runtime-cu12==12.8.90
+ + nvidia-cudnn-cu12==9.10.2.21
+ + nvidia-cufft-cu12==11.3.3.83
+ + nvidia-cufile-cu12==1.13.1.3
+ + nvidia-curand-cu12==10.3.9.90
+ + nvidia-cusolver-cu12==11.7.3.90
+ + nvidia-cusparse-cu12==12.5.8.93
+ + nvidia-cusparselt-cu12==0.7.1
+ + nvidia-nccl-cu12==2.27.3
+ + nvidia-nvjitlink-cu12==12.8.93
+ + nvidia-nvtx-cu12==12.8.90
+ + ogb==1.3.6
+ + outdated==0.2.2
+ + packaging==25.0
+ + pandas==2.3.2
+ + pillow==11.3.0
+ + pyparsing==3.2.3
+ + python-dateutil==2.9.0.post0
+ + pytz==2025.2
+ + pyyaml==6.0.2
+ + regex==2025.9.1
+ + requests==2.32.5
+ + safetensors==0.6.2
+ + scikit-learn==1.7.1
+ + scipy==1.16.1
+ + seaborn==0.13.2
+ + setuptools==80.9.0
+ + six==1.17.0
+ + sympy==1.14.0
+ + threadpoolctl==3.6.0
+ + timm==1.0.19
+ + tokenizers==0.22.0
+ + torch==2.8.0
+ + torchcam==0.4.0
+ + torchvision==0.23.0
+ + tqdm==4.67.1
+ + transformers==4.56.1
+ + triton==3.4.0
+ + typing-extensions==4.15.0
+ + tzdata==2025.2
+ + urllib3==2.5.0
+ + wilds==2.0.0
+ + zipp==3.23.0
+/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/.venv/lib/python3.11/site-packages/outdated/__init__.py:36: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import parse_version
+0Byte [00:00, ?Byte/s]0Byte [00:01, ?Byte/s]425984Byte [00:01, 3223519.13Byte/s]3710976Byte [00:01, 18612638.06Byte/s]13582336Byte [00:01, 52652321.72Byte/s]23896064Byte [00:01, 71733060.89Byte/s]32718848Byte [00:01, 77513701.58Byte/s]41533440Byte [00:01, 81037527.12Byte/s]51511296Byte [00:02, 81830967.71Byte/s]61480960Byte [00:02, 87196059.47Byte/s]70131712Byte [00:02, 86350225.69Byte/s]79208448Byte [00:02, 87669795.71Byte/s]87949312Byte [00:02, 80761733.65Byte/s]97910784Byte [00:02, 85418117.74Byte/s]106528768Byte [00:02, 78471733.12Byte/s]114925568Byte [00:02, 79354927.53Byte/s]122970112Byte [00:03, 51557298.44Byte/s]131047424Byte [00:03, 57526991.31Byte/s]137977856Byte [00:03, 57580161.56Byte/s]147046400Byte [00:03, 64775663.48Byte/s]154271744Byte [00:03, 64760020.51Byte/s]162816000Byte [00:03, 69817123.08Byte/s]170237952Byte [00:03, 66157661.28Byte/s]178626560Byte [00:03, 70630939.88Byte/s]185982976Byte [00:04, 68164687.42Byte/s]194871296Byte [00:04, 73770774.79Byte/s]202457088Byte [00:04, 61094378.74Byte/s]211427328Byte [00:04, 67315218.99Byte/s]218603520Byte [00:04, 62709248.77Byte/s]229122048Byte [00:04, 73307401.38Byte/s]236888064Byte [00:04, 52967134.66Byte/s]245506048Byte [00:05, 60008603.34Byte/s]252542976Byte [00:05, 52314445.70Byte/s]261971968Byte [00:05, 60935357.43Byte/s]268951552Byte [00:05, 53634928.69Byte/s]279003136Byte [00:05, 64076127.16Byte/s]286277632Byte [00:05, 58836102.33Byte/s]296304640Byte [00:05, 68543212.01Byte/s]303882240Byte [00:06, 60055481.87Byte/s]312582144Byte [00:06, 66350084.93Byte/s]319848448Byte [00:06, 36863489.50Byte/s]328843264Byte [00:06, 45486144.41Byte/s]335527936Byte [00:06, 49156493.35Byte/s]342081536Byte [00:06, 47374944.44Byte/s]352059392Byte [00:06, 58562157.81Byte/s]359170048Byte [00:07, 50404159.39Byte/s]367697920Byte [00:07, 57777845.28Byte/s]374489088Byte [00:07, 46565177.24Byte/s]383205376Byte [00:07, 54910937.09Byte/s]389783552Byte [00:07, 37483958.49Byte/s]399171584Byte [00:08, 47294203.27Byte/s]405610496Byte [00:08, 41970021.18Byte/s]413704192Byte [00:08, 49398653.49Byte/s]419946496Byte [00:08, 38063277.93Byte/s]429686784Byte [00:08, 48558004.63Byte/s]436207616Byte [00:09, 38589728.27Byte/s]446439424Byte [00:09, 49560774.03Byte/s]452984832Byte [00:09, 43289605.36Byte/s]462938112Byte [00:09, 54065359.11Byte/s]469794816Byte [00:09, 52026331.45Byte/s]480657408Byte [00:09, 64297198.28Byte/s]489291776Byte [00:09, 68620409.24Byte/s]489291776Byte [00:09, 50093538.65Byte/s]
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 67, in <module>
+    main()
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 63, in main
+    run_experiment(exp_cfg)
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 38, in run_experiment
+    cluster_ids, _ = miner.mine(train_ds)
+                     ^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/train.py", line 71, in mine
+    img = img.unsqueeze(0).to(dtype=DTYPE, device=DEVICE)
+          ^^^^^^^^^^^^^
+AttributeError: 'Image' object has no attribute 'unsqueeze'

@@ -1,12 +1,14 @@
-```python
+from __future__ import annotations
 """src/main.py
 Entry point for the HCER experiments – this file sticks as closely as
 possible to the original monolithic script while using the refactored
 modules.  Execute with
     uv  run  python -m  src.main
 """
-from __future__ import annotations
-import os, sys, json, time
+import os
+import sys
+import json
+import time
 from typing import Dict
 
 import torch
@@ -22,7 +24,7 @@ from .evaluate import plot_bar
 _CONFIG_PATH = os.path.join("config", "config.yaml")
 if not os.path.exists(_CONFIG_PATH):
     raise FileNotFoundError("Configuration file not found – expected config/config.yaml")
-with open(_CONFIG_PATH, "r") as f:
+with open(_CONFIG_PATH, "r", encoding="utf-8") as f:
     CONFIG = yaml.safe_load(f)
 
 common_cfg: Dict = CONFIG["common"]
@@ -31,8 +33,9 @@ common_cfg: Dict = CONFIG["common"]
 #                       EXP-1  (memory–accuracy curve)
 # -----------------------------------------------------------------------------
 
-# Central place for all plots – comply with iteration2 requirement
-_PLOT_DIR = os.path.join(".research", "iteration2", "images")
+# All plots must be saved under this directory as required by the
+# evaluation harness.
+_PLOT_DIR = os.path.join(".research", "iteration3", "images")
 
 
 def run_exp1():
@@ -53,10 +56,16 @@ def run_exp1():
             )
             tic = time.perf_counter()
             for exp in bench.train_stream:
-                trainer.observe_task(exp.dataloader(num_workers=common_cfg["num_workers"]), epochs=spec["epochs_per_task"])
+                trainer.observe_task(
+                    exp.dataloader(num_workers=common_cfg["num_workers"]),
+                    epochs=spec["epochs_per_task"],
+                )
             acc = trainer.evaluate(bench.test_stream[-1].dataloader(num_workers=common_cfg["num_workers"]))
             wall = time.perf_counter() - tic
-            print(f"[EXP-1] budget={budget}MB  method={method:<10}  ACC={acc:5.2f}  wall={wall/60:4.1f} min")
+            print(
+                f"[EXP-1] budget={budget}MB  method={method:<10}  ACC={acc:5.2f}  wall={wall/60:4.1f} min",
+                flush=True,
+            )
             accs[method] = acc
         results[budget] = accs
         # Ensure directory exists before plotting
@@ -70,6 +79,7 @@ def run_exp1():
     print("==== EXP-1 summary (Accuracy %) ====")
     print(json.dumps(results, indent=2))
 
+
 # -----------------------------------------------------------------------------
 #                       Main
 # -----------------------------------------------------------------------------
@@ -78,6 +88,7 @@ def main():
     if not torch.cuda.is_available():
         print("CUDA not available – aborting (GPU required by spec).")
         sys.exit(1)
+
     os.makedirs(_PLOT_DIR, exist_ok=True)
     print("Running EXP-1 (memory/accuracy curve)…")
     run_exp1()
@@ -86,4 +97,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```

@@ -6,5 +6,82 @@
     "distributional robustness",
     "invariant risk minimization",
     "causal representation learning"
+  ],
+  "research_study_list": [
+    {
+      "title": "Seeing is not Believing: Robust Reinforcement Learning against Spurious Correlation"
+    },
+    {
+      "title": "A Causal Framework for Decomposing Spurious Variations"
+    },
+    {
+      "title": "Examining and Combating Spurious Features under Distribution Shift"
+    },
+    {
+      "title": "Contextual Reliability: When Different Features Matter in Different Contexts"
+    },
+    {
+      "title": "Causal Effect Regularization: Automated Detection and Removal of Spurious Correlations"
+    },
+    {
+      "title": "Vector Quantization With Self-Attention for Quality-Independent Representation Learning"
+    },
+    {
+      "title": "Fundamental limits on the robustness of image classifiers"
+    },
+    {
+      "title": "Optimizing Relevance Maps of Vision Transformers Improves Robustness"
+    },
+    {
+      "title": "Robust Quantization: One Model to Rule Them All"
+    },
+    {
+      "title": "Contemplating Real-World Object Classification"
+    },
+    {
+      "title": "Optimal Transport Model Distributional Robustness"
+    },
+    {
+      "title": "Distributionally Robust $Q$-Learning"
+    },
+    {
+      "title": "Distributionally Robust $Q$-Learning"
+    },
+    {
+      "title": "Non-convex Distributionally Robust Optimization: Non-asymptotic Analysis"
+    },
+    {
+      "title": "Modeling the Second Player in Distributionally Robust Optimization"
+    },
+    {
+      "title": "Invariant Risk Minimization Is A Total Variation Model"
+    },
+    {
+      "title": "The Missing Invariance Principle found --  the Reciprocal Twin of Invariant Risk Minimization "
+    },
+    {
+      "title": "Sparse Invariant Risk Minimization"
+    },
+    {
+      "title": "Sparse Invariant Risk Minimization"
+    },
+    {
+      "title": "The Risks of Invariant Risk Minimization"
+    },
+    {
+      "title": "Causal Representation Learning Made Identifiable by Grouping of Observational Variables"
+    },
+    {
+      "title": "Causal Representation Learning for Instantaneous and Temporal Effects in Interactive Systems"
+    },
+    {
+      "title": "A Sparsity Principle for Partially Observable Causal Representation Learning"
+    },
+    {
+      "title": "Identifiable Latent Polynomial Causal Models through the Lens of Change"
+    },
+    {
+      "title": "Causal Representation Learning from Multiple Distributions: A General Setting"
+    }
   ]
 }

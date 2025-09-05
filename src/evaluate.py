@@ -8,11 +8,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
-from torchmetrics.classification import MulticlassAccuracy
 
-# The directory in which we store publication-ready figures
+# -----------------------------------------------------------------------------
+#  Save all figures inside the directory mandated by the instructions
+# -----------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent
-FIG_DIR = ROOT / "figures"
+FIG_DIR = ROOT / ".research" / "iteration2" / "images"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
 
 __all__ = [
@@ -28,19 +29,25 @@ def evaluate(
     task_id: int,
     device: torch.device,
 ) -> float:
-    """Return classification accuracy on *loader* for *task_id*."""
+    """Return classification accuracy on *loader* for *task_id*.
+
+    A hand-rolled metric is used instead of ``torchmetrics`` so that we do not
+    have to know ``num_classes`` beforehand (it differs across tasks).  This
+    keeps the evaluation routine generic and avoids shape-mismatch errors.
+    """
 
     model.eval()
-    # We always keep 100 classes for the metric so that different task splits
-    # are comparable.  The unused classes simply never appear.
-    acc_metric = MulticlassAccuracy(num_classes=100).to(device)
+    correct = 0
+    total = 0
 
     for images, labels in loader:
         images, labels = images.to(device), labels.to(device)
         logits = model(images, task_id)
-        acc_metric.update(logits, labels)
+        preds = logits.argmax(dim=1)
+        correct += (preds == labels).sum().item()
+        total += labels.size(0)
 
-    return acc_metric.compute().item()
+    return correct / total if total > 0 else 0.0
 
 
 def plot_metric(
@@ -50,7 +57,7 @@ def plot_metric(
     title: str,
     fname: str,
 ) -> None:
-    """Save a PDF line plot *fname* into FIG_DIR."""
+    """Save a PDF line plot *fname* into ``FIG_DIR``."""
 
     plt.figure(figsize=(6, 4))
     plt.plot(x, y, marker="o", label=ylabel)
@@ -65,5 +72,5 @@ def plot_metric(
 
     out_path = FIG_DIR / fname
     plt.savefig(out_path, bbox_inches="tight", format="pdf")
-    print(f"[Figure saved] {out_path.name}")
+    print(f"[Figure saved] {out_path.relative_to(ROOT)}")
     plt.close()

@@ -26,7 +26,7 @@ from .evaluate import evaluate, plot_metric
 # -----------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent  # project root
 DATA_DIR = ROOT / "data"
-FIG_DIR = ROOT / "figures"
+FIG_DIR = ROOT / ".research" / "iteration2" / "images"
 for _d in (DATA_DIR, FIG_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 
@@ -131,16 +131,3 @@ def _run_experiment(exp_key: str, exp_cfg: dict):
         title=f"{exp_key.upper()} – Accuracy over Tasks",
         fname=fig_name,
     )
-
-
-def main():
-    cfg = _load_config(Path(__file__).resolve().parent.parent / "config" / "config.yaml")
-
-    for exp_key, exp_cfg in cfg["experiments"].items():
-        _run_experiment(exp_key, exp_cfg)
-
-    print("\nAll experiments finished successfully.")
-
-
-if __name__ == "__main__":
-    main()

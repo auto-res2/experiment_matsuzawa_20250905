@@ -8,6 +8,7 @@ from typing import List, Tuple
 import torch
 import torch.utils.data as td
 import torchvision
+from torchvision.transforms.functional import to_tensor
 
 __all__ = [
     "get_data_stream",
@@ -36,9 +37,17 @@ def _build_cifar100_stream(
     ]
 
     def _subset(dataset, cls_subset):
+        """Return a ``TensorDataset`` containing only ``cls_subset`` classes.
+
+        The original CIFAR-100 targets (0‒99) are remapped to the consecutive
+        range 0‒(classes_per_task-1) so that they are compatible with the
+        task-specific heads (each head outputs ``classes_per_task`` logits).
+        """
+        label_map = {orig: new for new, orig in enumerate(sorted(cls_subset))}
         idx = [j for j, (_, y) in enumerate(dataset) if y in cls_subset]
-        imgs = torch.stack([dataset[j][0] for j in idx])
-        labels = torch.tensor([dataset[j][1] for j in idx])
+
+        imgs = torch.stack([to_tensor(dataset[j][0]) for j in idx])  # → [N,3,32,32]
+        labels = torch.tensor([label_map[dataset[j][1]] for j in idx])
         return td.TensorDataset(imgs, labels)
 
     train_stream = [_subset(train_set, c) for c in task_cls]

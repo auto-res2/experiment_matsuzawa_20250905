@@ -1,1 +1,21 @@
-# Please list the required python packages.
+[project]
+name = "hcer-cl"
+version = "0.1.0"
+description = "Hierarchically-Compressed Episodic Replay – refactored project structure"
+requires-python = ">=3.9"
+readme = "README.md"
+authors = [
+  {name = "Continual-Learning Researcher", email = "research@example.com"}
+]
+
+[project.dependencies]
+torch = "*"
+torchvision = "*"
+avalanche-lib = "*"
+matplotlib = "*"
+pyyaml = "*"
+requests = "*"
+numpy = "*"
+
+[tool.setuptools]
+packages = ["src"]

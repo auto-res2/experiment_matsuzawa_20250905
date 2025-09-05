@@ -1,0 +1,66 @@
+# =============================================================
+# Continuous-learning experiments for HCER (all stacks)
+# =============================================================
+common:
+  random_seeds: [11, 17, 23]
+  device: cuda
+  num_workers: 4
+  precision: fp16         # mixed precision via torch.cuda.amp
+  cudnn_deterministic: true
+  batch_size:
+    cifar100: 128
+    imagenet100: 96
+    streaming_cifar: 10
+  optimiser:
+    name: sgd
+    base_lr: 0.1          # will be scaled by (bs/128)
+    momentum: 0.9
+    weight_decay: 0.0005
+  scheduler:
+    name: cosine
+    warmup_iters: 200
+  augmentation:
+    input_size: 32
+    randaugment: {N: 2, M: 9}   # only ImageNet-100
+    cutout: {holes: 1, length: 8}
+
+# -----------------------------------------------------------------
+# EXP-1  Memory – accuracy – throughput curve
+# -----------------------------------------------------------------
+exp1:
+  datasets: [split_cifar100, split_imagenet100]
+  models: [resnet18]
+  memory_budgets_mb: [2, 5, 10, 20]
+  replay_methods:
+    - hcer
+    - er
+    - rar
+    - aqm
+    - sparcl
+    - orthogonal_subspace
+    - joint
+  epochs_per_task: 5
+
+# -----------------------------------------------------------------
+# EXP-2  Energy & latency on task-free streaming CIFAR
+# -----------------------------------------------------------------
+exp2:
+  dataset: streaming_cifar
+  model: resnet18
+  memory_budget_mb: 5
+  replay_methods: [hcer, er, aqm, sparcl]
+  online_batch: 10
+
+# -----------------------------------------------------------------
+# EXP-3  Robustness & ablations on split-miniImageNet
+# -----------------------------------------------------------------
+exp3:
+  dataset: split_mini_imagenet
+  task_orders: [random, balanced]
+  model: resnet18
+  variants:
+    - {name: full,           tier1_bits: 64, anchors_per_class: 2,  use_bfp: true}
+    - {name: tier1_only,     tier1_bits: 64, anchors_per_class: 0,  use_bfp: true}
+    - {name: no_bfp,         tier1_bits: 64, anchors_per_class: 2,  use_bfp: false}
+    - {name: bits_128_equmem,tier1_bits:128, anchors_per_class: 1,  use_bfp: true}
+  epochs_per_task: 5

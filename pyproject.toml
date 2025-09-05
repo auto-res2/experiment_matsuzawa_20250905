@@ -7,13 +7,13 @@ license = { text = "MIT" }
 readme = "README.md"
 
 # -----------------------------------------------------------------------------
-# PEP-621 compliant dependency specification (must be a sequence, not a table)
+# PEP-621 compliant dependency specification
 # -----------------------------------------------------------------------------
 
 dependencies = [
   "torch>=2.1.0,<2.2.0",
   "torchvision>=0.16.0,<0.17.0",  # 0.16.x pairs with PyTorch 2.1.x
-  "numpy",
+  "numpy>=1.23,<2.0",  # stay below major v2 for PyTorch binary compatibility
   "matplotlib",
   "pyyaml",
   "tqdm"

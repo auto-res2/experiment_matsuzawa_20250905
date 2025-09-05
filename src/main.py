@@ -36,13 +36,33 @@ if torch.cuda.is_available():
 # Experiment-1 (ImageNet-128) --------------------------------------------------
 # -----------------------------------------------------------------------------
 
+
+def _skip_result(seed: int, budget_kb: int, reason: str) -> Dict[str, float]:
+    """Utility producing a minimal result dict in case an experiment is skipped."""
+    return {
+        "seed": seed,
+        "budget_kb": budget_kb,
+        "skipped": True,
+        "reason": reason,
+    }
+
+
 def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
     desc = CONFIG["experiments"]["exp1"]["description"]
     print(f"\n===== Experiment-1 – {desc} | Budget: {budget_kb} kB | Seed {seed} =====")
 
     set_seed(seed)
     root = Path(CONFIG["datasets"]["imagenet128"]["root"])
-    assert_imagenet_present(root)
+
+    # ------------------------------------------------------------------
+    # Graceful handling if ImageNet archives are absent -----------------
+    # ------------------------------------------------------------------
+    try:
+        assert_imagenet_present(root)
+    except FileNotFoundError as e:
+        print("WARNING:", e)
+        print("Skipping Experiment-1 because ImageNet archives are missing.")
+        return _skip_result(seed, budget_kb, "imagenet_not_found")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = DFBDModel(
@@ -137,9 +157,9 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
     }
 
     # ------------------------------------------------------------------
-    # Store experiment artefacts under .research/iteration2              
+    # Store experiment artefacts under .research/iteration4
     # ------------------------------------------------------------------
-    out_dir = Path(".research") / "iteration2"
+    out_dir = Path(".research") / "iteration4"
     out_dir.mkdir(parents=True, exist_ok=True)
     res_path = out_dir / f"experiment1_seed{seed}_budget{budget_kb}.json"
     save_json(results, res_path)
@@ -152,22 +172,19 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
 # Main dispatcher --------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
+
 def main():
     results_all: List[Dict[str, float]] = []
-    try:
-        for seed in CONFIG["global"]["seeds"]:
-            for budget in CONFIG["experiments"]["exp1"]["memory_budgets_kb"]:
-                res = run_experiment1(seed, budget)
-                results_all.append(res)
-    except FileNotFoundError as e:
-        print("\nERROR:", e)
-        sys.exit(1)
+    for seed in CONFIG["global"]["seeds"]:
+        for budget in CONFIG["experiments"]["exp1"]["memory_budgets_kb"]:
+            res = run_experiment1(seed, budget)
+            results_all.append(res)
 
-    if results_all:
-        summary_path = Path(".research") / "iteration2" / "exp1_summary.json"
-        save_json({"all": results_all}, summary_path)
-        print("\n===== All Experiment-1 runs completed successfully =====")
-        print(json.dumps({"all": results_all}, indent=2))
+    # Even if all runs were skipped, we persist a summary for reproducibility
+    summary_path = Path(".research") / "iteration4" / "exp1_summary.json"
+    save_json({"all": results_all}, summary_path)
+    print("\n===== Experiment-1 processing finished =====")
+    print(json.dumps({"all": results_all}, indent=2))
 
 
 if __name__ == "__main__":

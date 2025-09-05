@@ -64,6 +64,10 @@ def save_json(obj: Dict[str, Any], path: str | Path) -> None:
 # Plotting ---------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
+# Centralised research directory (iteration4)
+_RESEARCH_IMG_DIR = Path(".research") / "iteration4" / "images"
+
+
 def _annotate(ax: plt.Axes):
     for line in ax.get_lines():
         x_data, y_data = line.get_xdata(), line.get_ydata()
@@ -97,11 +101,10 @@ def plot_line(
     ax.set_ylabel(ylabel)
     ax.legend()
     # ----------------------------------------------------------------------
-    # All research artefacts for the second iteration go under .research/iteration2
+    # All research artefacts for iteration4
     # ----------------------------------------------------------------------
-    out_dir = Path(".research") / "iteration2" / "images"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    outfile = out_dir / filename
+    _RESEARCH_IMG_DIR.mkdir(parents=True, exist_ok=True)
+    outfile = _RESEARCH_IMG_DIR / filename
     plt.savefig(outfile, format="pdf", bbox_inches="tight")
     plt.close()
     return outfile

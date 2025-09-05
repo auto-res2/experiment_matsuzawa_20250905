@@ -4,16 +4,21 @@ from pathlib import Path
 from typing import Dict, List
 
 import matplotlib
-import matplotlib.pyplot as plt
+
+# The backend *must* be set before importing pyplot
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402  (import after backend set)
+
 import numpy as np
 import torch  # ensure torch is available for metric computations
 from sklearn.cluster import KMeans
 from sklearn.metrics import accuracy_score, mutual_info_score
 
-matplotlib.use("Agg")
+# ──────────────────────────────────────────────────────────────────────────────
+#  Figure output directory (iteration *7*)
+# ──────────────────────────────────────────────────────────────────────────────
 
-# Save every figure to the iteration *6* directory as requested
-_IMAGES_DIR = Path(".research/iteration6/images")
+_IMAGES_DIR = Path(".research/iteration7/images")
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -25,6 +30,7 @@ def accuracy(logits, labels):
 
 
 def group_distance_ratio(emb, labels):
+    """Average inter-class distance divided by average intra-class distance."""
     with torch.no_grad():
         labels_np = labels.cpu().numpy()
         emb_cpu = emb.cpu()
@@ -44,13 +50,14 @@ def group_distance_ratio(emb, labels):
 
 
 def instance_information_gain(emb, labels, n_clusters: int):
+    """Normalized mutual information between KMeans clusters and ground truth."""
     with torch.no_grad():
         kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=0).fit(emb.cpu())
         mi = mutual_info_score(labels.cpu().numpy(), kmeans.labels_)
     return mi / np.log(n_clusters)
 
 # ──────────────────────────────────────────────────────────────────────────────
-#  Plotting
+#  Plotting helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
 def plot_line(

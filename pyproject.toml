@@ -10,31 +10,35 @@ requires-python = ">=3.9"
 authors = [{ name = "Researcher" }]
 
 # ---------------------------------------------------------------------------
-#  Runtime dependencies
+#  Runtime dependencies (version pins chosen for NumPy 1.x compatibility)
 # ---------------------------------------------------------------------------
 
 dependencies = [
     # Core deep-learning stack
     "torch==2.2.2",
 
-    # PyG core (pure Python) and compiled extensions
+    # PyG core (pure Python) and compiled extensions (built from source if wheel unavailable)
     "torch-geometric==2.5.2",
     "torch-scatter==2.1.2",
     "torch-sparse==0.6.18",
 
-    # Scientific / utility stack
+    # Numerical / scientific stack — keep NumPy 1.x to avoid ABI break with many wheels
+    "numpy<2.0",            # PyTorch & many compiled deps are not yet NumPy-2 ready
+    "scipy<1.13",           # SciPy 1.13+ requires NumPy>=2.0
+
+    # Utilities & misc
     "PyYAML",
     "matplotlib",
     "seaborn",
     "scikit-learn",
     "requests",
-    "networkx<3.0",            # GraphRicciCurvature 0.5.x expects networkx <3
+    "networkx<3.0",          # GraphRicciCurvature 0.5.x expects networkx <3
     "GraphRicciCurvature==0.5.3.2",
     "deeprobust>=0.2.9",
 ]
 
 # ---------------------------------------------------------------------------
-#  Extra build-time dependencies for C++/CUDA extensions that require torch
+#  Extra build-time dependencies for extensions that need torch headers
 # ---------------------------------------------------------------------------
 [tool.uv.extra-build-dependencies]
 "torch-scatter" = ["torch"]

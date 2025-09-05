@@ -49,8 +49,18 @@ def _hard_abort(msg: str) -> None:
 
 
 def _verify_notears() -> None:
-    if importlib.util.find_spec("notears") is None and importlib.util.find_spec("notears_torch") is None:
-        _hard_abort("ERROR: NOTEARS package not found – install notears-torch>=0.3.5")
+    """Abort if the *notears* package is unavailable.
+
+    We depend on the canonical NumPy implementation released on PyPI as
+    ``notears`` (see https://github.com/xunzheng/notears).  Earlier drafts of
+    this code referenced a non-existent ``notears-torch`` fork which caused the
+    dependency resolver to fail.  The guard is kept to surface a clear error
+    message if the import is still missing.
+    """
+    try:
+        import notears  # noqa: F401 – import only for the availability check
+    except ImportError:
+        _hard_abort("ERROR: 'notears' package not found – please install notears>=0.1.0 from PyPI.")
 
 
 def _verify_sd_checkpoint(sd_sha: str, ckpt_path: Path) -> None:
@@ -80,12 +90,13 @@ def _run_notears(
 
     z = latents.cpu().float().numpy()
     y = labels.cpu().float().numpy().reshape(-1, 1)
-    data = torch.from_numpy(z).numpy()
     data = __import__("numpy").concatenate([z, y], axis=1)
 
     w = notears_linear(data, lambda1=lambda1, max_iter=max_iter)
     causal_strength = w[:-1, -1]
-    idx = causal_strength.argsort()[-keep_dims:][::-1]
+    import numpy as np
+
+    idx = np.argsort(causal_strength)[-keep_dims:][::-1]
     return idx, causal_strength[idx]
 
 
@@ -194,6 +205,7 @@ def _run_single_config(cfg_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+
 def _run_one_seed(cfg: "omegaconf.DictConfig", seed: int) -> None:  # noqa: C901 – complex but linear
     start = time.time()
 

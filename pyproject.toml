@@ -13,7 +13,7 @@ dependencies = [
 
     # WILDS benchmark & causal-discovery helper
     "wilds==2.0.0",
-    "notears-torch==0.3.5",
+    "notears==0.1.0",  # canonical PyPI release of the NOTEARS implementation
 
     # Generative diffusion + LoRA fine-tuning
     "transformers==4.35.2",

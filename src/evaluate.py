@@ -8,9 +8,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402 – backend must be set before import
 
 # ----------------------------------------------------------------------------
-# Image output directory (specification: `.research/iteration5/images`)
+# Image output directory (specification: `.research/iteration6/images`)
 # ----------------------------------------------------------------------------
-IMG_DIR = Path(".research/iteration5/images")
+IMG_DIR = Path(".research/iteration6/images")
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 

@@ -108,7 +108,11 @@ def _build_model(model_name: str, data, depth: int) -> torch.nn.Module:
             dims = [in_dim] + [hidden] * (depth - 1) + [out_dim]
             for i in range(depth):
                 layers.append(GCNConv(dims[i], dims[i + 1]))
-            return Sequential("x, edge_index", [(l, "x, edge_index -> x") for l in layers], torch.nn.LogSoftmax(dim=-1))
+            # Sequential API (PyG ≥2.4) takes only two positional args: metadata & module list
+            return Sequential(
+                "x, edge_index",
+                [(l, "x, edge_index -> x") for l in layers] + [torch.nn.LogSoftmax(dim=-1)],
+            )
         return GCN(
             in_channels=in_dim,
             hidden_channels=hidden,
@@ -122,7 +126,10 @@ def _build_model(model_name: str, data, depth: int) -> torch.nn.Module:
         for i in range(depth):
             conv = GCNConv(dims[i], dims[i + 1])
             layers.append(DropEdgeWrapper(conv, p=0.2))
-        return Sequential("x, edge_index", [(l, "x, edge_index -> x") for l in layers], torch.nn.LogSoftmax(dim=-1))
+        return Sequential(
+            "x, edge_index",
+            [(l, "x, edge_index -> x") for l in layers] + [torch.nn.LogSoftmax(dim=-1)],
+        )
     if model_name == "GCNII":
         return GCN2(
             num_layers=depth,

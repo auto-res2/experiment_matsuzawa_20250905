@@ -1,1 +1,22 @@
-# Please list the required python packages.
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "afngnn-research"
+version = "0.1.0"
+description = "Adaptive Frequency-band Node-wise GNN experimental suite"
+requires-python = ">=3.9"
+authors = [{name = "Researcher"}]
+
+[project.dependencies]
+torch = ">=2.0"
+torch-geometric = "*"
+PyYAML = "*"
+matplotlib = "*"
+seaborn = "*"
+scikit-learn = "*"
+requests = "*"
+networkx = "*"
+GraphRicciCurvature = "==0.5.3.2"
+deeprobust = "*"

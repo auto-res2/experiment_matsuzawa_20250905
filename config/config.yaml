@@ -1,0 +1,32 @@
+seed_list: [11,13,17,19,23,29,31,37,41,43]
+precision: fp16   # use torch.cuda.amp
+num_epochs: 200
+patience: 100
+optim:
+  lr: 0.001
+  weight_decay: 0.0005
+  warmup: 10
+  scheduler: cosine
+  beta1: 0.9
+  beta2: 0.999
+model:
+  hidden_dim_small: 128   # when depth >=64
+  hidden_dim_large: 256
+  bands: 5
+  dropout: 0.3
+  entropy_lambda: 0.005
+experiments:
+  depth_scalability:
+    depths: [2,8,16,32,64,128]
+    datasets: [Cora,PubMed,Chameleon,Squirrel]
+  robustness:
+    edge_budgets: [0.05,0.1,0.2]
+    feat_budgets: [0.2,0.4,0.6]
+    datasets: [Cora,Chameleon]
+  frequency_usage:
+    layers_to_probe: [1,8,32]
+    dataset: Chameleon
+
+resources:
+  planetoid_repo: https://github.com/kimiyoung/planetoid/raw/master/data
+  gcnII_repo: https://github.com/chennnM/GCNII.git

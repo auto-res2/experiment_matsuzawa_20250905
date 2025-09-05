@@ -1,7 +1,7 @@
 from __future__ import annotations
 """src/main.py ––– project entry-point
 This script orchestrates the full experimental pipeline:
-    1. directory bootstrap (.research/iteration2/…)
+    1. directory bootstrap (.research/iteration3/…)
     2. configuration loading (YAML)
     3. experiment execution (train.py)
     4. result / figure persistence
@@ -27,10 +27,10 @@ set_global_seed(42)
 print(banner("Dynamic Halting GNN – Reproducible Experiment Suite"))
 
 # ---------------------------------------------------------------------------
-# 1.  Directory bootstrap (.research/iteration2/*)
+# 1.  Directory bootstrap (.research/iteration3/*)
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-RESEARCH_DIR = PROJECT_ROOT / ".research" / "iteration2"
+RESEARCH_DIR = PROJECT_ROOT / ".research" / "iteration3"
 IMAGES_DIR   = RESEARCH_DIR / "images"
 
 for d in (RESEARCH_DIR, IMAGES_DIR):

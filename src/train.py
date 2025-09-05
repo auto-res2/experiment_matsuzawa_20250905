@@ -1,193 +1,277 @@
-"""src/train.py
---------------------------------------------------------------------
-All model definitions and the generic training routine live here.
-The module is intentionally independent from the rest of the project
-except for the `config` dictionary that is passed in from src.main.
-"""
 from __future__ import annotations
 
-# ----------------- standard lib ----------------------------------
+import os
+import random
 import time
-from dataclasses import dataclass
-from typing import Dict, Any, Tuple
+from types import SimpleNamespace
+from typing import Dict
 
-# ----------------- third-party -----------------------------------
 import torch
 import torch.nn.functional as F
-from torch import nn, Tensor
-from torch_geometric.nn import GCNConv, Sequential
+from torch import Tensor, nn
+
+# Torch-Geometric -----------------------------------------------------------
+from torch_geometric.nn import GCNConv
 from torch_geometric.utils import degree
 
+# Optional – FLOP counter (fails gracefully if absent) ----------------------
 try:
-    from fvcore.nn import FlopCountAnalysis  # optional but nice to have
-except ImportError:  # pragma: no cover
-    FlopCountAnalysis = None  # type: ignore
+    from fvcore.nn import FlopCountAnalysis  # type: ignore
+except ImportError:  # pragma: no cover – fvcore is optional
+    FlopCountAnalysis = None
 
-# -----------------------------------------------------------------
-#  Utilities                                                        
-# -----------------------------------------------------------------
+# Local imports -------------------------------------------------------------
+from .evaluate import average_pairwise_distance, effective_rank  # no circular deps
 
-def simple_forman_curvature(edge_index: Tensor, num_nodes: int) -> Tensor:
-    """Cheap O(E) Forman-Ricci curvature approximation κ(u,v)=4−deg(u)−deg(v).
-    Returns a vector of length |E| with curvature values (float32).
-    """
-    row, col = edge_index
-    degs = degree(row, num_nodes=num_nodes).float()
-    kappa = 4.0 - degs[row] - degs[col]
-    return kappa
+__all__ = [
+    "ContraNorm",
+    "CurvoLayer",
+    "CurvoNet",
+    "PlainGCN",
+    "DropEdgeGCN",
+    "GCNII",
+    "build_model",
+    "train",
+]
 
-
+# ---------------------------------------------------------------------------
+# Normalisation & curvature helpers
+# ---------------------------------------------------------------------------
 class ContraNorm(nn.Module):
-    """Variance-preserving normalisation from ContraNorm (local variant)."""
+    """Variance-preserving normalisation (local variant as in the paper)."""
 
-    def __init__(self, eps: float = 1e-5):
+    def __init__(self, eps: float = 1e-5) -> None:  # noqa: D401 – trivial doc
         super().__init__()
         self.eps = eps
 
-    def forward(self, x: Tensor) -> Tensor:  # noqa: D401 – simple interface
+    def forward(self, x: Tensor) -> Tensor:  # noqa: D401 – simple forward
         mu = x.mean(dim=0, keepdim=True)
         var = (x - mu).pow(2).mean(dim=0, keepdim=True)
         return (x - mu) / (var + self.eps).sqrt()
 
 
-class CurvoLayer(nn.Module):
-    """One layer of CURVONet implementing curvature gating + ContraNorm."""
+# ---------------------------------------------------------------------------
+# Curvature helper
+# ---------------------------------------------------------------------------
 
-    def __init__(self, in_dim: int, out_dim: int):
+def _forman_curvature(edge_index: Tensor, num_nodes: int) -> Tensor:
+    """Cheap O(E) Forman curvature approximation κ = 4 − deg(u) − deg(v)."""
+    row, col = edge_index
+    deg = degree(row, num_nodes=num_nodes, dtype=torch.float32)
+    return 4.0 - deg[row] - deg[col]
+
+
+# ---------------------------------------------------------------------------
+# Model definitions
+# ---------------------------------------------------------------------------
+class CurvoLayer(nn.Module):
+    """Single CURVONet layer: curvature-gated GCN + ContraNorm + residual."""
+
+    def __init__(self, in_dim: int, out_dim: int) -> None:  # noqa: D401
         super().__init__()
-        self.gcn = GCNConv(in_dim, out_dim, add_self_loops=False, normalize=True)
-        self.gate_mlp = nn.Sequential(
+        self.conv = GCNConv(in_dim, out_dim, add_self_loops=False, normalize=True)
+        self.gate = nn.Sequential(
             nn.Linear(1, 16), nn.SiLU(), nn.Linear(16, 1), nn.Sigmoid()
         )
         self.norm = ContraNorm()
-        self.gamma = nn.Parameter(torch.tensor(0.1))  # residual strength (pre-sigmoid)
+        self.gamma = nn.Parameter(torch.tensor(0.1))  # learnable residual coefficient
 
     def forward(self, x: Tensor, edge_index: Tensor) -> Tensor:  # noqa: D401
-        kappa = simple_forman_curvature(edge_index, x.size(0)).unsqueeze(-1)  # [E,1]
-        a_uv = self.gate_mlp(kappa).squeeze()                                # [E]
-        out = self.gcn(x, edge_index, edge_weight=a_uv)
-        out = self.norm(out)
+        kappa = _forman_curvature(edge_index, x.size(0)).unsqueeze(-1)  # [E,1]
+        att = self.gate(kappa).squeeze()  # [E]
+        h = self.conv(x, edge_index, edge_weight=att)
+        h = self.norm(h)
         beta = torch.sigmoid(self.gamma)
-        return (1 - beta) * F.relu(out) + beta * x
+        return (1 - beta) * F.relu(h) + beta * x
 
 
 class CurvoNet(nn.Module):
-    """Stack of CurvoLayers + plain GCN head."""
+    """Full CURVONet backbone."""
 
     def __init__(self, in_dim: int, hidden: int, out_dim: int, num_layers: int):
         super().__init__()
-        dims = [in_dim] + [hidden] * (num_layers - 1) + [out_dim]
-        self.layers = nn.ModuleList([CurvoLayer(dims[i], dims[i + 1]) for i in range(num_layers - 1)])
-        self.final_conv = GCNConv(dims[-2], dims[-1], add_self_loops=False, normalize=True)
-        self.log_softmax = nn.LogSoftmax(dim=-1)
+        self.layers = nn.ModuleList(
+            [CurvoLayer(in_dim if i == 0 else hidden, hidden) for i in range(num_layers)]
+        )
+        self.head = GCNConv(hidden, out_dim, add_self_loops=False, normalize=True)
+        self.logsoftmax = nn.LogSoftmax(dim=-1)
 
     def forward(self, x: Tensor, edge_index: Tensor) -> Tensor:  # noqa: D401
         for layer in self.layers:
             x = layer(x, edge_index)
-        x = self.final_conv(x, edge_index)
-        return self.log_softmax(x)
+        x = self.head(x, edge_index)
+        return self.logsoftmax(x)
 
 
-class DropEdgeWrapper(nn.Module):
-    """Wrap a PyG GCNConv with edge-dropout at training time."""
+# ---------------------------------------------------------------------------
+# Baselines
+# ---------------------------------------------------------------------------
+class DropEdgeGCN(nn.Module):
+    """GCN with edge dropout (DropEdge baseline)."""
 
-    def __init__(self, conv: GCNConv, p: float = 0.2):
+    def __init__(self, in_dim: int, hidden: int, out_dim: int, num_layers: int, p: float = 0.2):
         super().__init__()
-        self.conv = conv
         self.p = p
+        dims = [in_dim] + [hidden] * (num_layers - 1) + [out_dim]
+        self.convs = nn.ModuleList([GCNConv(dims[i], dims[i + 1]) for i in range(num_layers)])
+        self.logsoftmax = nn.LogSoftmax(dim=-1)
 
     def forward(self, x: Tensor, edge_index: Tensor) -> Tensor:  # noqa: D401
         if self.training:
             mask = torch.rand(edge_index.size(1), device=edge_index.device) > self.p
             edge_index = edge_index[:, mask]
-        return self.conv(x, edge_index)
+        for i, conv in enumerate(self.convs):
+            x = conv(x, edge_index)
+            if i != len(self.convs) - 1:
+                x = F.relu(x)
+        return self.logsoftmax(x)
 
 
-@dataclass
-class RunResult:
-    test_metric: float
-    val_metric: float
-    train_time: float
-    best_epoch: int
-    flops_g: float
+class PlainGCN(nn.Module):
+    """Vanilla N-layer GCN."""
+
+    def __init__(self, in_dim: int, hidden: int, out_dim: int, num_layers: int):
+        super().__init__()
+        dims = [in_dim] + [hidden] * (num_layers - 1) + [out_dim]
+        self.convs = nn.ModuleList([GCNConv(dims[i], dims[i + 1]) for i in range(num_layers)])
+        self.logsoftmax = nn.LogSoftmax(dim=-1)
+
+    def forward(self, x: Tensor, edge_index: Tensor) -> Tensor:  # noqa: D401
+        for i, conv in enumerate(self.convs):
+            x = conv(x, edge_index)
+            if i != len(self.convs) - 1:
+                x = F.relu(x)
+        return self.logsoftmax(x)
 
 
-# -----------------------------------------------------------------
-#  Training routine                                                
-# -----------------------------------------------------------------
+class GCNII(nn.Module):
+    """Minimal, AMP-friendly re-implementation of GCNII (a.k.a. GCN2)."""
 
-def train_model(
-    model: nn.Module,
-    data,
-    train_mask: Tensor,
-    val_mask: Tensor,
-    test_mask: Tensor,
-    config: Dict[str, Any],
-) -> RunResult:
-    """Generic full-batch training loop with early stopping."""
+    def __init__(
+        self,
+        in_dim: int,
+        hidden: int,
+        out_dim: int,
+        num_layers: int,
+        alpha: float = 0.1,
+        lamda: float = 0.5,
+        dropout: float = 0.5,
+    ) -> None:
+        super().__init__()
+        from torch_geometric.nn import GCN2Conv  # local import avoids hard version pin
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model, data = model.to(device), data.to(device)
+        self.lin_in = nn.Linear(in_dim, hidden)
+        self.convs = nn.ModuleList(
+            [GCN2Conv(hidden, alpha, lamda, num_layers) for _ in range(num_layers)]
+        )
+        self.lin_out = nn.Linear(hidden, out_dim)
+        self.dropout = float(dropout)
+        self.logsoftmax = nn.LogSoftmax(dim=-1)
 
-    opt = torch.optim.Adam(
-        model.parameters(),
-        lr=config["lr"],
-        weight_decay=config["weight_decay"],
-    )
-    scaler = torch.cuda.amp.GradScaler(enabled=config.get("mixed_precision", False) and device.type == "cuda")
+    def forward(self, x: Tensor, edge_index: Tensor) -> Tensor:  # noqa: D401
+        x0 = x.detach()
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x = F.relu(self.lin_in(x))
+        for conv in self.convs:
+            x = F.dropout(x, p=self.dropout, training=self.training)
+            x = F.relu(conv(x, x0, edge_index))
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x = self.lin_out(x)
+        return self.logsoftmax(x)
 
-    best_val, best_state, best_epoch = -1.0, None, 0
-    start = time.time()
 
-    for epoch in range(config["epochs"]):
+# ---------------------------------------------------------------------------
+# Model factory
+# ---------------------------------------------------------------------------
+
+def build_model(name: str, in_dim: int, hidden: int, out_dim: int, depth: int) -> nn.Module:
+    """Return the requested model instance given its identifier string."""
+    name = name.upper()
+    if name == "GCN":
+        return PlainGCN(in_dim, hidden, out_dim, depth)
+    if name == "DROPEdge".upper():
+        return DropEdgeGCN(in_dim, hidden, out_dim, depth)
+    if name == "GCNII":
+        return GCNII(in_dim, hidden, out_dim, depth)
+    if name == "CURVONET":
+        return CurvoNet(in_dim, hidden, out_dim, depth)
+    raise ValueError(f"Model '{name}' not recognised")
+
+
+# ---------------------------------------------------------------------------
+# Training loop (full-batch)
+# ---------------------------------------------------------------------------
+
+def train(model: nn.Module, data, cfg: SimpleNamespace) -> Dict:  # noqa: ANN001 – PyG data
+    """Full-batch training with early stopping and automatic mixed precision."""
+
+    device = torch.device(cfg.device)
+    model = model.to(device)
+    data = data.to(device)
+
+    opt = torch.optim.Adam(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
+    scaler = torch.cuda.amp.GradScaler(enabled=cfg.mixed_precision and device.type == "cuda")
+
+    best_val = -1.0
+    best_state: Dict[str, Tensor] | None = None
+    best_epoch = 0
+    t0 = time.time()
+
+    for epoch in range(cfg.epochs):
         model.train()
         opt.zero_grad(set_to_none=True)
         with torch.cuda.amp.autocast(enabled=scaler.is_enabled()):
             out = model(data.x, data.edge_index)
-            loss = F.nll_loss(out[train_mask], data.y[train_mask])
+            loss = F.nll_loss(out[data.train_mask], data.y[data.train_mask])
         scaler.scale(loss).backward()
         scaler.unscale_(opt)
-        torch.nn.utils.clip_grad_norm_(model.parameters(), config.get("clip_grad", 1.0))
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         scaler.step(opt)
         scaler.update()
 
-        # --- validation ----------------------------------------------------
+        # Validation -------------------------------------------------------
         model.eval()
         with torch.no_grad():
             logits = model(data.x, data.edge_index)
         pred = logits.argmax(dim=-1)
-        val_acc = (pred[val_mask] == data.y[val_mask]).float().mean().item()
-
+        val_acc = (pred[data.val_mask] == data.y[data.val_mask]).float().mean().item()
         if val_acc > best_val:
             best_val = val_acc
-            best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
+            best_state = {k: v.clone() for k, v in model.state_dict().items()}
             best_epoch = epoch
-        if epoch - best_epoch >= config.get("early_stop_patience", 100):
+        if epoch - best_epoch >= cfg.early_stop_patience:
             break
 
-    train_time = time.time() - start
+    train_time = time.time() - t0
     if best_state is not None:
         model.load_state_dict(best_state)
 
-    # final evaluation -------------------------------------------------------
+    # Final evaluation ------------------------------------------------------
     model.eval()
     with torch.no_grad():
         logits = model(data.x, data.edge_index)
     pred = logits.argmax(dim=-1)
-    test_acc = (pred[test_mask] == data.y[test_mask]).float().mean().item()
+    test_acc = (pred[data.test_mask] == data.y[data.test_mask]).float().mean().item()
 
-    # FLOPs (single forward pass) -------------------------------------------
-    flops_g = 0.0
+    # Secondary metrics -----------------------------------------------------
+    h_last = logits.detach()
+    apd = average_pairwise_distance(h_last[data.test_mask].float())
+    reff = effective_rank(h_last[data.test_mask].float())
+
+    # FLOP count (best-effort) ---------------------------------------------
+    flops = 0.0
     if FlopCountAnalysis is not None:
         try:
-            flops_g = FlopCountAnalysis(model, (data.x, data.edge_index)).total() / 1e9
-        except Exception:
-            flops_g = 0.0  # gracefully degrade
+            flops = FlopCountAnalysis(model, (data.x, data.edge_index)).total() / 1e9
+        except Exception:  # pragma: no cover – unsupported op
+            flops = 0.0
 
-    return RunResult(
-        test_metric=test_acc,
-        val_metric=best_val,
-        train_time=train_time,
-        best_epoch=best_epoch,
-        flops_g=flops_g,
-    )
+    return {
+        "test_acc": test_acc,
+        "val_acc": best_val,
+        "epochs": epoch + 1,
+        "time_s": train_time,
+        "apd": apd,
+        "reff": reff,
+        "flops_g": flops,
+    }

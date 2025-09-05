@@ -9,7 +9,7 @@ for model-checkpoint storage via ``torch.save`` when desired.
 import copy
 import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 import torch
 import torch.nn.functional as F
@@ -22,6 +22,38 @@ from .utils import set_global_seed
 __all__ = [
     "run_experiment",
 ]
+
+# -----------------------------------------------------------------------------
+# Helper utilities
+# -----------------------------------------------------------------------------
+
+def _expand_model_cfg_list(models_cfg: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """The YAML allows specifying multiple *depth variants* inside one model
+    entry – for instance::
+
+        - {name: gcn, layers: [4, 8, 16, 32]}
+
+    This helper expands such shorthand into *multiple* configuration dicts so
+    that the downstream loop can treat each variant independently.  A new
+    auxiliary key ``_display_name`` is injected so that result dictionaries and
+    bar-plots remain readable (e.g. ``gcn_L8``).
+    """
+    expanded: List[Dict[str, Any]] = []
+    for cfg in models_cfg:
+        # Only GCN (and its light variants) currently support depth sweeps.
+        if cfg["name"] in ("gcn", "gcn_pairnorm", "gcn_dropedge") and isinstance(cfg.get("layers"), list):
+            for depth in cfg["layers"]:
+                new_cfg = cfg.copy()
+                new_cfg["layers"] = int(depth)
+                new_cfg["_display_name"] = f"{cfg['name']}_L{depth}"
+                expanded.append(new_cfg)
+        else:
+            expanded.append(cfg)
+    return expanded
+
+# -----------------------------------------------------------------------------
+# Per-epoch train / eval helpers
+# -----------------------------------------------------------------------------
 
 def _train_one_epoch(model: torch.nn.Module,
                      data,
@@ -50,6 +82,9 @@ def _evaluate(model: torch.nn.Module, data, device: torch.device):
     logits = model(data.x.to(device), data.edge_index.to(device))
     return compute_metrics(logits, data)
 
+# -----------------------------------------------------------------------------
+# Model construction
+# -----------------------------------------------------------------------------
 
 def _build_model(model_cfg: Dict[str, Any], data, dataset):
     """Instantiate a model from the registry, inferring input / output sizes
@@ -65,11 +100,11 @@ def _build_model(model_cfg: Dict[str, Any], data, dataset):
     # Model-specific argument dispatch
     # ------------------------------------------------------------------
     if name in ("gcn", "gcn_pairnorm", "gcn_dropedge"):
-        common_kwargs["layers"] = model_cfg.get("layers", 2)
+        common_kwargs["layers"] = int(model_cfg.get("layers", 2))
         if name == "gcn_dropedge":
             common_kwargs["dropedge_p"] = model_cfg.get("dropedge_p", 0.2)
     elif name == "gcnii":
-        common_kwargs["layers"] = model_cfg.get("layers", 32)
+        common_kwargs["layers"] = int(model_cfg.get("layers", 32))
     elif name == "ndls":
         common_kwargs["preset_depths"] = model_cfg.get("preset_depths", 6)
     elif name.startswith("dhgnn"):
@@ -79,32 +114,40 @@ def _build_model(model_cfg: Dict[str, Any], data, dataset):
 
     return ModelCls(**common_kwargs)
 
+# -----------------------------------------------------------------------------
+# Public API
+# -----------------------------------------------------------------------------
 
 def run_experiment(exp_name: str,
                    exp_cfg: Dict[str, Any],
                    global_cfg: Dict[str, Any]) -> Dict[str, Any]:
-    """Run **one** experiment as specified in ``config/config.yaml``.
+    """Run **one** experiment as specified in ``config/config.yaml``."""
+    # ------------------------- device resolution -------------------------
+    requested_device: str = str(global_cfg["global"].get("device", "cpu"))
+    if requested_device == "cuda" and not torch.cuda.is_available():
+        print("[WARN] CUDA requested but unavailable – falling back to CPU.")
+        requested_device = "cpu"
+    device = torch.device(requested_device)
 
-    Parameters
-    ----------
-    exp_name:  Human-readable experiment identifier (used for JSON / figure names).
-    exp_cfg:   Experiment-specific sub-dictionary from the YAML config.
-    global_cfg:Full, already-loaded YAML configuration dict.
-    """
-    device = torch.device(global_cfg["global"]["device"])
     epochs: int = int(global_cfg["global"]["epochs"])
     patience: int = int(global_cfg["global"]["early_stop_patience"])
     log_every: int = int(global_cfg["global"]["log_every"])
 
     results: Dict[str, Any] = {}
 
+    # ------------------------------------------------------------------
+    # Loop over datasets & models
+    # ------------------------------------------------------------------
     for dname in exp_cfg["datasets"]:
         dataset = get_dataset(dname)
         data = dataset[0].to(device)
 
         per_dataset_results: Dict[str, Any] = {}
-        for model_cfg in exp_cfg["models"]:
-            model_name = model_cfg["name"]
+
+        model_cfg_list = _expand_model_cfg_list(exp_cfg["models"])
+
+        for model_cfg in model_cfg_list:
+            model_name_display = model_cfg.get("_display_name", model_cfg["name"])
             model = _build_model(model_cfg, data, dataset).to(device)
             optimiser = torch.optim.Adam(model.parameters(), lr=5e-3, weight_decay=5e-4)
 
@@ -122,7 +165,7 @@ def run_experiment(exp_name: str,
                 history["val_acc"].append(val_acc)
 
                 if epoch % log_every == 0:
-                    print(f"[{dname}][{model_name}]  epoch {epoch:04d}  loss={loss:.4f}  val_acc={val_acc:.3f}")
+                    print(f"[{dname}][{model_name_display}]  epoch {epoch:04d}  loss={loss:.4f}  val_acc={val_acc:.3f}")
 
                 if val_acc > best_val:
                     best_val = val_acc
@@ -139,7 +182,7 @@ def run_experiment(exp_name: str,
                 model.load_state_dict(best_state)
             final_metrics = _evaluate(model, data, device)
             final_metrics.update({"best_val": best_val, "epochs": epoch})
-            per_dataset_results[model_name] = final_metrics
+            per_dataset_results[model_name_display] = final_metrics
 
         results[dname] = per_dataset_results
 

@@ -12,11 +12,12 @@ requires-python = ">=3.9"
 # --------------------------------------------------------------------------
 # Direct runtime dependencies (GPU-ready wheels assumed pre-installed)
 # --------------------------------------------------------------------------
-[project.dependencies]
-torch = "*"                     # CUDA build should already be present in env
-torch-geometric = "*"
-ogb = "*"
-pyyaml = "*"
-matplotlib = "*"
-seaborn = "*"
-scipy = "*"
+dependencies = [
+    "torch",            # CUDA build should already be present in env
+    "torch-geometric",
+    "ogb",
+    "pyyaml",
+    "matplotlib",
+    "seaborn",
+    "scipy",
+]

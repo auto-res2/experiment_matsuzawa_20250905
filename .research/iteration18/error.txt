@@ -1,0 +1,315 @@
+Downloading cpython-3.11.13-linux-x86_64-gnu (download) (27.7MiB)
+ Downloading cpython-3.11.13-linux-x86_64-gnu (download)
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 71 packages in 285ms
+   Building clove-sub @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading numpy (16.2MiB)
+Downloading pandas (11.8MiB)
+Downloading hf-xet (3.0MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading timm (2.4MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading sympy (6.0MiB)
+Downloading scipy (33.7MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading setuptools (1.1MiB)
+Downloading nvidia-nccl-cu12 (307.4MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading nvidia-cudnn-cu12 (674.0MiB)
+Downloading pillow (6.3MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading fonttools (4.7MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading triton (148.3MiB)
+Downloading networkx (1.9MiB)
+Downloading kiwisolver (1.4MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading matplotlib (8.3MiB)
+Downloading torch (846.9MiB)
+Downloading torchvision (8.2MiB)
+ Downloading nvidia-cufile-cu12
+ Downloading kiwisolver
+ Downloading hf-xet
+ Downloading timm
+ Downloading setuptools
+ Downloading networkx
+ Downloading fonttools
+ Downloading pillow
+  × Failed to build `clove-sub @
+  │ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905`
+  ├─▶ The build backend returned an error
+  ╰─▶ Call to `setuptools.build_meta.build_editable` failed (exit status: 1)
+
+      [stdout]
+      configuration error: `tool.setuptools.package-data` keys must be named
+      by:
+
+          at least one of the following:
+            - {type: string, format: 'python-module-name'}
+            - {predefined value: '*'}
+
+      DESCRIPTION:
+          Mapping from package names to lists of glob patterns. Usually this
+      option is
+          not needed when using ``include-package-data = true`` For more
+      information
+          on how to include data files, check ``setuptools`` `docs
+          <https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_.
+
+      GIVEN VALUE:
+          {
+              "": [
+                  "config/*.yaml"
+              ]
+          }
+
+      OFFENDING RULE: 'propertyNames'
+
+      DEFINITION:
+          {
+              "type": "object",
+              "additionalProperties": false,
+              "propertyNames": {
+                  "anyOf": [
+                      {
+                          "type": "string",
+                          "format": "python-module-name"
+                      },
+                      {
+                          "const": "*"
+                      }
+                  ]
+              },
+              "patternProperties": {
+                  "^.*$": {
+                      "type": "array",
+                      "items": {
+                          "type": "string"
+                      }
+                  }
+              }
+          }
+
+      For more details about `format` see
+      https://validate-pyproject.readthedocs.io/en/latest/api/validate_pyproject.formats.html
+
+
+      [stderr]
+      Traceback (most recent call last):
+        File "<string>", line 14, in <module>
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/build_meta.py",
+      line 473, in get_requires_for_build_editable
+          return self.get_requires_for_build_wheel(config_settings)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/build_meta.py",
+      line 331, in get_requires_for_build_wheel
+          return self._get_build_requires(config_settings, requirements=[])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/build_meta.py",
+      line 301, in _get_build_requires
+          self.run_setup()
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/build_meta.py",
+      line 317, in run_setup
+          exec(code, locals())
+        File "<string>", line 1, in <module>
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/__init__.py",
+      line 115, in setup
+          return distutils.core.setup(**attrs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/_distutils/core.py",
+      line 160, in setup
+          dist.parse_config_files()
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/_virtualenv.py",
+      line 20, in parse_config_files
+          result = old_parse_config_files(self, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/dist.py",
+      line 756, in parse_config_files
+          pyprojecttoml.apply_configuration(self, filename,
+      ignore_option_errors)
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/config/pyprojecttoml.py",
+      line 72, in apply_configuration
+          config = read_configuration(filepath, True, ignore_option_errors,
+      dist)
+      
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/config/pyprojecttoml.py",
+      line 140, in read_configuration
+          validate(subset, filepath)
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmplsLdwH/lib/python3.11/site-packages/setuptools/config/pyprojecttoml.py",
+      line 61, in validate
+          raise ValueError(f"{error}\n{summary}") from None
+      ValueError: invalid pyproject.toml config:
+      `tool.setuptools.package-data`.
+      configuration error: `tool.setuptools.package-data` keys must be named
+      by:
+
+          at least one of the following:
+            - {type: string, format: 'python-module-name'}
+            - {predefined value: '*'}
+
+
+      hint: This usually indicates a problem with the package or the build
+      environment.
+   Building clove-sub @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+Downloading sympy (6.0MiB)
+Downloading pandas (11.8MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading nvidia-cudnn-cu12 (674.0MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading scipy (33.7MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading triton (148.3MiB)
+Downloading numpy (16.2MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading nvidia-nccl-cu12 (307.4MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading matplotlib (8.3MiB)
+Downloading torchvision (8.2MiB)
+Downloading torch (846.9MiB)
+  × Failed to build `clove-sub @
+  │ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905`
+  ├─▶ The build backend returned an error
+  ╰─▶ Call to `setuptools.build_meta.build_editable` failed (exit status: 1)
+
+      [stdout]
+      configuration error: `tool.setuptools.package-data` keys must be named
+      by:
+
+          at least one of the following:
+            - {type: string, format: 'python-module-name'}
+            - {predefined value: '*'}
+
+      DESCRIPTION:
+          Mapping from package names to lists of glob patterns. Usually this
+      option is
+          not needed when using ``include-package-data = true`` For more
+      information
+          on how to include data files, check ``setuptools`` `docs
+          <https://setuptools.pypa.io/en/latest/userguide/datafiles.html>`_.
+
+      GIVEN VALUE:
+          {
+              "": [
+                  "config/*.yaml"
+              ]
+          }
+
+      OFFENDING RULE: 'propertyNames'
+
+      DEFINITION:
+          {
+              "type": "object",
+              "additionalProperties": false,
+              "propertyNames": {
+                  "anyOf": [
+                      {
+                          "type": "string",
+                          "format": "python-module-name"
+                      },
+                      {
+                          "const": "*"
+                      }
+                  ]
+              },
+              "patternProperties": {
+                  "^.*$": {
+                      "type": "array",
+                      "items": {
+                          "type": "string"
+                      }
+                  }
+              }
+          }
+
+      For more details about `format` see
+      https://validate-pyproject.readthedocs.io/en/latest/api/validate_pyproject.formats.html
+
+
+      [stderr]
+      Traceback (most recent call last):
+        File "<string>", line 14, in <module>
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/build_meta.py",
+      line 473, in get_requires_for_build_editable
+          return self.get_requires_for_build_wheel(config_settings)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/build_meta.py",
+      line 331, in get_requires_for_build_wheel
+          return self._get_build_requires(config_settings, requirements=[])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/build_meta.py",
+      line 301, in _get_build_requires
+          self.run_setup()
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/build_meta.py",
+      line 317, in run_setup
+          exec(code, locals())
+        File "<string>", line 1, in <module>
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/__init__.py",
+      line 115, in setup
+          return distutils.core.setup(**attrs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/_distutils/core.py",
+      line 160, in setup
+          dist.parse_config_files()
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/_virtualenv.py",
+      line 20, in parse_config_files
+          result = old_parse_config_files(self, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/dist.py",
+      line 756, in parse_config_files
+          pyprojecttoml.apply_configuration(self, filename,
+      ignore_option_errors)
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/config/pyprojecttoml.py",
+      line 72, in apply_configuration
+          config = read_configuration(filepath, True, ignore_option_errors,
+      dist)
+      
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/config/pyprojecttoml.py",
+      line 140, in read_configuration
+          validate(subset, filepath)
+        File
+      "/home/runner/work/_temp/setup-uv-cache/builds-v0/.tmpA6W0Uw/lib/python3.11/site-packages/setuptools/config/pyprojecttoml.py",
+      line 61, in validate
+          raise ValueError(f"{error}\n{summary}") from None
+      ValueError: invalid pyproject.toml config:
+      `tool.setuptools.package-data`.
+      configuration error: `tool.setuptools.package-data` keys must be named
+      by:
+
+          at least one of the following:
+            - {type: string, format: 'python-module-name'}
+            - {predefined value: '*'}
+
+
+      hint: This usually indicates a problem with the package or the build
+      environment.

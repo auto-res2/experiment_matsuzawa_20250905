@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 """src/main.py – experiment driver / orchestration
 
 Run with
     python -m src.main
 """
-from __future__ import annotations
 
 import json
 import os
@@ -26,7 +27,7 @@ from .evaluate import evaluate, plot_metric
 # -----------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent  # project root
 DATA_DIR = ROOT / "data"
-FIG_DIR = ROOT / ".research" / "iteration2" / "images"
+FIG_DIR = ROOT / ".research" / "iteration3" / "images"
 for _d in (DATA_DIR, FIG_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 
@@ -56,7 +57,12 @@ def _run_experiment(exp_key: str, exp_cfg: dict):
     # ------------------------------------------------------------------
     #  Prepare continual-learning data stream
     # ------------------------------------------------------------------
-    train_stream, test_stream = get_data_stream(exp_cfg["dataset"])
+    try:
+        train_stream, test_stream = get_data_stream(exp_cfg["dataset"])
+    except RuntimeError as e:
+        # Skip experiments whose datasets are unavailable in this environment.
+        print(f"[Skipped] {exp_key}: {e}\n")
+        return None
 
     all_seeds_results: List[List[float]] = []  # → shape [n_seeds, n_tasks]
 
@@ -131,3 +137,31 @@ def _run_experiment(exp_key: str, exp_cfg: dict):
         title=f"{exp_key.upper()} – Accuracy over Tasks",
         fname=fig_name,
     )
+
+    return df
+
+
+def main():
+    """Entry point when running ``python -m src.main``."""
+
+    cfg = _load_config(ROOT / "config" / "config.yaml")
+    exps = cfg.get("experiments", {})
+
+    results = {}
+    for key, exp_cfg in exps.items():
+        df = _run_experiment(key, exp_cfg)
+        if df is not None:
+            results[key] = df
+
+    # Optionally save aggregated results for downstream consumption
+    if results:
+        out_path = ROOT / ".research" / "iteration3" / "results.json"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        serialisable = {k: v.to_dict(orient="list") for k, v in results.items()}
+        with out_path.open("w", encoding="utf-8") as fh:
+            json.dump(serialisable, fh, indent=2)
+        print(f"\n[Results saved] {out_path.relative_to(ROOT)}")
+
+
+if __name__ == "__main__":
+    main()

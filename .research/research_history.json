@@ -1,0 +1,10 @@
+{
+  "research_topic": "Continuous Learningのメモリ効率に関して改善したい",
+  "queries": [
+    "continual learning memory compression",
+    "incremental learning quantization",
+    "lifelong learning parameter pruning",
+    "continual learning coreset selection",
+    "continual learning knowledge distillation"
+  ]
+}

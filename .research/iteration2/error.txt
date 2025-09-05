@@ -1,0 +1,11 @@
+Downloading cpython-3.11.13-linux-x86_64-gnu (download) (27.7MiB)
+ Downloading cpython-3.11.13-linux-x86_64-gnu (download)
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 73 packages in 289ms
+error: Distribution `faiss-gpu==1.7.2 @ registry+https://pypi.org/simple` can't be installed because it doesn't have a source distribution or wheel for the current platform
+
+hint: You're using CPython 3.11 (`cp311`), but `faiss-gpu` (v1.7.2) only has wheels with the following Python ABI tag: `cp310`
+error: Distribution `faiss-gpu==1.7.2 @ registry+https://pypi.org/simple` can't be installed because it doesn't have a source distribution or wheel for the current platform
+
+hint: You're using CPython 3.11 (`cp311`), but `faiss-gpu` (v1.7.2) only has wheels with the following Python ABI tag: `cp310`

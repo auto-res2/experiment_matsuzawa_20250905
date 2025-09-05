@@ -12,8 +12,8 @@ from sklearn.metrics import accuracy_score, mutual_info_score
 
 matplotlib.use("Agg")
 
-# Save every figure to the iteration *4* directory as requested
-_IMAGES_DIR = Path(".research/iteration4/images")
+# Save every figure to the iteration *5* directory as requested
+_IMAGES_DIR = Path(".research/iteration5/images")
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -48,7 +48,6 @@ def instance_information_gain(emb, labels, n_clusters: int):
         kmeans = KMeans(n_clusters=n_clusters, n_init=10, random_state=0).fit(emb.cpu())
         mi = mutual_info_score(labels.cpu().numpy(), kmeans.labels_)
     return mi / np.log(n_clusters)
-
 
 # ──────────────────────────────────────────────────────────────────────────────
 #  Plotting

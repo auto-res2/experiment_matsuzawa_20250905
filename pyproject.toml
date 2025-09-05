@@ -10,13 +10,14 @@ requires-python = ">=3.9"
 authors = [{ name = "Researcher" }]
 
 dependencies = [
-    # Torch – pin to a version that has *binary wheels* for PyG extensions
-    "torch==2.2.2",            # CPU wheel is enough; allows installing torch-sparse wheels
-    # PyG core & compiled extensions (CPU wheels available for 2.2.*)
+    # Torch – pin to a version that has binary wheels for Linux / CPU & CUDA
+    "torch==2.2.2",
+    # PyG core (pure python) and compiled extensions that have wheels on PyPI
     "torch-geometric==2.5.2",
     "torch-scatter==2.1.2",
     "torch-sparse==0.6.18",
-    "torch-cluster==1.6.3",
+    # NOTE: torch-cluster removed – not required by our code and avoided build failures
+
     # general utilities
     "PyYAML",
     "matplotlib",

@@ -157,9 +157,9 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
     }
 
     # ------------------------------------------------------------------
-    # Store experiment artefacts under .research/iteration4
+    # Store experiment artefacts under .research/iteration5
     # ------------------------------------------------------------------
-    out_dir = Path(".research") / "iteration4"
+    out_dir = Path(".research") / "iteration5"
     out_dir.mkdir(parents=True, exist_ok=True)
     res_path = out_dir / f"experiment1_seed{seed}_budget{budget_kb}.json"
     save_json(results, res_path)
@@ -181,7 +181,7 @@ def main():
             results_all.append(res)
 
     # Even if all runs were skipped, we persist a summary for reproducibility
-    summary_path = Path(".research") / "iteration4" / "exp1_summary.json"
+    summary_path = Path(".research") / "iteration5" / "exp1_summary.json"
     save_json({"all": results_all}, summary_path)
     print("\n===== Experiment-1 processing finished =====")
     print(json.dumps({"all": results_all}, indent=2))

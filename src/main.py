@@ -49,7 +49,7 @@ def _skip_result(seed: int, budget_kb: int, reason: str) -> Dict[str, float]:
 
 def _persist_individual_result(res: Dict[str, float]):
     """Save individual experiment result (regardless of skipped or not)."""
-    out_dir = Path(".research") / "iteration6"
+    out_dir = Path(".research") / "iteration7"
     out_dir.mkdir(parents=True, exist_ok=True)
     res_path = out_dir / f"experiment1_seed{res['seed']}_budget{res['budget_kb']}.json"
     save_json(res, res_path)
@@ -184,7 +184,7 @@ def main():
             results_all.append(res)
 
     # Even if all runs were skipped, we persist a summary for reproducibility
-    summary_path = Path(".research") / "iteration6" / "exp1_summary.json"
+    summary_path = Path(".research") / "iteration7" / "exp1_summary.json"
     save_json({"all": results_all}, summary_path)
     print("\n===== Experiment-1 processing finished =====")
     print(json.dumps({"all": results_all}, indent=2))

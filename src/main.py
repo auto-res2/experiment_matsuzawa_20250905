@@ -1,10 +1,6 @@
-"""src/main.py
-Entry-point orchestrating the full experimental sweep.  Execute with
-    python -m src.main
-from the project root.
-"""
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from typing import Dict
@@ -32,6 +28,22 @@ CONFIG: Dict = yaml.safe_load((ROOT / "config" / "config.yaml").read_text())
 # -----------------------------------------------------------------------------
 # SINGLE RUN -------------------------------------------------------------------
 # -----------------------------------------------------------------------------
+
+def _epochs_for_dataset(dataset_key: str) -> int:
+    """Map dataset_key to the correct epochs entry in the YAML config."""
+    # CIFAR variants (cifar10, cifar10c, cifar10.1, etc.) all map to "cifar"
+    if dataset_key.startswith("cifar"):
+        base = "cifar"
+    else:
+        # drop any suffix after an underscore if present (e.g. "nico_animals")
+        base = dataset_key.split("_")[0]
+    try:
+        return CONFIG["global"]["epochs"][base]
+    except KeyError as exc:
+        raise KeyError(
+            f"No epoch configuration found for dataset '{dataset_key}'. Expected key '{base}' in config.yaml."
+        ) from exc
+
 
 def run_single_experiment(dataset_key: str, model_cfg: Dict, algo: str, seed: int):
     print(f"Running {algo} on {dataset_key} | model={model_cfg['name']} | seed={seed}")
@@ -62,7 +74,7 @@ def run_single_experiment(dataset_key: str, model_cfg: Dict, algo: str, seed: in
     optim_cfg = {
         "lr": CONFIG["global"]["optim"]["lr_resnet"] if model_cfg["type"] == "resnet" else CONFIG["global"]["optim"]["lr_vit"],
         "weight_decay": CONFIG["global"]["optim"]["weight_decay"],
-        "epochs": CONFIG["global"]["epochs"][dataset_key.split("_")[0]],
+        "epochs": _epochs_for_dataset(dataset_key),
         "lambda_inv": CONFIG["global"]["loss_weights"]["lambda_inv"],
         "lambda_feat": CONFIG["global"]["loss_weights"]["lambda_feat"],
     }
@@ -100,15 +112,16 @@ def run_single_experiment(dataset_key: str, model_cfg: Dict, algo: str, seed: in
     }
 
     json_name = f"{dataset_key}_{model_cfg['name']}_{algo}_seed{seed}.json"
-    save_results_json(result_dict, RES_DIR / json_name)
+    json_path = RES_DIR / json_name
+    save_results_json(result_dict, json_path)
 
     title = f"Training Loss – {algo} on {dataset_key} ({model_cfg['name']})"
     fig_name = IMG_DIR / f"training_loss_{dataset_key}_{model_cfg['name']}_{algo}.pdf"
     plot_learning_curves(history["train_loss"], title, fig_name)
 
-    # stdout for CI / manual inspection
+    # stdout for CI / manual inspection – print JSON content as requested
     print("\n==================== SUMMARY ====================")
-    print(yaml.safe_dump(result_dict, sort_keys=False))
+    print(json.dumps(result_dict, indent=2))
     print("Figure saved:", fig_name.relative_to(ROOT))
     sys.stdout.flush()
 

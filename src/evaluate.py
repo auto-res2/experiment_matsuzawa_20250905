@@ -1,9 +1,3 @@
-"""src/evaluate.py
-Evaluation helpers – plotting utilities, JSON serialisation, and higher-level
-convenience wrappers that are used by *src.main*.
-"""
-from __future__ import annotations
-
 import json
 import logging
 from pathlib import Path
@@ -15,9 +9,12 @@ import seaborn as sns
 LOGGER = logging.getLogger("pcd.evaluate")
 
 ROOT = Path(__file__).resolve().parent.parent
-RESEARCH_DIR = ROOT / ".research" / "iteration1"
+# -----------------------------------------------------------------------------
+# Updated research directory (iteration2) as required by the spec
+# -----------------------------------------------------------------------------
+RESEARCH_DIR = ROOT / ".research" / "iteration2"
 IMG_DIR = RESEARCH_DIR / "images"
-RES_DIR = RESEARCH_DIR / "results"
+RES_DIR = RESEARCH_DIR
 for p in [IMG_DIR, RES_DIR]:
     p.mkdir(parents=True, exist_ok=True)
 

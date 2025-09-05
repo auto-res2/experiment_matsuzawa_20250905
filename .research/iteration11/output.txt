@@ -1,0 +1,27 @@
+=== uv sync start Fri Sep  5 14:11:44 UTC 2025 ===
+=== uv install end Fri Sep  5 14:12:12 UTC 2025 ===
+=== experiment start Fri Sep  5 14:12:12 UTC 2025 ===
+
+====================  EXPERIMENT  ====================
+CIFAR-100 20×5 – Fidelity & Memory-Accuracy Pareto
+=====================================================
+
+Downloading https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz to data/cifar100/cifar-100-python.tar.gz
+Extracting data/cifar100/cifar-100-python.tar.gz to data/cifar100
+Files already downloaded and verified
+[metrics saved] results/exp1_clove_sub_11.json
+[metrics saved] results/exp1_clove_sub_17.json
+[metrics saved] results/exp1_clove_sub_23.json
+[metrics saved] results/exp1_er_ring_11.json
+[metrics saved] results/exp1_er_ring_17.json
+[metrics saved] results/exp1_er_ring_23.json
+[metrics saved] results/exp1_ewc_11.json
+[metrics saved] results/exp1_ewc_17.json
+[metrics saved] results/exp1_ewc_23.json
+[metrics saved] results/exp1_sparcl_11.json
+[metrics saved] results/exp1_sparcl_17.json
+[metrics saved] results/exp1_sparcl_23.json
+[metrics saved] results/exp1_aqm_11.json
+[metrics saved] results/exp1_aqm_17.json
+[metrics saved] results/exp1_aqm_23.json
+=== experiment end Fri Sep  5 14:23:28 UTC 2025 ===

@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 #  Save all figures inside the directory mandated by the instructions
 # -----------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent
-FIG_DIR = ROOT / ".research" / "iteration3" / "images"
+FIG_DIR = ROOT / ".research" / "iteration4" / "images"  # <-- updated path
 FIG_DIR.mkdir(parents=True, exist_ok=True)
 
 __all__ = [

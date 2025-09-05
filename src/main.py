@@ -27,7 +27,7 @@ from .evaluate import evaluate, plot_metric
 # -----------------------------------------------------------------------------
 ROOT = Path(__file__).resolve().parent.parent  # project root
 DATA_DIR = ROOT / "data"
-FIG_DIR = ROOT / ".research" / "iteration3" / "images"
+FIG_DIR = ROOT / ".research" / "iteration4" / "images"  # <-- updated path
 for _d in (DATA_DIR, FIG_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 
@@ -48,6 +48,16 @@ def _load_config(cfg_path: Path):
 # -----------------------------------------------------------------------------
 #  Main routine
 # -----------------------------------------------------------------------------
+
+def _to_float(val):
+    """Utility: cast *val* to ``float`` if it is a (possibly numeric) string."""
+    if isinstance(val, str):
+        try:
+            return float(val)
+        except ValueError:
+            pass  # leave as-is, will raise later where appropriate
+    return val
+
 
 def _run_experiment(exp_key: str, exp_cfg: dict):
     print(f"\n======================  Running {exp_key}  ======================\n")
@@ -76,11 +86,20 @@ def _run_experiment(exp_key: str, exp_cfg: dict):
             classes_per_task=exp_cfg["dataset"]["classes_per_task"],
         ).to(device)
 
+        # ------------------------------------------------------------------
+        #  Convert optimiser hyper-parameters to floats (robust against YAML
+        #  treating scientific notation such as ``5e-4`` as a string).
+        # ------------------------------------------------------------------
+        opt_cfg = exp_cfg["optimiser"]
+        lr = _to_float(opt_cfg.get("lr", 0.01))
+        momentum = _to_float(opt_cfg.get("momentum", 0.0))
+        weight_decay = _to_float(opt_cfg.get("weight_decay", 0.0))
+
         optimiser = torch.optim.SGD(
             model.parameters(),
-            lr=exp_cfg["optimiser"]["lr"],
-            momentum=exp_cfg["optimiser"]["momentum"],
-            weight_decay=exp_cfg["optimiser"]["weight_decay"],
+            lr=lr,
+            momentum=momentum,
+            weight_decay=weight_decay,
         )
 
         task_acc: List[float] = []
@@ -155,7 +174,7 @@ def main():
 
     # Optionally save aggregated results for downstream consumption
     if results:
-        out_path = ROOT / ".research" / "iteration3" / "results.json"
+        out_path = ROOT / ".research" / "iteration4" / "results.json"  # <-- updated path
         out_path.parent.mkdir(parents=True, exist_ok=True)
         serialisable = {k: v.to_dict(orient="list") for k, v in results.items()}
         with out_path.open("w", encoding="utf-8") as fh:

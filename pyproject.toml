@@ -1,28 +1,33 @@
+[project]
+name = "cld_cd"
+version = "0.1.0"
+description = "Causal Latent Debiasing with Counterfactual Diffusion"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+[project.dependencies]
+torch = "==2.1.0"
+torchvision = "==0.16.0"
+#wild robustness & causal
+wilds = "==2.0.0"
+notears-torch = "==0.3.5"
+
+# generative & LoRA
+transformers = "==4.35.2"
+diffusers = "==0.27.0"
+peft = "==0.7.1"
+safetensors = "==0.3.3"
+
+# misc
+omegaconf = "==2.3.0"
+pyyaml = "==6.0.1"
+matplotlib = "==3.8.0"
+seaborn = "==0.13.0"
+opencv-python-headless = "==4.8.1.78"
+tqdm = "==4.66.2"
+ptflops = "==0.7.3"
+torchmetrics = "==1.2.0"
+
 [build-system]
 requires = ["setuptools", "wheel"]
-
-[project]
-name = "cld_cd_refactor"
-version = "0.1.0"
-description = "Refactored project structure for CLD-CD experiments"
-requires-python = ">=3.8"
-
-# --------------------------------------------------------------------
-# Dependencies – keep alphabetical for easier diff & to avoid cycles
-# --------------------------------------------------------------------
-dependencies = [
-    "diffusers>=0.22.0",
-    "matplotlib>=3.7",
-    "numpy>=1.23",
-    "opencv-python-headless>=4.8",
-    "peft>=0.4.0",
-    "PyYAML>=6.0",
-    "scipy>=1.10",
-    "seaborn>=0.12",
-    "torch>=2.0",
-    "torchmetrics>=1.2",
-    "torchvision>=0.15",
-    "tqdm>=4.66",
-    "transformers>=4.33",
-    "wilds>=2.0",
-]

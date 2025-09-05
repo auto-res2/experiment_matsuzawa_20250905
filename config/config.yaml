@@ -1,73 +1,51 @@
-experiments:
-  - name: exp1_waterbirds
-    dataset_name: waterbirds
-    seed: 0
-    latent_dims_keep: 10
-    notears_lambda1: 0.01
-    dro_radius: 0.2
-    fourier_lambda: 0.2
-    training:
-      epochs: 200
-      batch_size: 256
-      lr: 0.0003
-      weight_decay: 0.0001
-    diffusion:
-      lora_rank: 8
-      lora_lr: 0.0001
-      steps: 2000
-      ddim_steps: 20
-      cfg_scale: 7.5
-  - name: exp1_celeba
-    dataset_name: celeba
-    seed: 0
-    latent_dims_keep: 10
-    notears_lambda1: 0.01
-    dro_radius: 0.2
-    fourier_lambda: 0.2
-    training:
-      epochs: 200
-      batch_size: 256
-      lr: 0.0003
-      weight_decay: 0.0001
-    diffusion:
-      lora_rank: 8
-      lora_lr: 0.0001
-      steps: 2000
-      ddim_steps: 20
-      cfg_scale: 7.5
-  - name: exp2_diffspur
-    dataset_name: diffspur
-    seed: 0
-    latent_dims_keep: 6
-    notears_lambda1: 0.01
-    dro_radius: 0.0
-    fourier_lambda: 0.0
-    training:
-      epochs: 0
-      batch_size: 0
-      lr: 0.0
-      weight_decay: 0.0
-    diffusion:
-      lora_rank: 8
-      lora_lr: 0.0001
-      steps: 1000
-      ddim_steps: 20
-      cfg_scale: 7.5
-  - name: exp3_cifar_full
-    dataset_name: cifar10
-    seed: 0
-    latent_dims_keep: 6
-    notears_lambda1: 0.01
-    dro_radius: 0.2
-    fourier_lambda: 0.2
-    training:
-      epochs: 200
-      batch_size: 512
-      lr: 0.1
-      weight_decay: 0.0005
-    diffusion:
-      lora_rank: 8
-      lora_lr: 0.0001
-      steps: 1000
-      ddim_steps: 20
-      cfg_scale: 7.5
+experiment_name: exp1_waterbirds
+seed_list: [0, 1, 2]
+
+# --------------------------------------------------------------------
+#  DATASET CONFIGURATION
+# --------------------------------------------------------------------
+dataset:
+  name: waterbirds
+  url: https://wilds.stanford.edu/get_started/
+  splits: {train: train, val: val, test: test}
+  resize: 256
+  crop: 224
+
+# --------------------------------------------------------------------
+#  ENCODER / LATENT PROBE
+# --------------------------------------------------------------------
+encoder:
+  type: clip_vit_b32
+  url: https://huggingface.co/openai/clip-vit-base-patch32
+
+# --------------------------------------------------------------------
+#  CAUSAL DISCOVERY (NOTEARS)
+# --------------------------------------------------------------------
+causal:
+  lambda1: 0.01
+  keep_dims: 15
+  max_iter: 200
+
+# --------------------------------------------------------------------
+#  COUNTER-FACTUAL DIFFUSION GENERATOR
+# --------------------------------------------------------------------
+counterfactual:
+  sd_repo: runwayml/stable-diffusion-v1-5
+  sd_sha256: 9d1b13b2b19b3d886e6be4dfc5232d3c3e9e871486ccb4e67d1ef3a876e9fb17
+  lora_rank: 8
+  lora_lr: 1.0e-4
+  train_steps: 2000
+  ddim_steps: 20
+  cfg_scale: 7.5
+
+# --------------------------------------------------------------------
+#  ROBUST CLASSIFIER
+# --------------------------------------------------------------------
+classifier:
+  arch: resnet50
+  epochs: 200
+  batch_size: 256
+  lr: 3.0e-4
+  weight_decay: 1.0e-4
+  dro_radius: 0.2
+  fourier_lambda: 0.2

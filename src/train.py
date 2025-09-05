@@ -2,11 +2,9 @@ from __future__ import annotations
 
 """
 train.py
-========= 
+=========
 Model definition, GCID training logic, spurious-attribute miner and the
-counter-factual generator live here.  All heavy third-party dependencies are
-imported lazily but we still perform a fail-fast check so that the user gets a
-clear error message instead of a cryptic stack-trace.
+counter-factual generator live here.
 """
 
 import sys
@@ -16,7 +14,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from .preprocess import (  # local utilities / constants
+from .preprocess import (
     DEVICE,
     DTYPE,
 )
@@ -31,7 +29,7 @@ REQ = {
     "faiss": "faiss-cpu (pip install faiss-cpu)",
     "torchcam": "torchcam (pip install torchcam)",
     "diffusers": "diffusers[torch] (pip install diffusers[torch])",
-    "transformers": "transformers (pip install transformers)",
+    "transformers": "transformers (pip install transformers)",  # required by diffusers
 }
 MISSING: List[str] = []
 for pkg, hint in REQ.items():
@@ -47,7 +45,6 @@ import faiss  # noqa: E402  pylint: disable=wrong-import-order
 from wilds import get_dataset  # noqa: E402  pylint: disable=wrong-import-order
 from torchcam.methods import GradCAMpp  # noqa: E402  pylint: disable=wrong-import-order
 from diffusers import StableDiffusionInpaintPipeline  # noqa: E402
-from transformers import CLIPModel, CLIPProcessor  # noqa: E402  pylint: disable=wrong-import-order
 import timm  # noqa: E402  pylint: disable=wrong-import-order
 
 # --------------------------------------------------------------------------- #
@@ -81,32 +78,51 @@ class CounterfactualGenerator:
 # === Spurious-attribute miner ============================================= #
 # --------------------------------------------------------------------------- #
 class AttributeMiner:
-    """Grad-CAM++ on a frozen CLIP visual encoder followed by FAISS k-means."""
+    """Grad-CAM++ on a frozen classification backbone followed by FAISS k-means."""
 
-    def __init__(self, k: int):
+    def __init__(self, k: int, backbone_name: str = "convnext_tiny.in12k"):
+        """Initialise the miner.
+
+        Parameters
+        ----------
+        k : int
+            Number of clusters to derive with k-means.
+        backbone_name : str, optional
+            Any classification backbone available in *timm*.
+        """
         self.k = k
-        self.clip_model = CLIPModel.from_pretrained(
-            "openai/clip-vit-base-patch16",
-            torch_dtype=DTYPE,
-        ).to(DEVICE)
-        # CLIP stays frozen ➜ eval mode for speed / memory
-        self.clip_model.eval()
-        self.processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch16")
-        self.cam = GradCAMpp(model=self.clip_model.visual)
+        # ------------------------------------------------------------------ #
+        # Backbone selection – we rely on a standard ImageNet-pretrained CNN
+        # to obtain class logits required by CAM. The network is kept frozen
+        # and therefore runs in eval mode for speed / memory efficiency.
+        # ------------------------------------------------------------------ #
+        self.backbone = timm.create_model(backbone_name, pretrained=True).to(DEVICE)
+        self.backbone.eval()
 
+        # Grad-CAM++ extractor for the chosen backbone
+        self.cam = GradCAMpp(model=self.backbone)
+
+    # --------------------------------------------------------------------- #
+    # internal helpers                                                      #
+    # --------------------------------------------------------------------- #
     @torch.no_grad()
     def _heatmap(self, img: torch.Tensor) -> torch.Tensor:
         """Return a normalised Grad-CAM++ heat-map for a single image tensor."""
-        logits_per_image = self.clip_model.get_image_features(img)
-        pred_class = logits_per_image.argmax().item()
-        cam = self.cam(class_idx=pred_class, scores=logits_per_image, input_tensor=img)
-        return cam.squeeze(0)  # [H, W]
+        # Forward pass through the (frozen) backbone
+        logits = self.backbone(img)
+        pred_class = logits.argmax(dim=1).item()
+        # Extract CAM for the predicted class – returns a list (one map / input)
+        cam_map = self.cam(pred_class, logits)[0]  # [H, W]
+        return cam_map
 
+    # --------------------------------------------------------------------- #
+    # public API                                                            #
+    # --------------------------------------------------------------------- #
     def mine(self, dataset, limit: int = 2_000) -> Tuple[List[int], faiss.Kmeans]:  # type: ignore[valid-type]
         """Return cluster-id per sampled element & the fitted k-means object."""
         import random
 
-        # Prepare feature matrix ------------------------------------------------
+        # Prepare feature matrix ------------------------------------------- #
         heatmaps: List[torch.Tensor] = []
         sample_idxs = random.sample(range(len(dataset)), k=min(limit, len(dataset)))
         for idx in sample_idxs:
@@ -116,7 +132,7 @@ class AttributeMiner:
         maps = torch.stack(heatmaps).view(len(heatmaps), -1).numpy().astype("float32")
         faiss.normalize_L2(maps)
 
-        # Decide whether FAISS has GPU support ----------------------------------
+        # Decide whether FAISS has GPU support ----------------------------- #
         has_gpu = hasattr(faiss, "StandardGpuResources") and torch.cuda.is_available()
         km = faiss.Kmeans(d=maps.shape[1], k=self.k, niter=20, gpu=has_gpu, verbose=True)
         km.train(maps)

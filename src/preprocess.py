@@ -14,6 +14,7 @@ import random
 import numpy as np
 import torch
 from wilds import get_dataset  # type: ignore
+from torchvision import transforms  # new import
 
 # --------------------------------------------------------------------------- #
 # === constants ============================================================== #
@@ -22,8 +23,8 @@ from wilds import get_dataset  # type: ignore
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 OUTPUT_DIR = ROOT / "outputs"
-# conform with the job description: store figures under .research/iteration6/images
-FIG_DIR = ROOT / ".research" / "iteration6" / "images"
+# Updated per instructions: store figures under .research/iteration7/images
+FIG_DIR = ROOT / ".research" / "iteration7" / "images"
 
 for _d in (DATA_DIR, OUTPUT_DIR, FIG_DIR):
     _d.mkdir(parents=True, exist_ok=True)
@@ -55,6 +56,13 @@ def set_seed(seed: int = 0) -> None:  # noqa: D401 – imperative helper
 # === dataset loader ========================================================= #
 # --------------------------------------------------------------------------- #
 
+# A very lightweight transform pipeline shared across all datasets
+DEFAULT_TRANSFORM = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+])
+
+
 def load_dataset(exp_cfg: dict[str, Any]) -> Tuple[Any, Any]:  # noqa: D401 – simple helper
     """Load the train/validation split as utilised by WILDS datasets.
 
@@ -69,6 +77,6 @@ def load_dataset(exp_cfg: dict[str, Any]) -> Tuple[Any, Any]:  # noqa: D401 – 
 
     dataset = get_dataset(dataset=wilds_key, download=True, root_dir=str(DATA_DIR))
     # Use WILDS standard splits – 0: train, 1: val, 2: test
-    train_data = dataset.get_subset("train", transform=None)
-    val_data = dataset.get_subset("val", transform=None)
+    train_data = dataset.get_subset("train", transform=DEFAULT_TRANSFORM)
+    val_data = dataset.get_subset("val", transform=DEFAULT_TRANSFORM)
     return train_data, val_data

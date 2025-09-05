@@ -12,6 +12,7 @@ import faiss  # type: ignore
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
+import torchvision.transforms.functional as TF  # new import for PIL→Tensor
 
 from .preprocess import DEVICE, DTYPE  # relies on preprocess.py definitions
 
@@ -68,7 +69,11 @@ class AttributeMiner:
         for idx in sample_idxs:
             # WILDS datasets return (x, y, metadata). We only need the image.
             img, *_ = dataset[idx]
-            img = img.unsqueeze(0).to(dtype=DTYPE, device=DEVICE)
+
+            # Ensure we are working with a torch.Tensor
+            if not isinstance(img, torch.Tensor):
+                img = TF.to_tensor(img)  # (C, H, W) in [0,1]
+            img = img.unsqueeze(0).to(dtype=DTYPE, device=DEVICE)  # (1, C, H, W)
             heatmaps.append(self._heatmap(img).cpu())
         maps = torch.stack(heatmaps).view(len(heatmaps), -1).numpy().astype("float32")
         faiss.normalize_L2(maps)
@@ -112,7 +117,7 @@ class Trainer:
 
         # A *real* experiment would load timm / transformers backbones here. For
         # CI we stick to a tiny linear net to stay well below the 4 GB RAM mark.
-        self.model: nn.Module = DummyBackbone(num_classes=len(set(y for _, y, *_ in train_ds)))  # type: ignore[arg-type]
+        self.model: nn.Module = DummyBackbone(num_classes=len(set(int(y) for _, y, *_ in train_ds)))  # type: ignore[arg-type]
         self.model.to(device=DEVICE, dtype=DTYPE)
 
         self.criterion = nn.CrossEntropyLoss()
@@ -126,7 +131,8 @@ class Trainer:
         self.model.eval()
         correct = total = 0
         for x, y, *_ in self.val_loader:  # wilds returns (x, y, metadata)
-            x, y = x.to(DEVICE), y.to(DEVICE)
+            x = x.to(DEVICE)
+            y = y.to(DEVICE)
             logits, _ = self.model(x)
             pred = logits.argmax(1)
             correct += (pred == y).sum().item()
@@ -141,7 +147,8 @@ class Trainer:
         val_acc_history: List[float] = []
         for epoch in range(1, self.cfg["epochs"] + 1):
             for x, y, *_ in self.train_loader:  # wilds returns (x, y, metadata)
-                x, y = x.to(DEVICE), y.to(DEVICE)
+                x = x.to(DEVICE)
+                y = y.to(DEVICE)
                 logits, _ = self.model(x)
                 loss = self.criterion(logits, y)
                 self.opt.zero_grad()

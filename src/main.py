@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import torch
 import torch.backends.cudnn as cudnn
@@ -36,10 +36,10 @@ if torch.cuda.is_available():
 # Experiment-1 (ImageNet-128) --------------------------------------------------
 # -----------------------------------------------------------------------------
 
-_RESEARCH_ROOT = Path(".research") / "iteration9"
+_RESEARCH_ROOT = Path(".research") / "iteration10"
 
 
-def _skip_result(seed: int, budget_kb: int, reason: str) -> Dict[str, float]:
+def _skip_result(seed: int, budget_kb: int, reason: str) -> Dict[str, Any]:
     """Utility producing a minimal result dict in case an experiment is skipped."""
     return {
         "seed": seed,
@@ -49,7 +49,7 @@ def _skip_result(seed: int, budget_kb: int, reason: str) -> Dict[str, float]:
     }
 
 
-def _persist_individual_result(res: Dict[str, float]):
+def _persist_individual_result(res: Dict[str, Any]):
     """Save individual experiment result (regardless of skipped or not)."""
     out_dir = _RESEARCH_ROOT
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -59,7 +59,7 @@ def _persist_individual_result(res: Dict[str, float]):
     print(json.dumps(res, indent=2))
 
 
-def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
+def run_experiment1(seed: int, budget_kb: int) -> Dict[str, Any]:
     desc = CONFIG["experiments"]["exp1"]["description"]
     print(f"\n===== Experiment-1 – {desc} | Budget: {budget_kb} kB | Seed {seed} =====")
 
@@ -179,7 +179,7 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
 
 
 def main():
-    results_all: List[Dict[str, float]] = []
+    results_all: List[Dict[str, Any]] = []
     for seed in CONFIG["global"]["seeds"]:
         for budget in CONFIG["experiments"]["exp1"]["memory_budgets_kb"]:
             res = run_experiment1(seed, budget)

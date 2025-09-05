@@ -1,0 +1,8 @@
+=== uv sync start Fri Sep  5 14:08:45 UTC 2025 ===
+=== uv install end Fri Sep  5 14:18:39 UTC 2025 ===
+=== experiment start Fri Sep  5 14:18:39 UTC 2025 ===
+
+EXPERIMENT 1 — DEPTH-SCALABILITY BENCHMARK
+Computing Ollivier–Ricci curvature for Cora (one-off)…
+
+Dataset: Cora

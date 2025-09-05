@@ -6,5 +6,82 @@
     "domain generalization",
     "invariant risk minimization",
     "spurious feature debiasing"
+  ],
+  "research_study_list": [
+    {
+      "title": "A Causal Framework for Decomposing Spurious Variations"
+    },
+    {
+      "title": "Causal Effect Regularization: Automated Detection and Removal of Spurious Correlations"
+    },
+    {
+      "title": "Learning The Difference That Makes A Difference With Counterfactually-Augmented Data"
+    },
+    {
+      "title": "Counterfactual Invariance to Spurious Correlations in Text Classification"
+    },
+    {
+      "title": "Counterfactual Invariance to Spurious Correlations in Text Classification"
+    },
+    {
+      "title": "Models Out of Line: A Fourier Lens on Distribution Shift Robustness"
+    },
+    {
+      "title": "On the Adversarial Robustness of Out-of-distribution Generalization Models"
+    },
+    {
+      "title": "OODRobustBench: a Benchmark and Large-Scale Analysis of Adversarial Robustness under Distribution Shift"
+    },
+    {
+      "title": "Towards Robust Out-of-Distribution Generalization Bounds via Sharpness"
+    },
+    {
+      "title": "Improved OOD Generalization via Adversarial Training and Pretraing"
+    },
+    {
+      "title": "Domain Invariant Representation Learning with Domain Density Transformations"
+    },
+    {
+      "title": "Domain Generalization via Entropy Regularization"
+    },
+    {
+      "title": "Improving Generalization With Domain Convex Game"
+    },
+    {
+      "title": "In Search of Lost Domain Generalization"
+    },
+    {
+      "title": "Adversarially Robust Models may not Transfer Better: Sufficient Conditions for Domain Transferability from the View of Regularization"
+    },
+    {
+      "title": "Invariant Risk Minimization Is A Total Variation Model"
+    },
+    {
+      "title": "The Missing Invariance Principle found --  the Reciprocal Twin of Invariant Risk Minimization "
+    },
+    {
+      "title": "Sparse Invariant Risk Minimization"
+    },
+    {
+      "title": "Sparse Invariant Risk Minimization"
+    },
+    {
+      "title": "The Risks of Invariant Risk Minimization"
+    },
+    {
+      "title": "Spuriosity Rankings: Sorting Data to Measure and Mitigate Biases"
+    },
+    {
+      "title": "Self-supervised Debiasing Using Low Rank Regularization"
+    },
+    {
+      "title": "BendVLM: Test-Time Debiasing of Vision-Language Embeddings"
+    },
+    {
+      "title": "Training Debiased Subnetworks With Contrastive Weight Pruning"
+    },
+    {
+      "title": "Overcoming Simplicity Bias in Deep Networks using a Feature Sieve"
+    }
   ]
 }

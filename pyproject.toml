@@ -4,24 +4,35 @@ version = "0.2.0"
 requires-python = ">=3.10,<3.12"
 
 dependencies = [
-  "torch>=2.1.0,<2.3.0",
-  "torchvision>=0.16.0,<0.18.0",
+  # ---------------------------------------------------------------------
+  # Core deep-learning stack
+  #   • We explicitly pin to the CUDA-11.8 build of PyTorch 2.1.x to ensure
+  #     compatibility with the Tesla T4 GPU available in the execution
+  #     environment.  Newer PyTorch releases default to CUDA-12 wheels which
+  #     are not supported on that hardware and unnecessarily bloat the  CI
+  #     download size.
+  #   • Torch 2.1.x wheels were built against NumPy 1.x, therefore importing
+  #     them with NumPy ≥2 raises “compiled against NumPy 1.x” run-time
+  #     errors.  We consequently cap NumPy to <2.0.
+  # ---------------------------------------------------------------------
+  "torch>=2.1.0,<2.2.0",          # cu118 wheel
+  "torchvision>=0.16.0,<0.17.0",  # version family matched to torch 2.1.x
   "timm>=0.9.5,<1.2.0",
-  # Geoopt 0.5.x provides all functionalities we rely on (Stiefel manifold,
-  # ManifoldParameter, etc.) and has pre-built wheels for both CPU and CUDA on
-  # Python 3.11.  Version ≥0.6 is currently not available for the target
-  # environment which broke dependency resolution, so we pin to the latest 0.5
-  # release instead.
+
+  # Geometry / manifold optimisation
   "geoopt>=0.5.0,<0.6.0",
-  "numpy>=1.26,<2.4",
+
+  # Scientific Python stack (NumPy hard-capped <2.0 for binary ABI compat)
+  "numpy>=1.26,<2.0",
   "pandas>=2.1,<2.4",
   "matplotlib",
   "PyYAML",
+
+  # Evaluation helpers
   "torchmetrics>=1.3,<1.9",
   "pynvml>=11.5,<13.0",
-  # Fix: use the correct package name ("pytorch-optimizer") – version 3.x is
-  # provided under this name on PyPI, whereas the legacy "torch-optimizer"
-  # package only goes up to 0.3.x and caused dependency resolution failure.
+
+  # Extended optimiser zoo (note the correct PyPI name)
   "pytorch-optimizer>=3.0.0,<4.0.0",
 ]
 

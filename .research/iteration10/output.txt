@@ -1,0 +1,278 @@
+=== uv sync start Fri Sep  5 13:55:13 UTC 2025 ===
+=== uv install end Fri Sep  5 13:55:47 UTC 2025 ===
+=== experiment start Fri Sep  5 13:55:47 UTC 2025 ===
+
+>>> Running exp1_waterbirds  seed=0
+
+===============================================================================
+Experiment: exp1_waterbirds
+Experiment 1 – Waterbirds worst-group accuracy with GCID vs baselines.
+
+===============================================================================
+
+Downloading dataset to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0...
+You can also download the dataset manually at https://wilds.stanford.edu/downloads.
+Downloading https://worksheets.codalab.org/rest/bundles/0x505056d5cdea4e4eaa0e242cbfe2daa4/contents/blob/ to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0/archive.tar.gz
+Clustering 2000 points in 147D to 25 clusters, redo 1 times, 20 iterations
+  Preprocessing in 0.00 s
+  Iteration 0 (0.00 s, search 0.00 s): objective=3.59943 imbalance=1.505 nsplit=0         Iteration 1 (0.00 s, search 0.00 s): objective=2.6027 imbalance=1.419 nsplit=0         Iteration 2 (0.00 s, search 0.00 s): objective=2.33394 imbalance=1.432 nsplit=0         Iteration 3 (0.00 s, search 0.00 s): objective=2.18817 imbalance=1.471 nsplit=0         Iteration 4 (0.00 s, search 0.00 s): objective=2.08534 imbalance=1.495 nsplit=0         Iteration 5 (0.00 s, search 0.00 s): objective=2.01092 imbalance=1.516 nsplit=0         Iteration 6 (0.00 s, search 0.00 s): objective=1.95993 imbalance=1.529 nsplit=0         Iteration 7 (0.00 s, search 0.00 s): objective=1.93959 imbalance=1.544 nsplit=0         Iteration 8 (0.01 s, search 0.00 s): objective=1.92732 imbalance=1.552 nsplit=0         Iteration 9 (0.01 s, search 0.00 s): objective=1.91821 imbalance=1.555 nsplit=0         Iteration 10 (0.01 s, search 0.01 s): objective=1.91008 imbalance=1.555 nsplit=0         Iteration 11 (0.01 s, search 0.01 s): objective=1.90397 imbalance=1.552 nsplit=0         Iteration 12 (0.01 s, search 0.01 s): objective=1.89665 imbalance=1.559 nsplit=0         Iteration 13 (0.01 s, search 0.01 s): objective=1.8917 imbalance=1.555 nsplit=0         Iteration 14 (0.01 s, search 0.01 s): objective=1.88869 imbalance=1.557 nsplit=0         Iteration 15 (0.01 s, search 0.01 s): objective=1.88755 imbalance=1.556 nsplit=0         Iteration 16 (0.01 s, search 0.01 s): objective=1.88615 imbalance=1.557 nsplit=0         Iteration 17 (0.01 s, search 0.01 s): objective=1.88507 imbalance=1.557 nsplit=0         Iteration 18 (0.01 s, search 0.01 s): objective=1.88361 imbalance=1.552 nsplit=0         Iteration 19 (0.01 s, search 0.01 s): objective=1.88163 imbalance=1.551 nsplit=0       
+Clustering 2000 points in 147D to 25 clusters, redo 1 times, 20 iterations
+  Preprocessing in 0.00 s
+  Iteration 0 (0.00 s, search 0.00 s): objective=6.31491 imbalance=1.404 nsplit=0         Iteration 1 (0.00 s, search 0.00 s): objective=3.4238 imbalance=1.200 nsplit=0         Iteration 2 (0.00 s, search 0.00 s): objective=3.09074 imbalance=1.189 nsplit=0         Iteration 3 (0.00 s, search 0.00 s): objective=2.89998 imbalance=1.196 nsplit=0         Iteration 4 (0.00 s, search 0.00 s): objective=2.77366 imbalance=1.206 nsplit=0         Iteration 5 (0.00 s, search 0.00 s): objective=2.66848 imbalance=1.213 nsplit=0         Iteration 6 (0.00 s, search 0.00 s): objective=2.57801 imbalance=1.229 nsplit=0         Iteration 7 (0.00 s, search 0.00 s): objective=2.51081 imbalance=1.253 nsplit=0         Iteration 8 (0.01 s, search 0.00 s): objective=2.45239 imbalance=1.281 nsplit=0         Iteration 9 (0.01 s, search 0.00 s): objective=2.39483 imbalance=1.297 nsplit=0         Iteration 10 (0.01 s, search 0.00 s): objective=2.33744 imbalance=1.307 nsplit=0         Iteration 11 (0.01 s, search 0.01 s): objective=2.2898 imbalance=1.320 nsplit=0         Iteration 12 (0.01 s, search 0.01 s): objective=2.25787 imbalance=1.327 nsplit=0         Iteration 13 (0.01 s, search 0.01 s): objective=2.23642 imbalance=1.329 nsplit=0         Iteration 14 (0.01 s, search 0.01 s): objective=2.21954 imbalance=1.336 nsplit=0         Iteration 15 (0.01 s, search 0.01 s): objective=2.20964 imbalance=1.337 nsplit=0         Iteration 16 (0.01 s, search 0.01 s): objective=2.20226 imbalance=1.336 nsplit=0         Iteration 17 (0.01 s, search 0.01 s): objective=2.19279 imbalance=1.342 nsplit=0         Iteration 18 (0.01 s, search 0.01 s): objective=2.18038 imbalance=1.350 nsplit=0         Iteration 19 (0.01 s, search 0.01 s): objective=2.17125 imbalance=1.357 nsplit=0       
+Clustering 2000 points in 147D to 25 clusters, redo 1 times, 20 iterations
+  Preprocessing in 0.00 s
+  Iteration 0 (0.00 s, search 0.00 s): objective=4.26946 imbalance=1.788 nsplit=0         Iteration 1 (0.00 s, search 0.00 s): objective=2.94588 imbalance=1.475 nsplit=0         Iteration 2 (0.00 s, search 0.00 s): objective=2.55126 imbalance=1.416 nsplit=0         Iteration 3 (0.00 s, search 0.00 s): objective=2.3855 imbalance=1.425 nsplit=0         Iteration 4 (0.00 s, search 0.00 s): objective=2.28693 imbalance=1.420 nsplit=0         Iteration 5 (0.00 s, search 0.00 s): objective=2.23269 imbalance=1.386 nsplit=0         Iteration 6 (0.00 s, search 0.00 s): objective=2.20005 imbalance=1.365 nsplit=0         Iteration 7 (0.00 s, search 0.00 s): objective=2.1673 imbalance=1.356 nsplit=0         Iteration 8 (0.00 s, search 0.00 s): objective=2.13864 imbalance=1.363 nsplit=0         Iteration 9 (0.01 s, search 0.00 s): objective=2.11843 imbalance=1.372 nsplit=0         Iteration 10 (0.01 s, search 0.00 s): objective=2.10455 imbalance=1.385 nsplit=0         Iteration 11 (0.01 s, search 0.00 s): objective=2.09628 imbalance=1.396 nsplit=0         Iteration 12 (0.01 s, search 0.00 s): objective=2.08684 imbalance=1.406 nsplit=0         Iteration 13 (0.01 s, search 0.01 s): objective=2.07837 imbalance=1.413 nsplit=0         Iteration 14 (0.01 s, search 0.01 s): objective=2.06836 imbalance=1.421 nsplit=0         Iteration 15 (0.01 s, search 0.01 s): objective=2.05953 imbalance=1.425 nsplit=0         Iteration 16 (0.01 s, search 0.01 s): objective=2.05096 imbalance=1.436 nsplit=0         Iteration 17 (0.01 s, search 0.01 s): objective=2.04537 imbalance=1.441 nsplit=0         Iteration 18 (0.01 s, search 0.01 s): objective=2.04253 imbalance=1.447 nsplit=0         Iteration 19 (0.01 s, search 0.01 s): objective=2.03349 imbalance=1.451 nsplit=0       Extracting /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0/archive.tar.gz to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0
+
+It took 0.26 minutes to download and uncompress the dataset.
+
+[Miner] derived 25 clusters for 2000 samples.
+Epoch 01/10  |  val-acc = 0.669
+Epoch 02/10  |  val-acc = 0.655
+Epoch 03/10  |  val-acc = 0.556
+Epoch 04/10  |  val-acc = 0.701
+Epoch 05/10  |  val-acc = 0.722
+Epoch 06/10  |  val-acc = 0.712
+Epoch 07/10  |  val-acc = 0.667
+Epoch 08/10  |  val-acc = 0.757
+Epoch 09/10  |  val-acc = 0.633
+Epoch 10/10  |  val-acc = 0.572
+
+----- SUMMARY -----
+{
+  "val_acc": [
+    0.6688907422852377,
+    0.6547122602168474,
+    0.5562969140950792,
+    0.700583819849875,
+    0.7222685571309424,
+    0.7122602168473728,
+    0.6672226855713094,
+    0.7572977481234362,
+    0.6330275229357798,
+    0.5721434528773979
+  ]
+}
+Generated figure: accuracy_exp1_waterbirds.pdf
+-------------------
+
+
+>>> Running exp1_waterbirds  seed=1
+
+===============================================================================
+Experiment: exp1_waterbirds
+Experiment 1 – Waterbirds worst-group accuracy with GCID vs baselines.
+
+===============================================================================
+
+[Miner] derived 25 clusters for 2000 samples.
+Epoch 01/10  |  val-acc = 0.768
+Epoch 02/10  |  val-acc = 0.655
+Epoch 03/10  |  val-acc = 0.598
+Epoch 04/10  |  val-acc = 0.648
+Epoch 05/10  |  val-acc = 0.748
+Epoch 06/10  |  val-acc = 0.673
+Epoch 07/10  |  val-acc = 0.626
+Epoch 08/10  |  val-acc = 0.750
+Epoch 09/10  |  val-acc = 0.694
+Epoch 10/10  |  val-acc = 0.714
+
+----- SUMMARY -----
+{
+  "val_acc": [
+    0.76814011676397,
+    0.6547122602168474,
+    0.5979983319432861,
+    0.6480400333611342,
+    0.7481234361968306,
+    0.6730608840700584,
+    0.6255212677231026,
+    0.749791492910759,
+    0.6939115929941618,
+    0.7139282735613011
+  ]
+}
+Generated figure: accuracy_exp1_waterbirds.pdf
+-------------------
+
+
+>>> Running exp1_waterbirds  seed=2
+
+===============================================================================
+Experiment: exp1_waterbirds
+Experiment 1 – Waterbirds worst-group accuracy with GCID vs baselines.
+
+===============================================================================
+
+[Miner] derived 25 clusters for 2000 samples.
+Epoch 01/10  |  val-acc = 0.612
+Epoch 02/10  |  val-acc = 0.624
+Epoch 03/10  |  val-acc = 0.706
+Epoch 04/10  |  val-acc = 0.528
+Epoch 05/10  |  val-acc = 0.720
+Epoch 06/10  |  val-acc = 0.707
+Epoch 07/10  |  val-acc = 0.658
+Epoch 08/10  |  val-acc = 0.621
+Epoch 09/10  |  val-acc = 0.592
+Epoch 10/10  |  val-acc = 0.741
+
+----- SUMMARY -----
+{
+  "val_acc": [
+    0.6121768140116765,
+    0.6238532110091743,
+    0.7055879899916597,
+    0.5279399499582986,
+    0.7197664720600501,
+    0.707256046705588,
+    0.6580483736447039,
+    0.6205170975813178,
+    0.5921601334445371,
+    0.7406171809841534
+  ]
+}
+Generated figure: accuracy_exp1_waterbirds.pdf
+-------------------
+
+
+>>> Running exp1_celeba  seed=0
+
+===============================================================================
+Experiment: exp1_celeba
+Experiment 1 – CelebA-Hair balanced accuracy with GCID vs baselines.
+
+===============================================================================
+
+Downloading dataset to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/celebA_v1.0...
+You can also download the dataset manually at https://wilds.stanford.edu/downloads.
+Downloading https://worksheets.codalab.org/rest/bundles/0xfe55077f5cd541f985ebf9ec50473293/contents/blob/ to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/celebA_v1.0/archive.tar.gz
+
+Clustering 2000 points in 147D to 30 clusters, redo 1 times, 20 iterations
+  Preprocessing in 0.00 s
+  Iteration 0 (0.00 s, search 0.00 s): objective=2.48437 imbalance=1.283 nsplit=0         Iteration 1 (0.00 s, search 0.00 s): objective=1.67306 imbalance=1.228 nsplit=0         Iteration 2 (0.00 s, search 0.00 s): objective=1.44556 imbalance=1.247 nsplit=0         Iteration 3 (0.00 s, search 0.00 s): objective=1.33909 imbalance=1.264 nsplit=0         Iteration 4 (0.00 s, search 0.00 s): objective=1.28628 imbalance=1.271 nsplit=0         Iteration 5 (0.00 s, search 0.00 s): objective=1.25717 imbalance=1.271 nsplit=0         Iteration 6 (0.00 s, search 0.00 s): objective=1.22963 imbalance=1.287 nsplit=0         Iteration 7 (0.00 s, search 0.00 s): objective=1.20828 imbalance=1.302 nsplit=0         Iteration 8 (0.01 s, search 0.00 s): objective=1.18806 imbalance=1.316 nsplit=0         Iteration 9 (0.01 s, search 0.00 s): objective=1.16891 imbalance=1.330 nsplit=0         Iteration 10 (0.01 s, search 0.01 s): objective=1.14675 imbalance=1.344 nsplit=0         Iteration 11 (0.01 s, search 0.01 s): objective=1.13102 imbalance=1.367 nsplit=0         Iteration 12 (0.01 s, search 0.01 s): objective=1.12283 imbalance=1.385 nsplit=0         Iteration 13 (0.01 s, search 0.01 s): objective=1.11594 imbalance=1.403 nsplit=0         Iteration 14 (0.01 s, search 0.01 s): objective=1.10941 imbalance=1.415 nsplit=0         Iteration 15 (0.01 s, search 0.01 s): objective=1.09931 imbalance=1.431 nsplit=0         Iteration 16 (0.01 s, search 0.01 s): objective=1.08604 imbalance=1.438 nsplit=0         Iteration 17 (0.01 s, search 0.01 s): objective=1.07802 imbalance=1.446 nsplit=0         Iteration 18 (0.01 s, search 0.01 s): objective=1.06553 imbalance=1.461 nsplit=0         Iteration 19 (0.01 s, search 0.01 s): objective=1.05602 imbalance=1.474 nsplit=0       
+Clustering 2000 points in 147D to 30 clusters, redo 1 times, 20 iterations
+  Preprocessing in 0.00 s
+  Iteration 0 (0.00 s, search 0.00 s): objective=3.48079 imbalance=1.235 nsplit=0         Iteration 1 (0.00 s, search 0.00 s): objective=2.34858 imbalance=1.167 nsplit=0         Iteration 2 (0.00 s, search 0.00 s): objective=2.10474 imbalance=1.184 nsplit=0         Iteration 3 (0.00 s, search 0.00 s): objective=1.91895 imbalance=1.207 nsplit=0         Iteration 4 (0.00 s, search 0.00 s): objective=1.748 imbalance=1.239 nsplit=0         Iteration 5 (0.00 s, search 0.00 s): objective=1.61863 imbalance=1.262 nsplit=0         Iteration 6 (0.00 s, search 0.00 s): objective=1.52616 imbalance=1.303 nsplit=0         Iteration 7 (0.01 s, search 0.01 s): objective=1.4528 imbalance=1.328 nsplit=0         Iteration 8 (0.01 s, search 0.01 s): objective=1.41694 imbalance=1.334 nsplit=0         Iteration 9 (0.01 s, search 0.01 s): objective=1.37978 imbalance=1.350 nsplit=0         Iteration 10 (0.01 s, search 0.01 s): objective=1.35044 imbalance=1.362 nsplit=0         Iteration 11 (0.01 s, search 0.01 s): objective=1.32481 imbalance=1.375 nsplit=0         Iteration 12 (0.01 s, search 0.01 s): objective=1.30985 imbalance=1.391 nsplit=0         Iteration 13 (0.01 s, search 0.01 s): objective=1.29594 imbalance=1.405 nsplit=0         Iteration 14 (0.01 s, search 0.01 s): objective=1.28637 imbalance=1.425 nsplit=0         Iteration 15 (0.01 s, search 0.01 s): objective=1.27633 imbalance=1.439 nsplit=0         Iteration 16 (0.01 s, search 0.01 s): objective=1.26335 imbalance=1.448 nsplit=0         Iteration 17 (0.01 s, search 0.01 s): objective=1.25273 imbalance=1.450 nsplit=0         Iteration 18 (0.01 s, search 0.01 s): objective=1.24548 imbalance=1.457 nsplit=0         Iteration 19 (0.01 s, search 0.01 s): objective=1.238 imbalance=1.466 nsplit=0       
+Clustering 2000 points in 147D to 30 clusters, redo 1 times, 20 iterations
+  Preprocessing in 0.00 s
+  Iteration 0 (0.00 s, search 0.00 s): objective=3.91316 imbalance=1.353 nsplit=0         Iteration 1 (0.00 s, search 0.00 s): objective=2.50854 imbalance=1.216 nsplit=0         Iteration 2 (0.00 s, search 0.00 s): objective=2.15501 imbalance=1.215 nsplit=0         Iteration 3 (0.00 s, search 0.00 s): objective=1.98684 imbalance=1.239 nsplit=0         Iteration 4 (0.00 s, search 0.00 s): objective=1.81672 imbalance=1.258 nsplit=0         Iteration 5 (0.00 s, search 0.00 s): objective=1.72425 imbalance=1.277 nsplit=0         Iteration 6 (0.00 s, search 0.00 s): objective=1.67976 imbalance=1.295 nsplit=0         Iteration 7 (0.00 s, search 0.00 s): objective=1.64651 imbalance=1.314 nsplit=0         Iteration 8 (0.01 s, search 0.00 s): objective=1.60306 imbalance=1.329 nsplit=0         Iteration 9 (0.01 s, search 0.00 s): objective=1.56345 imbalance=1.355 nsplit=0         Iteration 10 (0.01 s, search 0.01 s): objective=1.51588 imbalance=1.387 nsplit=0         Iteration 11 (0.01 s, search 0.01 s): objective=1.47348 imbalance=1.407 nsplit=0         Iteration 12 (0.01 s, search 0.01 s): objective=1.42089 imbalance=1.426 nsplit=0         Iteration 13 (0.01 s, search 0.01 s): objective=1.36617 imbalance=1.452 nsplit=0         Iteration 14 (0.01 s, search 0.01 s): objective=1.34038 imbalance=1.478 nsplit=0         Iteration 15 (0.01 s, search 0.01 s): objective=1.30947 imbalance=1.500 nsplit=0         Iteration 16 (0.01 s, search 0.01 s): objective=1.26856 imbalance=1.514 nsplit=0         Iteration 17 (0.01 s, search 0.01 s): objective=1.2368 imbalance=1.531 nsplit=0         Iteration 18 (0.01 s, search 0.01 s): objective=1.21749 imbalance=1.542 nsplit=0         Iteration 19 (0.01 s, search 0.01 s): objective=1.20371 imbalance=1.554 nsplit=0       
+Extracting /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/celebA_v1.0/archive.tar.gz to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/celebA_v1.0
+
+It took 1.14 minutes to download and uncompress the dataset.
+
+[Miner] derived 30 clusters for 2000 samples.
+Epoch 01/10  |  val-acc = 0.917
+Epoch 02/10  |  val-acc = 0.923
+Epoch 03/10  |  val-acc = 0.923
+Epoch 04/10  |  val-acc = 0.924
+Epoch 05/10  |  val-acc = 0.924
+Epoch 06/10  |  val-acc = 0.934
+Epoch 07/10  |  val-acc = 0.914
+Epoch 08/10  |  val-acc = 0.921
+Epoch 09/10  |  val-acc = 0.930
+Epoch 10/10  |  val-acc = 0.934
+
+----- SUMMARY -----
+{
+  "val_acc": [
+    0.9170987063975437,
+    0.9232395429606886,
+    0.923289877686616,
+    0.9237428902199627,
+    0.9244475763829466,
+    0.9335581617758091,
+    0.913524940856697,
+    0.9214274928273015,
+    0.9302360698645996,
+    0.9337595006795189
+  ]
+}
+Generated figure: accuracy_exp1_celeba.pdf
+-------------------
+
+
+>>> Running exp1_celeba  seed=1
+
+===============================================================================
+Experiment: exp1_celeba
+Experiment 1 – CelebA-Hair balanced accuracy with GCID vs baselines.
+
+===============================================================================
+
+[Miner] derived 30 clusters for 2000 samples.
+Epoch 01/10  |  val-acc = 0.920
+Epoch 02/10  |  val-acc = 0.921
+Epoch 03/10  |  val-acc = 0.926
+Epoch 04/10  |  val-acc = 0.915
+Epoch 05/10  |  val-acc = 0.928
+Epoch 06/10  |  val-acc = 0.930
+Epoch 07/10  |  val-acc = 0.926
+Epoch 08/10  |  val-acc = 0.930
+Epoch 09/10  |  val-acc = 0.931
+Epoch 10/10  |  val-acc = 0.937
+
+----- SUMMARY -----
+{
+  "val_acc": [
+    0.9203201288568984,
+    0.9214274928273015,
+    0.9261589570644788,
+    0.9148839784567373,
+    0.9280213419237933,
+    0.9298837267831077,
+    0.926058287612624,
+    0.9297830573312529,
+    0.9308400865757286,
+    0.9371822620425831
+  ]
+}
+Generated figure: accuracy_exp1_celeba.pdf
+-------------------
+
+
+>>> Running exp1_celeba  seed=2
+
+===============================================================================
+Experiment: exp1_celeba
+Experiment 1 – CelebA-Hair balanced accuracy with GCID vs baselines.
+
+===============================================================================
+
+[Miner] derived 30 clusters for 2000 samples.
+Epoch 01/10  |  val-acc = 0.896
+Epoch 02/10  |  val-acc = 0.915
+Epoch 03/10  |  val-acc = 0.918
+Epoch 04/10  |  val-acc = 0.919
+Epoch 05/10  |  val-acc = 0.915
+Epoch 06/10  |  val-acc = 0.924
+Epoch 07/10  |  val-acc = 0.914
+Epoch 08/10  |  val-acc = 0.924
+Epoch 09/10  |  val-acc = 0.925
+Epoch 10/10  |  val-acc = 0.926
+
+----- SUMMARY -----
+{
+  "val_acc": [
+    0.8962601298635929,
+    0.9154879951678663,
+    0.9176020536568178,
+    0.9193637690642774,
+    0.9147833090048825,
+    0.9236422207681079,
+    0.9137766144863341,
+    0.9240448985755273,
+    0.925101927820003,
+    0.9258066139829869
+  ]
+}
+Generated figure: accuracy_exp1_celeba.pdf
+-------------------
+
+
+>>> Running exp2_mini_imagenet_bg  seed=0
+
+===============================================================================
+Experiment: exp2_mini_imagenet_bg
+Experiment 2 – Mini-ImageNet synthetic background shift.
+
+===============================================================================
+

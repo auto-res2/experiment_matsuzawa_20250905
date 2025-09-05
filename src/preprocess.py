@@ -23,8 +23,8 @@ from torchvision import transforms  # new import
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 OUTPUT_DIR = ROOT / "outputs"
-# Updated per instructions: store figures under .research/iteration8/images
-FIG_DIR = ROOT / ".research" / "iteration8" / "images"
+# Updated per instructions: store figures under .research/iteration9/images
+FIG_DIR = ROOT / ".research" / "iteration9" / "images"
 
 for _d in (DATA_DIR, OUTPUT_DIR, FIG_DIR):
     _d.mkdir(parents=True, exist_ok=True)

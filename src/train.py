@@ -116,17 +116,27 @@ class Trainer:
     """Very small training loop good enough for smoke-tests."""
 
     def __init__(self, cfg: dict, train_ds, val_ds) -> None:  # noqa: D401 – simple init
+        # Make sure the numeric hyper-parameters are *actually* numeric.
+        self.batch_size: int = int(cfg.get("batch_size", 32))
+        self.lr: float = float(cfg.get("lr", 1e-3))
+        self.epochs: int = int(cfg.get("epochs", 1))
+
         self.cfg = cfg
-        self.train_loader = DataLoader(train_ds, batch_size=cfg["batch_size"], shuffle=True)
-        self.val_loader = DataLoader(val_ds, batch_size=cfg["batch_size"], shuffle=False)
+
+        self.train_loader = DataLoader(train_ds, batch_size=self.batch_size, shuffle=True)
+        self.val_loader = DataLoader(val_ds, batch_size=self.batch_size, shuffle=False)
+
+        # Derive the number of classes from the training set targets.
+        uniq_labels = {int(y.item() if isinstance(y, torch.Tensor) else y) for _, y, *_ in train_ds}
+        num_classes = len(uniq_labels)
 
         # A *real* experiment would load timm / transformers backbones here. For
         # CI we stick to a tiny linear net to stay well below the 4 GB RAM mark.
-        self.model: nn.Module = DummyBackbone(num_classes=len(set(int(y) for _, y, *_ in train_ds)))  # type: ignore[arg-type]
+        self.model: nn.Module = DummyBackbone(num_classes=num_classes)
         self.model.to(device=DEVICE, dtype=DTYPE)
 
         self.criterion = nn.CrossEntropyLoss()
-        self.opt = torch.optim.Adam(self.model.parameters(), lr=cfg["lr"])
+        self.opt = torch.optim.Adam(self.model.parameters(), lr=self.lr)
 
     # --------------------------------------------------------------------- #
     # internal helpers                                                     #
@@ -150,7 +160,7 @@ class Trainer:
     # --------------------------------------------------------------------- #
     def run(self):  # noqa: D401 – loop wrapper
         val_acc_history: List[float] = []
-        for epoch in range(1, self.cfg["epochs"] + 1):
+        for epoch in range(1, self.epochs + 1):
             for x, y, *_ in self.train_loader:  # wilds returns (x, y, metadata)
                 x = x.to(DEVICE, dtype=DTYPE)
                 y = y.to(DEVICE)
@@ -161,6 +171,6 @@ class Trainer:
                 self.opt.step()
             val_acc = self._eval()
             val_acc_history.append(val_acc)
-            print(f"Epoch {epoch:02d}/{self.cfg['epochs']}  |  val-acc = {val_acc:.3f}")
+            print(f"Epoch {epoch:02d}/{self.epochs}  |  val-acc = {val_acc:.3f}")
 
         return {"val_acc": val_acc_history}

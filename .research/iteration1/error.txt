@@ -1,0 +1,139 @@
+Downloading cpython-3.11.13-linux-x86_64-gnu (download) (27.7MiB)
+ Downloading cpython-3.11.13-linux-x86_64-gnu (download)
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 66 packages in 604ms
+   Building clove-sub @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+Downloading networkx (1.9MiB)
+Downloading fonttools (4.7MiB)
+Downloading numpy (16.2MiB)
+Downloading pillow (6.3MiB)
+Downloading sympy (6.0MiB)
+Downloading hf-xet (3.0MiB)
+Downloading setuptools (1.1MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading nvidia-nccl-cu12 (307.4MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading torchvision (8.2MiB)
+Downloading pandas (11.8MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading timm (2.4MiB)
+Downloading torch (846.9MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading matplotlib (8.3MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading triton (148.3MiB)
+Downloading nvidia-cudnn-cu12 (674.0MiB)
+Downloading kiwisolver (1.4MiB)
+ Downloading nvidia-cufile-cu12
+ Downloading kiwisolver
+ Downloading hf-xet
+ Downloading timm
+ Downloading setuptools
+ Downloading networkx
+ Downloading fonttools
+ Downloading pillow
+ Downloading torchvision
+ Downloading matplotlib
+      Built clove-sub @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+ Downloading nvidia-cuda-cupti-cu12
+ Downloading sympy
+ Downloading numpy
+ Downloading pandas
+ Downloading nvidia-nvjitlink-cu12
+ Downloading nvidia-curand-cu12
+ Downloading nvidia-cuda-nvrtc-cu12
+ Downloading triton
+ Downloading nvidia-cufft-cu12
+ Downloading nvidia-cusolver-cu12
+ Downloading nvidia-cusparse-cu12
+ Downloading nvidia-cusparselt-cu12
+ Downloading nvidia-nccl-cu12
+ Downloading nvidia-cublas-cu12
+ Downloading nvidia-cudnn-cu12
+ Downloading torch
+Prepared 54 packages in 30.78s
+Installed 54 packages in 1.50s
+ + certifi==2025.8.3
+ + charset-normalizer==3.4.3
+ + clove-sub==0.1.0 (from file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905)
+ + contourpy==1.3.3
+ + cycler==0.12.1
+ + filelock==3.19.1
+ + fonttools==4.59.2
+ + fsspec==2025.9.0
+ + hf-xet==1.1.9
+ + huggingface-hub==0.34.4
+ + idna==3.10
+ + jinja2==3.1.6
+ + kiwisolver==1.4.9
+ + lightning-utilities==0.15.2
+ + markupsafe==3.0.2
+ + matplotlib==3.10.6
+ + mpmath==1.3.0
+ + networkx==3.5
+ + numpy==2.3.2
+ + nvidia-cublas-cu12==12.8.4.1
+ + nvidia-cuda-cupti-cu12==12.8.90
+ + nvidia-cuda-nvrtc-cu12==12.8.93
+ + nvidia-cuda-runtime-cu12==12.8.90
+ + nvidia-cudnn-cu12==9.10.2.21
+ + nvidia-cufft-cu12==11.3.3.83
+ + nvidia-cufile-cu12==1.13.1.3
+ + nvidia-curand-cu12==10.3.9.90
+ + nvidia-cusolver-cu12==11.7.3.90
+ + nvidia-cusparse-cu12==12.5.8.93
+ + nvidia-cusparselt-cu12==0.7.1
+ + nvidia-nccl-cu12==2.27.3
+ + nvidia-nvjitlink-cu12==12.8.93
+ + nvidia-nvtx-cu12==12.8.90
+ + packaging==25.0
+ + pandas==2.3.2
+ + pillow==11.3.0
+ + pyparsing==3.2.3
+ + python-dateutil==2.9.0.post0
+ + pytz==2025.2
+ + pyyaml==6.0.2
+ + requests==2.32.5
+ + safetensors==0.6.2
+ + setuptools==80.9.0
+ + six==1.17.0
+ + sympy==1.14.0
+ + timm==1.0.19
+ + torch==2.8.0
+ + torchmetrics==1.8.2
+ + torchvision==0.23.0
+ + tqdm==4.67.1
+ + triton==3.4.0
+ + typing-extensions==4.15.0
+ + tzdata==2025.2
+ + urllib3==2.5.0
+  0%|          | 0.00/169M [00:00<?, ?B/s]  0%|          | 98.3k/169M [00:00<03:59, 706kB/s]  0%|          | 590k/169M [00:00<00:59, 2.82MB/s]  1%|▏         | 2.26M/169M [00:00<00:19, 8.61MB/s]  4%|▍         | 6.39M/169M [00:00<00:07, 20.8MB/s]  7%|▋         | 11.7M/169M [00:00<00:04, 31.9MB/s] 10%|█         | 17.5M/169M [00:00<00:03, 40.5MB/s] 14%|█▍        | 23.3M/169M [00:00<00:03, 46.0MB/s] 17%|█▋        | 29.0M/169M [00:00<00:02, 49.5MB/s] 21%|██        | 34.8M/169M [00:00<00:02, 52.0MB/s] 24%|██▍       | 40.6M/169M [00:01<00:02, 53.8MB/s] 27%|██▋       | 46.3M/169M [00:01<00:02, 54.7MB/s] 31%|███       | 52.2M/169M [00:01<00:02, 55.9MB/s] 34%|███▍      | 57.9M/169M [00:01<00:01, 56.4MB/s] 38%|███▊      | 63.7M/169M [00:01<00:01, 56.8MB/s] 41%|████      | 69.5M/169M [00:01<00:01, 57.1MB/s] 45%|████▍     | 75.3M/169M [00:01<00:01, 57.2MB/s] 48%|████▊     | 81.1M/169M [00:01<00:01, 57.4MB/s] 51%|█████▏    | 86.9M/169M [00:01<00:01, 57.6MB/s] 55%|█████▍    | 92.7M/169M [00:01<00:01, 57.6MB/s] 58%|█████▊    | 98.4M/169M [00:02<00:01, 57.6MB/s] 62%|██████▏   | 104M/169M [00:02<00:01, 57.5MB/s]  65%|██████▌   | 110M/169M [00:02<00:01, 57.5MB/s] 69%|██████▉   | 116M/169M [00:02<00:00, 58.9MB/s] 73%|███████▎  | 123M/169M [00:02<00:00, 59.1MB/s] 77%|███████▋  | 129M/169M [00:02<00:00, 60.6MB/s] 80%|████████  | 136M/169M [00:02<00:00, 61.6MB/s] 84%|████████▍ | 142M/169M [00:02<00:00, 62.4MB/s] 88%|████████▊ | 149M/169M [00:02<00:00, 62.8MB/s] 92%|█████████▏| 155M/169M [00:02<00:00, 63.2MB/s] 95%|█████████▌| 161M/169M [00:03<00:00, 63.4MB/s] 99%|█████████▉| 168M/169M [00:03<00:00, 63.5MB/s]100%|██████████| 169M/169M [00:03<00:00, 53.3MB/s]
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 146, in <module>
+    main()
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 140, in main
+    _run_experiment(exp_key, exp_cfg)
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 59, in _run_experiment
+    train_stream, test_stream = get_data_stream(exp_cfg["dataset"])
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/preprocess.py", line 59, in get_data_stream
+    return _build_cifar100_stream(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/preprocess.py", line 44, in _build_cifar100_stream
+    train_stream = [_subset(train_set, c) for c in task_cls]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/preprocess.py", line 44, in <listcomp>
+    train_stream = [_subset(train_set, c) for c in task_cls]
+                    ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/preprocess.py", line 40, in _subset
+    imgs = torch.stack([dataset[j][0] for j in idx])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: expected Tensor as element 0 in argument 0, but got Image

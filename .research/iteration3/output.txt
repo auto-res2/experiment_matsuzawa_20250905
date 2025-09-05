@@ -1,0 +1,19 @@
+=== uv sync start Fri Sep  5 13:25:02 UTC 2025 ===
+=== uv install end Fri Sep  5 13:25:39 UTC 2025 ===
+=== experiment start Fri Sep  5 13:25:39 UTC 2025 ===
+
+>>> Running exp1_waterbirds  seed=0
+
+===============================================================================
+Experiment: exp1_waterbirds
+Experiment 1 – Waterbirds worst-group accuracy with GCID vs baselines.
+
+===============================================================================
+
+Downloading dataset to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0...
+You can also download the dataset manually at https://wilds.stanford.edu/downloads.
+Downloading https://worksheets.codalab.org/rest/bundles/0x505056d5cdea4e4eaa0e242cbfe2daa4/contents/blob/ to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0/archive.tar.gz
+Extracting /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0/archive.tar.gz to /home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/data/waterbirds_v1.0
+
+It took 0.32 minutes to download and uncompress the dataset.
+

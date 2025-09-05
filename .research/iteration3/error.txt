@@ -1,0 +1,164 @@
+Downloading cpython-3.11.13-linux-x86_64-gnu (download) (27.7MiB)
+ Downloading cpython-3.11.13-linux-x86_64-gnu (download)
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 73 packages in 346ms
+   Building gcid @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+Downloading scipy (33.7MiB)
+Downloading numpy (17.4MiB)
+Downloading pandas (11.8MiB)
+Downloading matplotlib (8.3MiB)
+Downloading pillow (6.3MiB)
+Downloading sympy (6.0MiB)
+Downloading fonttools (4.7MiB)
+Downloading tokenizers (3.2MiB)
+Downloading hf-xet (3.0MiB)
+Downloading networkx (1.9MiB)
+Downloading setuptools (1.1MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading scikit-learn (9.3MiB)
+Downloading kiwisolver (1.4MiB)
+Downloading faiss-cpu (30.0MiB)
+Downloading torch (846.9MiB)
+Downloading diffusers (3.9MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading nvidia-cudnn-cu12 (674.0MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading nvidia-nccl-cu12 (307.4MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading triton (148.3MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading torchvision (8.2MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading transformers (11.1MiB)
+Downloading timm (2.4MiB)
+ Downloading nvidia-cufile-cu12
+ Downloading kiwisolver
+ Downloading timm
+ Downloading setuptools
+ Downloading hf-xet
+ Downloading tokenizers
+ Downloading networkx
+ Downloading diffusers
+ Downloading fonttools
+ Downloading pillow
+      Built gcid @ file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905
+ Downloading torchvision
+ Downloading matplotlib
+ Downloading scikit-learn
+ Downloading nvidia-cuda-cupti-cu12
+ Downloading sympy
+ Downloading numpy
+ Downloading transformers
+ Downloading pandas
+ Downloading faiss-cpu
+ Downloading nvidia-nvjitlink-cu12
+ Downloading scipy
+ Downloading nvidia-curand-cu12
+ Downloading nvidia-cuda-nvrtc-cu12
+ Downloading triton
+ Downloading nvidia-cufft-cu12
+ Downloading nvidia-cusolver-cu12
+ Downloading nvidia-cusparse-cu12
+ Downloading nvidia-cusparselt-cu12
+ Downloading nvidia-nccl-cu12
+ Downloading nvidia-cublas-cu12
+ Downloading nvidia-cudnn-cu12
+ Downloading torch
+Prepared 69 packages in 33.26s
+Installed 69 packages in 1.57s
+ + certifi==2025.8.3
+ + charset-normalizer==3.4.3
+ + contourpy==1.3.3
+ + cycler==0.12.1
+ + diffusers==0.35.1
+ + faiss-cpu==1.12.0
+ + filelock==3.19.1
+ + fonttools==4.59.2
+ + fsspec==2025.9.0
+ + gcid==0.1.0 (from file:///home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905)
+ + hf-xet==1.1.9
+ + huggingface-hub==0.34.4
+ + idna==3.10
+ + importlib-metadata==8.7.0
+ + jinja2==3.1.6
+ + joblib==1.5.2
+ + kiwisolver==1.4.9
+ + littleutils==0.2.4
+ + markupsafe==3.0.2
+ + matplotlib==3.10.6
+ + mpmath==1.3.0
+ + networkx==3.5
+ + numpy==1.26.4
+ + nvidia-cublas-cu12==12.8.4.1
+ + nvidia-cuda-cupti-cu12==12.8.90
+ + nvidia-cuda-nvrtc-cu12==12.8.93
+ + nvidia-cuda-runtime-cu12==12.8.90
+ + nvidia-cudnn-cu12==9.10.2.21
+ + nvidia-cufft-cu12==11.3.3.83
+ + nvidia-cufile-cu12==1.13.1.3
+ + nvidia-curand-cu12==10.3.9.90
+ + nvidia-cusolver-cu12==11.7.3.90
+ + nvidia-cusparse-cu12==12.5.8.93
+ + nvidia-cusparselt-cu12==0.7.1
+ + nvidia-nccl-cu12==2.27.3
+ + nvidia-nvjitlink-cu12==12.8.93
+ + nvidia-nvtx-cu12==12.8.90
+ + ogb==1.3.6
+ + outdated==0.2.2
+ + packaging==25.0
+ + pandas==2.3.2
+ + pillow==11.3.0
+ + pyparsing==3.2.3
+ + python-dateutil==2.9.0.post0
+ + pytz==2025.2
+ + pyyaml==6.0.2
+ + regex==2025.9.1
+ + requests==2.32.5
+ + safetensors==0.6.2
+ + scikit-learn==1.7.1
+ + scipy==1.16.1
+ + seaborn==0.13.2
+ + setuptools==80.9.0
+ + six==1.17.0
+ + sympy==1.14.0
+ + threadpoolctl==3.6.0
+ + timm==1.0.19
+ + tokenizers==0.22.0
+ + torch==2.8.0
+ + torchcam==0.4.0
+ + torchvision==0.23.0
+ + tqdm==4.67.1
+ + transformers==4.56.1
+ + triton==3.4.0
+ + typing-extensions==4.15.0
+ + tzdata==2025.2
+ + urllib3==2.5.0
+ + wilds==2.0.0
+ + zipp==3.23.0
+/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/.venv/lib/python3.11/site-packages/outdated/__init__.py:36: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import parse_version
+0Byte [00:00, ?Byte/s]0Byte [00:01, ?Byte/s]81920Byte [00:01, 600753.54Byte/s]344064Byte [00:01, 1378196.47Byte/s]1359872Byte [00:01, 4137757.93Byte/s]5488640Byte [00:02, 14416469.15Byte/s]11730944Byte [00:02, 25332220.24Byte/s]18087936Byte [00:02, 32393003.89Byte/s]22085632Byte [00:02, 33785403.26Byte/s]28672000Byte [00:02, 38031571.02Byte/s]35504128Byte [00:02, 41577987.21Byte/s]42139648Byte [00:02, 42911606.85Byte/s]47792128Byte [00:03, 42370755.45Byte/s]54280192Byte [00:03, 43728840.46Byte/s]58695680Byte [00:03, 43814703.52Byte/s]64348160Byte [00:03, 46296855.64Byte/s]69001216Byte [00:03, 45778022.89Byte/s]74997760Byte [00:03, 49589152.03Byte/s]80003072Byte [00:03, 46495014.46Byte/s]86007808Byte [00:03, 45273430.11Byte/s]92594176Byte [00:04, 45651749.60Byte/s]99049472Byte [00:04, 45366718.09Byte/s]105963520Byte [00:04, 46218446.52Byte/s]113025024Byte [00:04, 47875927.29Byte/s]119603200Byte [00:04, 47769784.63Byte/s]125878272Byte [00:04, 47080758.11Byte/s]132939776Byte [00:04, 48440677.64Byte/s]138969088Byte [00:04, 51171889.07Byte/s]144162816Byte [00:05, 47763715.64Byte/s]149929984Byte [00:05, 48693947.10Byte/s]155287552Byte [00:05, 49953321.15Byte/s]160497664Byte [00:05, 49929875.96Byte/s]165535744Byte [00:05, 48889475.65Byte/s]170450944Byte [00:05, 48930242.12Byte/s]175448064Byte [00:05, 48147094.94Byte/s]181313536Byte [00:05, 51033216.42Byte/s]186441728Byte [00:05, 46378829.84Byte/s]192045056Byte [00:06, 45518188.48Byte/s]198402048Byte [00:06, 45406084.11Byte/s]204988416Byte [00:06, 46060018.29Byte/s]212017152Byte [00:06, 47758601.50Byte/s]218521600Byte [00:06, 45314856.16Byte/s]225353728Byte [00:06, 46024949.77Byte/s]232431616Byte [00:06, 47657982.65Byte/s]238452736Byte [00:07, 46226516.12Byte/s]245481472Byte [00:07, 47814210.73Byte/s]251789312Byte [00:07, 47259852.65Byte/s]258949120Byte [00:07, 48858892.52Byte/s]264871936Byte [00:07, 51320533.76Byte/s]270082048Byte [00:07, 47439564.03Byte/s]276152320Byte [00:07, 48955957.35Byte/s]281419776Byte [00:07, 49908376.99Byte/s]286474240Byte [00:08, 49337671.50Byte/s]291446784Byte [00:08, 48551997.21Byte/s]296329216Byte [00:08, 48195286.10Byte/s]301719552Byte [00:08, 46148718.57Byte/s]307093504Byte [00:08, 46945602.94Byte/s]312852480Byte [00:08, 49866057.33Byte/s]317890560Byte [00:08, 48998093.71Byte/s]323313664Byte [00:08, 48625914.61Byte/s]328605696Byte [00:08, 47919489.57Byte/s]334176256Byte [00:09, 42444718.15Byte/s]339615744Byte [00:09, 41532634.56Byte/s]346660864Byte [00:09, 43863720.45Byte/s]353124352Byte [00:09, 44753933.52Byte/s]359972864Byte [00:09, 46027838.04Byte/s]366559232Byte [00:09, 46541192.19Byte/s]373571584Byte [00:09, 47977183.07Byte/s]379846656Byte [00:10, 47238676.10Byte/s]386875392Byte [00:10, 48514701.48Byte/s]393265152Byte [00:10, 47853213.53Byte/s]399286272Byte [00:10, 50791749.74Byte/s]404447232Byte [00:10, 46954808.80Byte/s]410206208Byte [00:10, 48181839.86Byte/s]415260672Byte [00:10, 48787589.41Byte/s]420200448Byte [00:10, 48181478.92Byte/s]425058304Byte [00:10, 47881734.58Byte/s]430841856Byte [00:11, 50493865.63Byte/s]435929088Byte [00:11, 48034302.65Byte/s]441114624Byte [00:11, 20986450.32Byte/s]447782912Byte [00:11, 26894820.26Byte/s]454090752Byte [00:12, 30462566.79Byte/s]461234176Byte [00:12, 35576269.75Byte/s]467574784Byte [00:12, 38220150.67Byte/s]474775552Byte [00:12, 41839353.87Byte/s]480477184Byte [00:12, 45077965.76Byte/s]485515264Byte [00:12, 45578785.22Byte/s]489291776Byte [00:12, 38167653.20Byte/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Using a slow image processor as `use_fast` is unset and a slow processor was saved with this model. `use_fast=True` will be the default behavior in v4.52, even if the model was saved with a slow processor. This will result in minor differences in outputs. You'll still be able to use a slow processor with `use_fast=False`.
+Fetching 1 files:   0%|          | 0/1 [00:00<?, ?it/s]Fetching 1 files: 100%|██████████| 1/1 [00:00<00:00,  8.16it/s]Fetching 1 files: 100%|██████████| 1/1 [00:00<00:00,  8.15it/s]
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 67, in <module>
+    main()
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 63, in main
+    run_experiment(exp_cfg)
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/main.py", line 37, in run_experiment
+    miner = AttributeMiner(k=exp_cfg["k_clusters"])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/src/train.py", line 95, in __init__
+    self.cam = GradCAMpp(model=self.clip_model.visual)
+                               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_20250905/experiment_matsuzawa_20250905/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1962, in __getattr__
+    raise AttributeError(
+AttributeError: 'CLIPModel' object has no attribute 'visual'

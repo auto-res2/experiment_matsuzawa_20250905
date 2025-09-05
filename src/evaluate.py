@@ -12,8 +12,8 @@ from sklearn.metrics import accuracy_score, mutual_info_score
 
 matplotlib.use("Agg")
 
-# Save every figure to the iteration *5* directory as requested
-_IMAGES_DIR = Path(".research/iteration5/images")
+# Save every figure to the iteration *6* directory as requested
+_IMAGES_DIR = Path(".research/iteration6/images")
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────────────────────────

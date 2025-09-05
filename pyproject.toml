@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,16 +9,20 @@ description = "Adaptive Frequency-band Node-wise GNN experimental suite"
 requires-python = ">=3.9"
 authors = [{ name = "Researcher" }]
 
+# ---------------------------------------------------------------------------
+#  Runtime dependencies
+# ---------------------------------------------------------------------------
+
 dependencies = [
-    # Torch – pin to a version that has binary wheels for Linux / CPU & CUDA
+    # Core deep-learning stack
     "torch==2.2.2",
-    # PyG core (pure python) and compiled extensions that have wheels on PyPI
+
+    # PyG core (pure Python) and compiled extensions
     "torch-geometric==2.5.2",
     "torch-scatter==2.1.2",
     "torch-sparse==0.6.18",
-    # NOTE: torch-cluster removed – not required by our code and avoided build failures
 
-    # general utilities
+    # Scientific / utility stack
     "PyYAML",
     "matplotlib",
     "seaborn",
@@ -28,3 +32,10 @@ dependencies = [
     "GraphRicciCurvature==0.5.3.2",
     "deeprobust>=0.2.9",
 ]
+
+# ---------------------------------------------------------------------------
+#  Extra build-time dependencies for C++/CUDA extensions that require torch
+# ---------------------------------------------------------------------------
+[tool.uv.extra-build-dependencies]
+"torch-scatter" = ["torch"]
+"torch-sparse"  = ["torch"]

@@ -36,7 +36,7 @@ if torch.cuda.is_available():
 # Experiment-1 (ImageNet-128) --------------------------------------------------
 # -----------------------------------------------------------------------------
 
-_RESEARCH_ROOT = Path(".research") / "iteration10"
+_RESEARCH_ROOT = Path(".research") / "iteration11"
 
 
 def _skip_result(seed: int, budget_kb: int, reason: str) -> Dict[str, Any]:

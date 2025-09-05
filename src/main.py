@@ -1,5 +1,3 @@
-"""src.main – orchestrates the whole experimental workflow with the refactored
-code-base.  Execute via `python -m src.main` from the repository root."""
 from __future__ import annotations
 
 import sys
@@ -138,7 +136,10 @@ def run_experiment1(seed: int, budget_kb: int) -> Dict[str, float]:
         "forgetting": forgetting,
     }
 
-    out_dir = Path(".research") / "iteration1"
+    # ------------------------------------------------------------------
+    # Store experiment artefacts under .research/iteration2              
+    # ------------------------------------------------------------------
+    out_dir = Path(".research") / "iteration2"
     out_dir.mkdir(parents=True, exist_ok=True)
     res_path = out_dir / f"experiment1_seed{seed}_budget{budget_kb}.json"
     save_json(results, res_path)
@@ -163,7 +164,7 @@ def main():
         sys.exit(1)
 
     if results_all:
-        summary_path = Path(".research") / "iteration1" / "exp1_summary.json"
+        summary_path = Path(".research") / "iteration2" / "exp1_summary.json"
         save_json({"all": results_all}, summary_path)
         print("\n===== All Experiment-1 runs completed successfully =====")
         print(json.dumps({"all": results_all}, indent=2))

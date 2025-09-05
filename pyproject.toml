@@ -6,13 +6,18 @@ requires-python = ">=3.10"
 license = { text = "MIT" }
 readme = "README.md"
 
-[project.dependencies]
-torch = ">=2.1.0,<2.2.0"
-torchvision = ">=0.18.0,<0.19.0"
-numpy = "*"
-matplotlib = "*"
-pyyaml = "*"
-tqdm = "*"
+# -----------------------------------------------------------------------------
+# PEP-621 compliant dependency specification (must be a sequence, not a table)
+# -----------------------------------------------------------------------------
+
+dependencies = [
+  "torch>=2.1.0,<2.2.0",
+  "torchvision>=0.18.0,<0.19.0",
+  "numpy",
+  "matplotlib",
+  "pyyaml",
+  "tqdm"
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

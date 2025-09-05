@@ -1,5 +1,3 @@
-"""src.evaluate – evaluation utilities, metric computation, plotting and
-miscellaneous helper functions that are shared across experiments."""
 from __future__ import annotations
 
 import json
@@ -98,7 +96,10 @@ def plot_line(
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.legend()
-    out_dir = Path(".research") / "iteration1" / "images"
+    # ----------------------------------------------------------------------
+    # All research artefacts for the second iteration go under .research/iteration2
+    # ----------------------------------------------------------------------
+    out_dir = Path(".research") / "iteration2" / "images"
     out_dir.mkdir(parents=True, exist_ok=True)
     outfile = out_dir / filename
     plt.savefig(outfile, format="pdf", bbox_inches="tight")

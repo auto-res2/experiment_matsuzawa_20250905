@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Deque, List, Tuple
+from collections import deque  # <-- use Python's deque implementation
 
 import torch
 import torch.nn as nn
@@ -38,7 +39,7 @@ def mask_gradients(backbone: nn.Module, theta: float = 0.2):
 class LatentReplayBuffer:
     def __init__(self, capacity_bytes: int, code_dim: int):
         self.capacity = max(1, capacity_bytes // (code_dim * 4))  # float32 = 4 B
-        self.store: Deque[Tuple[torch.Tensor, torch.Tensor]] = torch.deque(maxlen=self.capacity)  # type: ignore[arg-type]
+        self.store: Deque[Tuple[torch.Tensor, torch.Tensor]] = deque(maxlen=self.capacity)
 
     def __len__(self):
         return len(self.store)
@@ -49,6 +50,8 @@ class LatentReplayBuffer:
             self.store.append((zi.cpu(), yi.cpu()))
 
     def sample(self, n: int):
+        if len(self.store) == 0:
+            raise RuntimeError("ReplayBuffer is empty – cannot sample.")
         idx = torch.randint(0, len(self.store), (n,))
         z, y = zip(*[self.store[i] for i in idx])
         return torch.stack(z).cuda(non_blocking=True), torch.tensor(y).cuda(non_blocking=True)
@@ -178,9 +181,10 @@ class CLoVeSub(nn.Module):
         self.backbone = tv.resnet18(weights=None)
         feat_dim = self.backbone.fc.in_features
         self.backbone.fc = nn.Identity()
+        self.feat_dim = feat_dim  # cache for projector construction
 
         # Task-specific projectors
-        self.projectors: List[OrthogonalProjector] = []
+        self.projectors = nn.ModuleList()  # ensure proper registration
         self.classifier = nn.Linear(method_cfg["rank"], exp_cfg["dataset"]["num_classes_total"], bias=False)
 
         # VQ-VAE-Lite & adapter
@@ -206,8 +210,9 @@ class CLoVeSub(nn.Module):
     # =============================================================
     def before_task(self, task_id: int):
         rank = self.method_cfg["rank"]
-        proj = OrthogonalProjector(self.backbone.backbone.out_features if hasattr(self.backbone, 'backbone') else 512, rank).cuda()  # noqa: E501
+        proj = OrthogonalProjector(self.feat_dim, rank).cuda()
         self.projectors.append(proj)
+        # add new projector parameters to optimiser
         self.opt_main.add_param_group({"params": proj.parameters()})
 
     def forward(self, x, task_id: int):

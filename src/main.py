@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 import time
 from pathlib import Path
 from typing import Dict, List
@@ -26,9 +25,9 @@ from .train import (
 from .evaluate import plot_line
 
 # ---------------------------------------------------------------------------
-#  All experiment figures are stored under iteration3 (see instructions)
+#  All experiment figures are stored under iteration4 (see instructions)
 # ---------------------------------------------------------------------------
-IMG_DIR = Path(".research/iteration3/images")
+IMG_DIR = Path(".research/iteration4/images")
 IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 

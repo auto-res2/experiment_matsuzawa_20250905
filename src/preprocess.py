@@ -92,21 +92,26 @@ def load_dataset(name: str) -> Data:
         edges_ordered = np.load(curv_file.with_suffix("_edges.npy"))
     else:
         print(f"Computing Ollivier–Ricci curvature for {name} (one-off)…")
+        # Build graph without self-loops for curvature computation -------------
         g = nx.Graph()
-        # ensure *consistent* Python-int node types throughout ----------------
         g.add_nodes_from(range(int(data.num_nodes)))
-        # convert edge index to a list of Python-int tuples (avoids np.int64 keys)
         edges_ordered = [tuple(map(int, e)) for e in data.edge_index.t().tolist()]
-        g.add_edges_from(edges_ordered)
+        edges_no_self = [(u, v) for u, v in edges_ordered if u != v]
+        g.add_edges_from(edges_no_self)
 
         # run curvature computation
         orc = OllivierRicci(g, alpha=0.5, verbose="ERROR")
         orc.compute_ricci_curvature()
 
-        # curvature for each edge (same order as *edges_ordered*)
-        edge_curv = np.array([orc.G[u][v]["ricciCurvature"] for u, v in edges_ordered])
-        # cache both curvature values and the corresponding edge list so that
-        # ordering is reproduced exactly the next time we load from disk.
+        # map curvature to *all* edges (self-loops assigned zero) --------------
+        curv_lookup = {
+            (min(u, v), max(u, v)): orc.G[u][v]["ricciCurvature"] for u, v in edges_no_self
+        }
+        edge_curv = np.array(
+            [curv_lookup.get((min(u, v), max(u, v)), 0.0) for u, v in edges_ordered],
+            dtype=np.float32,
+        )
+        # cache
         np.save(curv_file, edge_curv)
         np.save(curv_file.with_suffix("_edges.npy"), np.asarray(edges_ordered, dtype=np.int64))
 

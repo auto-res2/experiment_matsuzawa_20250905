@@ -9,16 +9,21 @@ description = "Adaptive Frequency-band Node-wise GNN experimental suite"
 requires-python = ">=3.9"
 authors = [{ name = "Researcher" }]
 
-# Proper PEP 621 dependencies list (array)
 dependencies = [
-    "torch>=2.0",
-    "torch-geometric",
+    # Torch – pin to a version that has *binary wheels* for PyG extensions
+    "torch==2.2.2",            # CPU wheel is enough; allows installing torch-sparse wheels
+    # PyG core & compiled extensions (CPU wheels available for 2.2.*)
+    "torch-geometric==2.5.2",
+    "torch-scatter==2.1.2",
+    "torch-sparse==0.6.18",
+    "torch-cluster==1.6.3",
+    # general utilities
     "PyYAML",
     "matplotlib",
     "seaborn",
     "scikit-learn",
     "requests",
-    "networkx",
+    "networkx<3.0",            # GraphRicciCurvature 0.5.x expects networkx <3
     "GraphRicciCurvature==0.5.3.2",
-    "deeprobust",
+    "deeprobust>=0.2.9",
 ]

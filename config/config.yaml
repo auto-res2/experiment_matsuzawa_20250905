@@ -1,0 +1,60 @@
+global:
+  framework: PyTorch
+  torch_version: ">=2.1.0,<2.2.0"
+  torchvision_version: ">=0.18.0,<0.19.0"
+  device: cuda
+  mixed_precision: true
+  optimiser:
+    name: AdamW
+    lr: 0.0003
+    betas:
+    - 0.9
+    - 0.999
+    weight_decay: 0.0005
+    grad_clip: 1.0
+  scheduler:
+    name: cosine
+    warmup_epochs: 10
+  seeds:
+  - 0
+  - 1
+  - 2
+  batch_size: 128
+datasets:
+  imagenet128:
+    url: https://www.image-net.org/download
+    root: data/imagenet
+    img_size: 128
+    n_tasks: 100
+    classes_per_task: 10
+  atari_pong:
+    env_id: ALE/Pong-v5
+    root: data/atari
+    frame_size: 84
+    total_frames: 540000
+    fps: 15
+models:
+  backbone_imagenet:
+    name: resnet18
+    pretrained: true
+    feature_dim: 256
+  backbone_atari:
+    name: nature_cnn
+    feature_dim: 256
+  dfbd:
+    K: 48
+    bits_per_basis: 8
+    rho: 0.002
+    self_compress_interval: 200000
+experiments:
+  exp1:
+    memory_budgets_kb:
+    - 50
+    - 100
+    description: Fixed-Budget Class-Incremental Learning on ImageNet-128
+  exp2:
+    extra_images: 2000000
+    description: Scalability & Strictly-Constant Memory Stress-Test
+  exp3:
+    memory_budget_kb: 100
+    description: Temporally-Correlated Atari Pong Stream

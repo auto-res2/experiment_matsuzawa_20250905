@@ -20,7 +20,7 @@ from .evaluate import lineplot
 CONFIG_PATH = Path("config/config.yaml")
 CFG = yaml.safe_load(CONFIG_PATH.read_text())
 
-RESULTS_DIR = Path(".research/iteration4")
+RESULTS_DIR = Path(".research/iteration5")
 IMAGES_DIR = RESULTS_DIR / "images"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -43,8 +43,9 @@ def run_exp1():
                 scores = []
                 for seed in cfg["seeds"]:
                     set_seed(seed)
-                    test_acc, val_acc = train_single(data, kappa_e, kappa_n, depth,
-                                                     variant, DEVICE, cfg)
+                    test_acc, val_acc = train_single(
+                        data, kappa_e, kappa_n, depth, variant, DEVICE, cfg
+                    )
                     scores.append(test_acc)
                 mean = float(torch.tensor(scores).mean().item())
                 std = float(torch.tensor(scores).std().item())

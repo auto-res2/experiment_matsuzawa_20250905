@@ -5,22 +5,33 @@ description = "CurvAdaNorm experimental suite (refactored)"
 authors = [ {name = "ML Researcher"} ]
 requires-python = ">=3.9"
 
-# Core dependencies – order chosen to avoid circular / build issues
+# Core dependencies – placed in an order that guarantees pre-built wheels are
+# available before any optional extensions attempt compilation.
+#
+# We intentionally *exclude* `torch-cluster` – it lacks proper build metadata
+# and often fails to compile in constrained CI environments.  The current code
+# base does not rely on it.  GraphRicciCurvature is also removed to avoid the
+# heavyweight Networkit build; a graceful runtime fallback is implemented.
+
 dependencies = [
-    "torch",
-    "torchvision",
-    "torch-geometric",
-    "torch-scatter",
-    "torch-sparse",
-    "torch-cluster",
-    "torch-spline-conv",
-    "networkx",
-    "pyyaml",
-    "matplotlib",
-    "seaborn",
-    "scikit-learn",
-    "ogb",
-    "GraphRicciCurvature",
+    # Deep-learning stack
+    "torch>=2.1,<2.9",            # CUDA 11.8 wheels available for Tesla T4
+    "torchvision>=0.17,<0.20",
+
+    # PyG + essential extensions (pre-built wheels exist for cpu/cu118)
+    "torch-scatter>=2.1,<3.0",
+    "torch-sparse>=0.6.18,<0.8.0",
+    "torch-geometric>=2.4,<2.9",
+
+    # Scientific / utility stack
+    "networkx>=2.8,<4.0",
+    "pyyaml>=6.0",
+    "matplotlib>=3.7,<4.0",
+    "seaborn>=0.13,<0.14",
+    "scikit-learn>=1.3,<2.0",
+
+    # Optional – will be imported lazily; harmless if not present
+    "ogb>=1.3.6,<2.0",
 ]
 
 [tool.setuptools.packages.find]

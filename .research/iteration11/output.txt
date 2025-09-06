@@ -1,0 +1,5 @@
+=== uv sync start Sat Sep  6 04:56:44 UTC 2025 ===
+=== uv install end Sat Sep  6 04:57:20 UTC 2025 ===
+=== experiment start Sat Sep  6 04:57:20 UTC 2025 ===
+[Warning] Full training pipeline is disabled in this test-bed. Re-run with --dry-run to only verify config parsing.
+=== experiment end Sat Sep  6 04:57:20 UTC 2025 ===

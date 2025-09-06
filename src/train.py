@@ -136,7 +136,7 @@ class DeepGCN(nn.Module):
 # 2.  Single run helper – trains *one* (model,dataset,seed) combination
 # ---------------------------------------------------------------------------
 
-_RESULT_IMG_DIR = Path(".research/iteration1/images")
+_RESULT_IMG_DIR = Path(".research/iteration2/images")  # UPDATED PATH
 _RESULT_IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -238,7 +238,7 @@ def run_experiment(exp_name: str, cfg) -> Tuple[Dict, List[str]]:
     metrics : dict
         Aggregate metrics.
     fig_files : list[str]
-        PDF paths created during the run (saved in .research/iteration1/images).
+        PDF paths created during the run (saved in .research/iteration2/images).
     """
 
     fig_files: List[str] = []

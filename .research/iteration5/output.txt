@@ -1,0 +1,25 @@
+=== uv sync start Sat Sep  6 04:13:19 UTC 2025 ===
+=== uv install end Sat Sep  6 04:13:52 UTC 2025 ===
+=== experiment start Sat Sep  6 04:13:52 UTC 2025 ===
+
+=== Running experiment ===
+{
+  "name": "exp1",
+  "dataset": "cifar100",
+  "backbone": "resnet18",
+  "method": "LOSR",
+  "seed": 7,
+  "lr": 0.001,
+  "budget_kb": 32
+}
+[Download] Fetching https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz → data/cifar-100-python.tar.gz
+{
+  "dataset": "cifar100",
+  "backbone": "resnet18",
+  "method": "LOSR",
+  "mem_kB": 300.0,
+  "final_accuracy": 0.016,
+  "seed": 7
+}
+Figure saved: .research/iteration4/images/accuracy_cifar100_resnet18_LOSR.pdf
+=== experiment end Sat Sep  6 04:14:41 UTC 2025 ===

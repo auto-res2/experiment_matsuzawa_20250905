@@ -1,0 +1,8 @@
+{
+  "dataset": "cifar100",
+  "backbone": "resnet18",
+  "method": "LOSR",
+  "mem_kB": 300.0,
+  "final_accuracy": 0.016,
+  "seed": 7
+}

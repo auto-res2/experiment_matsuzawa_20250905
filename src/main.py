@@ -10,7 +10,7 @@ It performs the following steps:
      importing PyTorch to avoid duplicate CUDA context creation.
   2. Reads the YAML configuration from `config/config.yaml` using PyYAML.
   3. Runs each experiment via `src.train.run_experiment`.
-  4. Saves the resulting metrics as JSON under `.research/iteration2` **and**
+  4. Saves the resulting metrics as JSON under `.research/iteration3` **and**
      prints the JSON object to stdout – the evaluation harness depends on this.
 """
 from __future__ import annotations
@@ -34,12 +34,35 @@ _REPO_REQUIREMENTS: Dict[str, str] = {
 }
 
 
+def _pip_available() -> bool:
+    """Return True iff the current interpreter has the `pip` module bundled."""
+    import importlib.util
+
+    return importlib.util.find_spec("pip") is not None
+
+
 def _install_repo(name: str, url: str):
+    """Attempt to import `name`; if that fails and pip is available, try to
+    install from `url`.  If pip is missing or installation fails, we log a
+    warning and continue – the experiment will only break later if that
+    dependency is *actually* required.  This avoids hard crashes when the
+    external baselines are *not* used (the common case for the provided YAML).
+    """
     try:
         importlib.import_module(name)
+        return
     except ImportError:
+        pass  # not installed – try to fetch below
+
+    if not _pip_available():
+        print(f"[setup] pip unavailable – skipping installation of {name}.", flush=True)
+        return
+
+    try:
         print(f"[setup] Installing {name} from {url} …", flush=True)
         subprocess.check_call([sys.executable, "-m", "pip", "install", url])
+    except subprocess.CalledProcessError as e:
+        print(f"[setup] Failed to install {name}: {e}. Proceeding without.", flush=True)
 
 
 for _lib, _url in _REPO_REQUIREMENTS.items():
@@ -55,6 +78,7 @@ from .train import run_experiment
 # ---------------------------------------------------------------------------
 
 _JSON_OPTS = dict(indent=2, sort_keys=True)
+
 
 def _echo_json(d: Dict):
     js = json.dumps(d, **_JSON_OPTS)
@@ -74,7 +98,7 @@ with _CFG_PATH.open("r") as fp:
 # ---------------------------------------------------------------------------
 # 2.  Run the experiments
 # ---------------------------------------------------------------------------
-_RESULTS_DIR = Path(".research/iteration2")  # UPDATED PATH
+_RESULTS_DIR = Path(".research/iteration3")  # UPDATED PATH
 _RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 

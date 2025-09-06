@@ -1,5 +1,6 @@
-"""src/main.py – orchestrates the complete experimental workflow"""
 from __future__ import annotations
+
+"""src/main.py – orchestrates the complete experimental workflow"""
 
 # std -----------------------------------------------------------------------
 import json, os, random, sys, pathlib
@@ -26,8 +27,8 @@ from .preprocess import build_split_cifar100
 # Simple utilities -----------------------------------------------------------
 
 Path = pathlib.Path
-IMAGES_DIR = Path(".research/iteration6/images")
-RESULTS_DIR = Path(".research/iteration6/results")
+IMAGES_DIR = Path(".research/iteration7/images")  # <–– updated as required
+RESULTS_DIR = Path(".research/iteration7")        # <–– updated as required
 
 
 def gpu_assert() -> None:
@@ -53,6 +54,7 @@ def dump_json(obj: Any, path: Path) -> None:  # noqa: D401
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w") as fp:
         json.dump(obj, fp, indent=2)
+    # Echo to stdout for CI visibility
     print(json.dumps(obj, indent=2))
 
 # ============================================================================
@@ -113,7 +115,14 @@ def run_one(exp_cfg: dict, seed: int) -> None:
     dump_json(result, out_json)
 
     # quick sanity plot
-    plot_curves([0, 1], [0, acc * 100], "", "Accuracy %", strategy, IMAGES_DIR / f"acc_{strategy}.pdf")
+    plot_curves(
+        [0, 1],
+        [0, acc * 100],
+        "",
+        "Accuracy %",
+        strategy,
+        IMAGES_DIR / f"acc_{strategy}.pdf",
+    )
 
 
 # ---------------------------------------------------------------------------

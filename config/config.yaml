@@ -1,0 +1,29 @@
+tag: depth_stress_cora
+dataset:
+  name: Cora
+variants:
+  - backbone: GCN
+    layers: 2
+    variant: curvada
+  - backbone: GCN
+    layers: 8
+    variant: curvada
+  - backbone: GCN
+    layers: 32
+    variant: curvada
+  - backbone: GCN
+    layers: 64
+    variant: curvada
+  - backbone: GCN
+    layers: 120
+    variant: curvada
+seeds: [0, 1, 2]
+optim:
+  lr: 0.005
+  weight_decay: 0.0005
+scheduler:
+  max_epochs: 200
+curvada:
+  alpha_init: 1.0
+  beta_init: 0.0
+  gamma_init: 1.0

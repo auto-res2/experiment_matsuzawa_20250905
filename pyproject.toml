@@ -1,1 +1,32 @@
-# Please list the required python packages.
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "curvada_norm_experiments"
+version = "0.1.0"
+description = "CurvAdaNorm – curvature-adaptive normalisation experiments"
+authors = [
+  {name = "Research Engineer", email = "research@example.com"}
+]
+requires-python = ">=3.10"
+
+# ---------------------------------------------------------------------------
+#  Run-time dependencies.  torch-geometric & ogb versions are chosen to be
+#  compatible with PyTorch ≥2.1  (CUDA 12 wheels available on PyPI).
+# ---------------------------------------------------------------------------
+
+dependencies = [
+  "torch>=2.0",
+  "torch_geometric>=2.4.0",
+  "torch_sparse>=0.6.18",
+  "torch_cluster>=1.6.1",
+  "torch_scatter>=2.1.2",
+  "networkx>=3.1",
+  "scikit-learn",
+  "pyyaml",
+  "matplotlib",
+  "seaborn",
+  "ogb",
+  "GraphRicciCurvature",
+]

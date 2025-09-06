@@ -1,5 +1,5 @@
 """src/main.py
-Entry point that orchestrates the complete EXP-1 (Waterbirds) pipeline.
+Entry point orchestrating the complete EXP-1 (Waterbirds) pipeline.
 Run via:
     python -m src.main
 """
@@ -29,8 +29,8 @@ if not CONFIG_PATH.exists():
     )
 CFG: Dict = yaml.safe_load(CONFIG_PATH.read_text())
 
-# output directories (strictly follow the task requirements)
-RESULTS_DIR = Path(".research/iteration57")
+# Override paths to comply with the task requirements -------------------------
+RESULTS_DIR = Path(".research/iteration58")
 FIG_DIR = RESULTS_DIR / "images"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 FIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -43,12 +43,13 @@ def _run_single_seed(seed: int) -> None:
     print(f"\n===== Running seed {seed} =====")
     set_seed(seed)
 
-    # ----------------------- DATA
+    # ----------------------- DATA -------------------------------------------
     _download_waterbirds(CFG["dataset_repo"], CFG["data_root"])
     ld_train, ld_val, ld_test = build_dataloaders(CFG)
 
-    # -------------------- 3 baselines ----------------------------
+    # -------------------- 3 baselines ---------------------------------------
     results_json: Dict[str, Dict] = {}
+
     for method in ["ERM", "GC-DRO-Oracle", "CGSI"]:
         print(f"\n[Model] training {method}")
         model = build_vit_s().cuda()
@@ -57,20 +58,21 @@ def _run_single_seed(seed: int) -> None:
         )
         scaler = torch.cuda.amp.GradScaler()
 
-        # GC-DRO weight helper -------------------------------------------------
+        # GC-DRO helper -------------------------------------------------------
         if method == "GC-DRO-Oracle":
             dro_loss = GCDROLoss(alpha=0.1)
 
-            def _weights(gidx):
-                # minority groups are 1 & 2 (following Waterbirds convention)
-                return torch.tensor([1.0 if i in [1, 2] else 0.0 for i in gidx])
+            # minority groups are 1 & 2 (Waterbirds convention)
+            def _weights(gidx: torch.Tensor) -> torch.Tensor:  # noqa: N801 – local helper
+                return ((gidx == 1) | (gidx == 2)).float()
 
-            dro_loss.criterion = dro_loss  # expose to *train_epoch*
+            dro_loss.weight_fn = _weights  # type: ignore[attr-defined]
             loss_helper = dro_loss
         else:
             loss_helper = None
 
         epoch_acc, epoch_wg, epoch_gap, times = [], [], [], []
+
         for ep in range(1, CFG["epochs"] + 1):
             t0 = time.time()
             train_loss, train_acc = train_epoch(model, ld_train, optimiser, scaler, loss_helper)
@@ -93,11 +95,10 @@ def _run_single_seed(seed: int) -> None:
             }
             print("[Epoch]", json.dumps(row))
 
-        # ----------------- final test set ---------------------------
+        # ----------------- final test set ------------------------------------
         test_acc, test_wg, test_gap, _ = evaluate(model, ld_test)
-        pgd_acc = evaluate_pgd(
-            model, ld_test, eps=CFG["pgd_eps"], steps=CFG["pgd_steps"]
-        )
+        pgd_acc = evaluate_pgd(model, ld_test, eps=CFG["pgd_eps"], steps=CFG["pgd_steps"])
+
         results_json[method] = {
             "method": method,
             "seed": seed,
@@ -112,7 +113,7 @@ def _run_single_seed(seed: int) -> None:
         save_lineplot(xs, {"AvgAcc": epoch_acc, "WGAcc": epoch_wg}, "Accuracy", f"{method}_acc_curve", FIG_DIR)
         save_lineplot(xs, {"CorrGap": epoch_gap}, "CorrGap", f"{method}_cor_gap", FIG_DIR)
 
-    # ---------------------- persist JSON --------------------------
+    # ---------------------- persist JSON ------------------------------------
     out_json = RESULTS_DIR / f"results_seed{seed}.json"
     out_json.write_text(json.dumps(results_json, indent=2))
     print(f"\n[JSON] {out_json} =\n{json.dumps(results_json, indent=2)}")

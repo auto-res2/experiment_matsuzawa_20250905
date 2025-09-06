@@ -33,7 +33,7 @@ __all__ = ["ExperimentBase"]
 # ---------------------------------------------------------------------------
 # Directories mandated by the assessment instructions
 # ---------------------------------------------------------------------------
-_BASE_RESULTS_DIR = Path(".research/iteration3")
+_BASE_RESULTS_DIR = Path(".research/iteration4")  # CHANGED (iteration3 → iteration4)
 _IMAGES_DIR = _BASE_RESULTS_DIR / "images"
 _BASE_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -48,7 +48,7 @@ class ExperimentBase:
         self.global_cfg = global_cfg
         # keep a sub-directory for any auxiliary files the experiment wishes
         # to dump (e.g. counterfactual samples) but store *results* & *figures*
-        # strictly under .research/iteration3/ as required.
+        # strictly under .research/iteration4/ as required.
         self.results_dir = _BASE_RESULTS_DIR / name
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
@@ -79,7 +79,7 @@ class ExperimentBase:
         ylabel: str,
         fig_name: str,
     ) -> None:
-        """Utility that writes a small line plot to .research/iteration3/images."""
+        """Utility that writes a small line plot to .research/iteration4/images."""
         plt.figure(figsize=(6, 4))
         sns.lineplot(x=list(xs), y=list(ys), marker="o", label=ylabel)
         for x_val, y_val in zip(xs, ys):

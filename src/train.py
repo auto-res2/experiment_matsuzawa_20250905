@@ -8,7 +8,11 @@ from typing import Dict, List, Tuple
 
 import torch
 from torch import nn
-from torch.cuda.amp import GradScaler, autocast
+# AMP is nice for speed, but mixed-precision overflow was the main source of
+# the NaNs that terminated training at high depths (≥120 layers).  We therefore
+# **disable AMP by default** – it can be re-enabled from the YAML config via the
+# optional key `use_amp: true`.
+from torch.cuda.amp import GradScaler, autocast  # still imported to avoid API drift
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch_geometric.nn import PairNorm
 from torch_geometric.nn.conv import MessagePassing
@@ -52,9 +56,6 @@ class CurvGCNConv(MessagePassing):
         # with their corresponding edges to avoid length mismatches.
         # ------------------------------------------------------------------
         if self.training and dropedge_p > 0.0:
-            # dropout_edge now returns (edge_index, edge_attr, mask) in recent
-            # PyG releases.  We therefore unpack accordingly and fall back to the
-            # older 2-tuple behaviour if only two values are returned.
             out = dropout_edge(
                 edge_index,
                 p=dropedge_p,
@@ -256,14 +257,20 @@ def train_single(
 
     opt = torch.optim.AdamW(model.parameters(), lr=cfg["lr"], weight_decay=5e-4)
     sched = CosineAnnealingLR(opt, T_max=cfg["max_epochs"])
-    scaler = GradScaler(enabled=(device == "cuda"))
+
+    # ------------------------------------------------------------------
+    # AMP OFF by default – can be re-enabled from the YAML by adding
+    # `use_amp: true` to the experiment block.
+    # ------------------------------------------------------------------
+    use_amp: bool = cfg.get("use_amp", False)
+    scaler = GradScaler(enabled=use_amp)
     stopper = EarlyStopper(patience=50)
 
     best_val, best_test = 0.0, 0.0
     for epoch in range(1, cfg["max_epochs"] + 1):
         model.train()
         opt.zero_grad()
-        with autocast(enabled=(device == "cuda")):
+        with autocast(enabled=use_amp):
             out = model(data.x, data.edge_index, kappa_edge, kappa_node)
             loss = torch.nn.functional.cross_entropy(
                 out[data.train_mask], data.y[data.train_mask]

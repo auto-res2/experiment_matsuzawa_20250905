@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 """src/preprocess.py
 -------------------------------------------------------------------------------
 Data-handling, downloads and reproducibility utilities.
 """
-from __future__ import annotations
 
 import hashlib
 import random
@@ -26,8 +27,8 @@ from torch.utils.data import DataLoader, Subset
 DATA_ROOT = Path("data")
 DATA_ROOT.mkdir(parents=True, exist_ok=True)
 
-# mini research folder structure requested in the prompt
-RESEARCH_ROOT = Path(".research") / "iteration1"
+# Updated research folder structure to comply with the prompt requirements
+RESEARCH_ROOT = Path(".research") / "iteration2"
 IMAGES_DIR = RESEARCH_ROOT / "images"
 RESULTS_DIR = RESEARCH_ROOT
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)

@@ -8,15 +8,19 @@ authors = [
   {name = "Researcher", email = "research@openai.com"}
 ]
 
-[project.dependencies]
-torch = "*"
-torchvision = "*"
-matplotlib = "*"
-seaborn = "*"
-scikit-learn = "*"
-pyyaml = "*"
-requests = "*"
-avalanche-lib = "*"
+# Dependencies must be expressed as an *array* of requirement strings according
+# to PEP 621. The previous table-style declaration was invalid and caused the
+# TOML parser to fail.
+dependencies = [
+  "torch",
+  "torchvision",
+  "matplotlib",
+  "seaborn",
+  "scikit-learn",
+  "pyyaml",
+  "requests",
+  "avalanche-lib"
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

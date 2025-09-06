@@ -1,9 +1,9 @@
-[UPDATED FILE]
 """src/train.py – models, replay memories and training loop"""
 from __future__ import annotations
 
 # std -----------------------------------------------------------------------
-import math, random
+import math
+import random
 from typing import Optional, List, Dict, Tuple
 
 # third-party ---------------------------------------------------------------
@@ -16,8 +16,10 @@ import torchvision
 # ============================================================================
 # Models --------------------------------------------------------------------
 
+
 class ExpandingClassifier(nn.Module):
     """A linear classifier that can grow output units on the fly."""
+
     def __init__(self, in_dim: int):
         super().__init__()
         self.in_dim: int = in_dim
@@ -45,7 +47,9 @@ class ExpandingClassifier(nn.Module):
     # ---------------------------------------------------------------- forward
     def forward(self, x: torch.Tensor) -> torch.Tensor:  # type: ignore[override]
         if self.out_dim == 1:
-            raise RuntimeError("Classifier has not been grown yet – call ensure_capacity() first")
+            raise RuntimeError(
+                "Classifier has not been grown yet – call ensure_capacity() first"
+            )
         return self.fc(x)
 
 
@@ -79,6 +83,7 @@ def _pack4bit(t: torch.Tensor) -> torch.Tensor:
     low = t[1::2] & 0x0F
     return high | low
 
+
 def _unpack4bit(t: torch.Tensor, length: int) -> torch.Tensor:
     high = (t >> 4) & 0x0F
     low = t & 0x0F
@@ -110,10 +115,8 @@ class AnchorBank(nn.Module):
         self.scale: Dict[int, float] = {}
         self.U_idx: Dict[int, torch.Tensor] = {}
 
-        # 16-level scalar code-book.  Using a 1-D codebook avoids the erroneous
-        # (r, comp, comp) broadcast that caused the matmul dimension mismatch at
-        # runtime (see CI log).  Each entry represents a single scalar value
-        # sampled when reconstructing the low-rank matrix U ∈ ℝ^{r×comp}.
+        # 16-level scalar code-book. Using a 1-D codebook avoids the erroneous
+        # broadcast that caused the matmul dimension mismatch at runtime.
         self.codebook = nn.Parameter(torch.randn(16))
 
     # ---------------------------------------------------------------- utils
@@ -133,7 +136,9 @@ class AnchorBank(nn.Module):
                 mu_q, s = self._quant8(z)
                 self.mu_q[cls] = mu_q.cpu()
                 self.scale[cls] = s
-                self.U_idx[cls] = torch.zeros(self.r * self.comp // 2, dtype=torch.uint8)
+                self.U_idx[cls] = torch.zeros(
+                    self.r * self.comp // 2, dtype=torch.uint8
+                )
             else:
                 # exponential moving average in fp32
                 mu_fp = 0.99 * self.dequant_mu(cls) + 0.01 * z.cpu()
@@ -151,28 +156,29 @@ class AnchorBank(nn.Module):
     def bytes(self) -> int:
         b = 0
         for cls in self.mu_q:
-            b += self.comp                 # mu_q uint8
-            b += self.r * self.comp // 2   # U_idx packed 4-bit
-            b += 4                         # scale float32
+            b += self.comp  # mu_q uint8
+            b += self.r * self.comp // 2  # U_idx packed 4-bit
+            b += 4  # scale float32
         return b
 
     # ---------------------------------------------------------------- sampling
     def sample(self, cls: int, n: int = 32) -> torch.Tensor:
         """Return *n* normalised features for *cls* (on CPU)."""
-        mu = self.dequant_mu(cls)                     # [comp]
+        mu = self.dequant_mu(cls)  # [comp]
         # --- reconstruct U ∈ ℝ^{r×comp} from the packed 4-bit indices
         U_code = _unpack4bit(self.U_idx[cls], self.r * self.comp)
         U_code = U_code.view(self.r, self.comp).long()
-        U = self.codebook[U_code]                     # [r, comp]
+        U = self.codebook[U_code]  # [r, comp]
 
         eps = torch.randn(n, self.r)
-        z_comp = mu + eps @ U                         # [n, comp]
-        z_full = z_comp @ self.P.T                    # back-projection to 256-D
+        z_comp = mu + eps @ U  # [n, comp]
+        z_full = z_comp @ self.P.T  # back-projection to 256-D
         return F.normalize(z_full, dim=1)
 
 
 class FeatureSynthesiser(nn.Module):
     """Tiny hyper-network that turns noise + class-id into a 256-D feature."""
+
     def __init__(self, feat_dim: int, n_cls_max: int = 500, noise: int = 8):
         super().__init__()
         self.embed = nn.Embedding(n_cls_max, 16)
@@ -187,6 +193,7 @@ class FeatureSynthesiser(nn.Module):
 
 class LOSRMemory(nn.Module):
     """Full memory module combining the analytic anchor bank and synthesiser."""
+
     def __init__(self, feat_dim_full: int = 256, r: int = 2, budget_kb: int = 32):
         super().__init__()
         self.bank = AnchorBank(feat_dim_full, r, budget_kb)
@@ -213,8 +220,10 @@ class LOSRMemory(nn.Module):
 # ============================================================================
 # Experience-replay buffer ---------------------------------------------------
 
+
 class ERBuffer:
     """Reservoir buffer obeying a byte budget (stores fp16 images)."""
+
     def __init__(self, byte_budget: int, img_shape: Tuple[int, int, int] = (3, 32, 32)):
         self.byte_budget = byte_budget
         self.img_bytes = math.prod(img_shape) * 2  # fp16
@@ -257,6 +266,7 @@ def train_stream(
     device: str = "cuda",
 ) -> None:
     """One pass over *loader* using *strategy* (LOSR / ER / NONE)."""
+
     backbone.train()
     clf.train()
 

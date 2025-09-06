@@ -1,10 +1,12 @@
-[UPDATED FILE]
+"""src/main.py – orchestrates the complete experimental workflow"""
 from __future__ import annotations
 
-"""src/main.py – orchestrates the complete experimental workflow"""
-
 # std -----------------------------------------------------------------------
-import json, os, random, sys, pathlib
+import json
+import os
+import random
+import sys
+import pathlib
 from typing import Any
 
 # third-party ---------------------------------------------------------------
@@ -29,10 +31,10 @@ from .preprocess import build_split_cifar100
 
 Path = pathlib.Path
 # ---------------------------------------------------------------------------
-# IMPORTANT: all artefacts for this iteration must live under `.research/iteration12/`
+# IMPORTANT: all artefacts for this iteration must live under `.research/iteration13/`
 # ---------------------------------------------------------------------------
-IMAGES_DIR = Path(".research/iteration12/images")
-RESULTS_DIR = Path(".research/iteration12")
+IMAGES_DIR = Path(".research/iteration13/images")
+RESULTS_DIR = Path(".research/iteration13")
 
 
 def gpu_assert() -> None:

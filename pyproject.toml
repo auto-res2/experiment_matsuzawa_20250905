@@ -1,1 +1,26 @@
-# Please list the required python packages.
+[project]
+name = "samp-experiments"
+version = "0.1.0"
+description = "Deep GNN over-smoothing study with Spectral Attention Message Passing (SAMP)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+# ---------------------------------------------------------------------------
+# Dependencies – ordered to avoid circular constraints
+# ---------------------------------------------------------------------------
+[project.dependencies]
+torch = ">=1.13.1"
+torch_geometric = ">=2.3.1"
+ogb = "*"
+networkx = "*"
+scikit-learn = "*"
+matplotlib = "*"
+seaborn = "*"
+PyYAML = "*"
+ptflops = "*"
+# Optional but nice-to-have (plots look better)
+psutil = {version="*", optional=true}
+
+[build-system]
+requires = ["setuptools", "wheel"]

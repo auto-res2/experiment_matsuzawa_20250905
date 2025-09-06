@@ -1,0 +1,12 @@
+experiments:
+  exp1_sbm:
+    description: "Spectrum-Aware Diagnostic on Synthetic SBM graphs"
+    seeds: 5               # reduced for quick demo run
+    h_values: [0.1, 0.3]
+    sigma_values: [0.0, 0.5]
+    models: [GCN, SAMP]
+    epochs: 50
+    patience: 10
+    hidden_dim: 64
+    lr: 0.01
+    cheb_K: 8

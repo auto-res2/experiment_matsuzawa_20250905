@@ -1,0 +1,10 @@
+{
+  "research_topic": "スプリアス相関に頑若な画像分類を「分布外頑健性」に関して改善したい ",
+  "queries": [
+    "spurious correlation robustness",
+    "out-of-distribution image classification",
+    "invariant risk minimization",
+    "domain generalization",
+    "counterfactual data augmentation"
+  ]
+}

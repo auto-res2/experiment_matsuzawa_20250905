@@ -4,27 +4,34 @@ version = "0.1.0"
 description = "Refactored project structure for CGSI experiments"
 requires-python = ">=3.9"
 authors = [
-    {name = "Researcher", email = "research@example.com"}
+  { name = "Researcher", email = "research@example.com" }
 ]
 
 # ---------------------------------------------------------------------------
-# Dependencies – kept minimal; CUDA variants of torch/torchvision must be
-# pre-installed on the target machine.  Version pins are intentionally loose
-# to avoid conflicts.
+# Core dependencies – CUDA-enabled PyTorch & friends should already be present
+# on the target machine.  Version pins are kept loose to reduce conflicts.
 # ---------------------------------------------------------------------------
-[project.dependencies]
-torch = "*"
-torchvision = "*"
-timm = "*"
-diffusers = "*"
-scikit-learn = "*"
-matplotlib = "*"
-seaborn = "*"
-PyYAML = "*"
-huggingface-hub = "*"
-Pillow = "*"
-requests = "*"
-tqdm = "*"
-# optional – not fatal if missing
-fvcore = {version = "*", optional = true}
-pynvml = {version = "*", optional = true}
+dependencies = [
+  "torch",           # Pre-installed with the desired CUDA toolkit
+  "torchvision",     # Matches the installed torch version
+  "timm",            # Vision Transformer models
+  "diffusers",       # Stable-Diffusion-XL in-painting pipeline
+  "scikit-learn",    # K-means, MI, metrics …
+  "matplotlib",      # Plotting utilities
+  "seaborn",         # Nicer matplotlib defaults
+  "PyYAML",          # Configuration loader
+  "huggingface-hub", # Dataset & model snapshots
+  "Pillow",          # Image I/O
+  "requests",        # HTTP downloads (e.g. NICO zip)
+  "tqdm"             # Progress bars
+]
+
+# ---------------------------------------------------------------------------
+# Optional extras – the project works without these, but enables GPU-util
+# logging (NVML) and flop counting (fvcore) if they are present.
+# ---------------------------------------------------------------------------
+[project.optional-dependencies]
+extras = [
+  "fvcore",  # flop counter / misc utils
+  "pynvml"   # NVIDIA GPU utilisation metrics
+]

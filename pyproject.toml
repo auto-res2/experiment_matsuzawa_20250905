@@ -1,38 +1,22 @@
 [project]
-name = "cgsi-refactor"
+name = "cgsi-experiment"
 version = "0.1.0"
-description = "Refactored project structure for CGSI experiments"
+authors = [{name = "ML Researcher"}]
+description = "Refactored CGSI robustness experiments"
 requires-python = ">=3.9"
-authors = [
-  { name = "Researcher", email = "research@example.com" }
-]
-
-# ---------------------------------------------------------------------------
-# Core dependencies – CUDA-enabled PyTorch & friends should already be present
-# on the target machine.  Version pins are kept loose to reduce conflicts.
-# ---------------------------------------------------------------------------
+license = {text = "MIT"}
 dependencies = [
-  "torch",           # Pre-installed with the desired CUDA toolkit
-  "torchvision",     # Matches the installed torch version
-  "timm",            # Vision Transformer models
-  "diffusers",       # Stable-Diffusion-XL in-painting pipeline
-  "accelerate>=0.20,<1.0",  # Needed for efficient CPU/GPU off-load
-  "scikit-learn",    # K-means, MI, metrics …
-  "matplotlib",      # Plotting utilities
-  "seaborn",         # Nicer matplotlib defaults
-  "PyYAML",          # Configuration loader
-  "huggingface-hub", # Dataset & model snapshots
-  "Pillow",          # Image I/O
-  "requests",        # HTTP downloads (e.g. NICO zip)
-  "tqdm"             # Progress bars
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "timm>=0.6.13",
+    "torchmetrics>=0.11",
+    "scikit-learn>=1.3",
+    "huggingface_hub>=0.16",
+    "tqdm>=4.66",
+    "pillow>=10.0",
+    "matplotlib>=3.7",
+    "pyyaml>=6.0",
 ]
 
-# ---------------------------------------------------------------------------
-# Optional extras – the project works without these, but enables GPU-util
-# logging (NVML) and flop counting (fvcore) if they are present.
-# ---------------------------------------------------------------------------
-[project.optional-dependencies]
-extras = [
-  "fvcore",  # flop counter / misc utils
-  "pynvml"   # NVIDIA GPU utilisation metrics
-]
+[tool.setuptools.packages.find]
+where = ["src"]

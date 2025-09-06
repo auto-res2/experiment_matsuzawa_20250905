@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 """
 preprocess.py – data download, verification and task stream builders
 Only CIFAR-100 variants are needed for this iteration.
 """
-from __future__ import annotations
 
 import hashlib
 import pathlib
@@ -120,15 +121,17 @@ def build_split_cifar100(seed: int) -> Tuple[List[Subset], Dataset]:
 # ---------------------------------------------------------------------------
 
 def build_cifar100_one_class(seed: int):
+    """Return (stream, test_set) where *stream* consists of 100 single-class tasks."""
     stream, test_set = build_split_cifar100(seed)
 
     single: List[Subset] = []
     for subset in stream:
+        dataset = subset.dataset  # original CIFAR-100 dataset instance
         # which classes are inside this subset?
-        labels = set(int(torchvision.datasets.CIFAR100.targets[i]) for i in subset.indices)  # type: ignore[attr-defined]
+        labels = set(int(dataset.targets[i]) for i in subset.indices)  # type: ignore[attr-defined]
         for c in labels:
-            idx = [i for i in subset.indices if torchvision.datasets.CIFAR100.targets[i] == c]  # type: ignore[attr-defined]
-            single.append(Subset(subset.dataset, idx))
+            idx = [i for i in subset.indices if dataset.targets[i] == c]  # type: ignore[attr-defined]
+            single.append(Subset(dataset, idx))
 
     single = single[:100]  # ensure 100 tasks exactly
     return single, test_set

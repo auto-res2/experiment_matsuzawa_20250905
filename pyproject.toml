@@ -1,19 +1,24 @@
 [project]
 name = "losr-research"
 version = "0.1.0"
-description = "Latent Orthogonal Sketch Replay (iteration-14) – continual learning with kB-scale memory"
+description = "Latent Orthogonal Sketch Replay (iteration-15) – continual learning with kB-scale memory"
 requires-python = ">=3.9"
 
-[project.dependencies]
-torch = "*"
-torchvision = "*"
-requests = "*"
-PyYAML = "*"
-matplotlib = "*"
-seaborn = "*"
-scikit-learn = "*"
-ptflops = "*"
-numpy = "*"
+# ---------------------------------------------------------------------------
+#  Dependencies – list style as required by PEP 621
+# ---------------------------------------------------------------------------
+
+dependencies = [
+  "torch",
+  "torchvision",
+  "requests",
+  "PyYAML",
+  "matplotlib",
+  "seaborn",
+  "scikit-learn",
+  "ptflops",
+  "numpy"
+]
 
 [tool.setuptools]
 package-dir = {"" = "."}

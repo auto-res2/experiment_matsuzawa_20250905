@@ -1,14 +1,14 @@
+from __future__ import annotations
+
 """
 main.py – orchestrates the whole experimental pipeline
 Entry-point:  python main.py
 """
-from __future__ import annotations
 
 import json
 import pathlib
 import random
 import sys
-import time
 from typing import Dict, List
 
 import numpy as np
@@ -28,8 +28,10 @@ from train import (
 )
 
 # ---------------------------------------------------------------------------
-RESULT_DIR = pathlib.Path(".research/iteration14/results")
-FIG_DIR = pathlib.Path(".research/iteration14/figures")
+#  Directories – updated to iteration15 as per specification
+# ---------------------------------------------------------------------------
+RESULT_DIR = pathlib.Path(".research/iteration15")
+FIG_DIR = pathlib.Path(".research/iteration15/images")
 
 # ---------------------------------------------------------------------------
 #  Environment sanity check – GPU required for the heavy models
@@ -118,7 +120,7 @@ def _run_one(
             flops_g = profile_flops(backbone)
 
             # ---------------- continual training --------------------------
-            for task_id, subset in enumerate(train_tasks):
+            for subset in train_tasks:
                 loader = DataLoader(
                     subset,
                     batch_size=SHARED["batch_size"],

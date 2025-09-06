@@ -14,13 +14,13 @@ from .train import train_single
 from .evaluate import lineplot
 
 # -----------------------------------------------------------------------------
-#  Global configuration & paths
+#  Global configuration & paths (iteration *6* as per submission guidelines)
 # -----------------------------------------------------------------------------
 
 CONFIG_PATH = Path("config/config.yaml")
 CFG = yaml.safe_load(CONFIG_PATH.read_text())
 
-RESULTS_DIR = Path(".research/iteration5")
+RESULTS_DIR = Path(".research/iteration6")
 IMAGES_DIR = RESULTS_DIR / "images"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)

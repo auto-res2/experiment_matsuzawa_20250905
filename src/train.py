@@ -12,7 +12,6 @@ from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch_geometric.nn import PairNorm
 from torch_geometric.nn.conv import MessagePassing
-from torch_geometric.nn.norm import BatchNorm
 from torch_geometric.utils import add_self_loops, dropout_edge
 
 from .evaluate import accuracy  # evaluation metrics used inside the training loop
@@ -40,18 +39,38 @@ class CurvGCNConv(MessagePassing):
         if self.bias is not None:
             nn.init.zeros_(self.bias)
 
-    def forward(self, x: torch.Tensor, edge_index: torch.Tensor, kappa_edge: torch.Tensor,
-                dropedge_p: float = 0.0) -> torch.Tensor:
+    def forward(
+        self,
+        x: torch.Tensor,
+        edge_index: torch.Tensor,
+        kappa_edge: torch.Tensor,
+        dropedge_p: float = 0.0,
+    ) -> torch.Tensor:
+        # ------------------------------------------------------------------
+        # Edge dropout – ensure that curvature attributes are dropped *together*
+        # with their corresponding edges to avoid length mismatches.
+        # ------------------------------------------------------------------
         if self.training and dropedge_p > 0.0:
-            # NOTE: dropout_edge returns (edge_index, edge_attr).  We ignore attr.
-            edge_index, _ = dropout_edge(edge_index, p=dropedge_p, force_undirected=True,
-                                         training=True)
-            # we keep kappa_edge unchanged – mismatch is minor because indices are dropped
-        # add self-loops (curvature 0 ⇒ gate = σ(β))
-        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
-        kappa_edge = torch.cat(
-            [kappa_edge, torch.zeros(x.size(0), dtype=kappa_edge.dtype, device=kappa_edge.device)])
-        gate = torch.sigmoid(self.alpha * kappa_edge + self.beta)
+            edge_index, kappa_edge = dropout_edge(
+                edge_index,
+                kappa_edge,
+                p=dropedge_p,
+                force_undirected=True,
+                training=True,
+            )
+
+        # ------------------------------------------------------------------
+        # Add self-loops; curvature for those edges is defined as 0.
+        # PyG's helper keeps edge_attr in sync so no manual slicing needed.
+        # ------------------------------------------------------------------
+        edge_index, kappa_edge = add_self_loops(
+            edge_index,
+            edge_attr=kappa_edge,
+            fill_value=0.0,
+            num_nodes=x.size(0),
+        )
+
+        gate = torch.sigmoid(self.alpha * kappa_edge.float() + self.beta)
 
         row, col = edge_index
         deg = torch.bincount(row, minlength=x.size(0)).float().clamp(min=1)
@@ -93,11 +112,12 @@ class DGNLayer(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         n, c = x.shape
-        x_g = x.view(self.num_groups, -1, c)
+        # Reshape into groups * batch * feat
+        x_g = x.reshape(self.num_groups, -1, c)
         mean = x_g.mean(dim=1, keepdim=True)
         var = x_g.var(dim=1, unbiased=False, keepdim=True)
         x = (x_g - mean) / torch.sqrt(var + self.eps)
-        return x.view(n, c) * self.weight
+        return x.reshape(n, c) * self.weight
 
 
 class PSNRGate(nn.Module):
@@ -115,8 +135,7 @@ class PSNRGate(nn.Module):
 class GNNStack(nn.Module):
     """Back-bone + normalisation variants assembled automatically."""
 
-    def __init__(self, in_dim: int, out_dim: int, depth: int, variant: str,
-                 dropedge_p: float):
+    def __init__(self, in_dim: int, out_dim: int, depth: int, variant: str, dropedge_p: float):
         super().__init__()
         hidden = 128
         layers: List[nn.Module] = []
@@ -141,17 +160,29 @@ class GNNStack(nn.Module):
         if variant == "psnr":
             self.psnr_gates = nn.ModuleList([PSNRGate(hidden) for _ in range(depth)])
 
-    def forward(self, x: torch.Tensor, edge_index: torch.Tensor, kappa_edge: torch.Tensor,
-                kappa_node: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self,
+        x: torch.Tensor,
+        edge_index: torch.Tensor,
+        kappa_edge: torch.Tensor,
+        kappa_node: torch.Tensor,
+    ) -> torch.Tensor:
         psnr_idx = 0
         for layer in self.layers:
             if isinstance(layer, CurvGCNConv):
                 x_new = layer(x, edge_index, kappa_edge, dropedge_p=self.dropedge_p)
+
                 if self.variant == "psnr":
-                    x = self.psnr_gates[psnr_idx](x_new, x)
+                    # Ensure dimensionality match for residual connection.
+                    residual = x if x.shape[-1] == x_new.shape[-1] else torch.zeros_like(x_new)
+                    x = self.psnr_gates[psnr_idx](x_new, residual)
                     psnr_idx += 1
                 else:
-                    x = x_new + x  # residual connection
+                    # Vanilla / other variants – add residual only if dims match
+                    if x.shape[-1] == x_new.shape[-1]:
+                        x = x_new + x
+                    else:
+                        x = x_new
             elif isinstance(layer, CurvAdaNorm):
                 x = layer(x, kappa_node)
             elif isinstance(layer, PairNorm):
@@ -182,7 +213,9 @@ class EarlyStopper:
 
 
 @torch.no_grad()
-def _eval(model: nn.Module, data, kappa_edge, kappa_node, device: str) -> Tuple[float, float]:
+def _eval(
+    model: nn.Module, data, kappa_edge, kappa_node, device: str
+) -> Tuple[float, float]:
     model.eval()
     out = model(data.x, data.edge_index, kappa_edge, kappa_node)
     val_acc = accuracy(out[data.val_mask], data.y[data.val_mask])
@@ -190,13 +223,21 @@ def _eval(model: nn.Module, data, kappa_edge, kappa_node, device: str) -> Tuple[
     return val_acc, test_acc
 
 
-def train_single(data, kappa_edge, kappa_node, depth: int, variant: str, device: str,
-                 cfg: Dict) -> Tuple[float, float]:
+def train_single(
+    data,
+    kappa_edge,
+    kappa_node,
+    depth: int,
+    variant: str,
+    device: str,
+    cfg: Dict,
+) -> Tuple[float, float]:
     """Train on a single (pre-split) dataset split and return (test_acc, best_val_acc)."""
 
     num_classes = int(data.y.max().item()) + 1
-    model = GNNStack(data.num_features, num_classes, depth, variant,
-                     dropedge_p=0.2 if depth > 32 else 0.0).to(device)
+    model = GNNStack(
+        data.num_features, num_classes, depth, variant, dropedge_p=0.2 if depth > 32 else 0.0
+    ).to(device)
 
     data = data.to(device, non_blocking=True)
     kappa_edge, kappa_node = kappa_edge.to(device), kappa_node.to(device)
@@ -212,7 +253,9 @@ def train_single(data, kappa_edge, kappa_node, depth: int, variant: str, device:
         opt.zero_grad()
         with autocast(enabled=(device == "cuda")):
             out = model(data.x, data.edge_index, kappa_edge, kappa_node)
-            loss = torch.nn.functional.cross_entropy(out[data.train_mask], data.y[data.train_mask])
+            loss = torch.nn.functional.cross_entropy(
+                out[data.train_mask], data.y[data.train_mask]
+            )
         if torch.isnan(loss):
             raise RuntimeError("NaN encountered during training – aborting.")
         scaler.scale(loss).backward()

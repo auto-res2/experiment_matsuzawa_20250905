@@ -36,3 +36,12 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+# ---------------------------------------------------------------------------
+#  uv specific build hooks – ensure extension packages see `torch` at build
+#  time to avoid falling back to a (slow) source compilation path.
+# ---------------------------------------------------------------------------
+
+[tool.uv.extra-build-dependencies]
+"torch-scatter" = ["torch"]
+"torch-sparse" = ["torch"]

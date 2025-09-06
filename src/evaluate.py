@@ -4,11 +4,11 @@ from __future__ import annotations
 evaluate.py – generic helper utilities for logging, plotting and storing
 per-experiment JSON results.
 
-Iteration44 update:
+Iteration45 update:
   • All results JSONs must be saved under
-        .research/iteration44/
+        .research/iteration45/
   • All figure files must be saved under
-        .research/iteration44/images/
+        .research/iteration45/images/
 This file centralises those paths so that the rest of the code-base does not
 have to worry about the bookkeeping details.
 """
@@ -45,9 +45,9 @@ except Exception:  # pragma: no cover – best-effort only
 __all__ = ["ExperimentBase"]
 
 # ---------------------------------------------------------------------------
-# Directories mandated by the assessment instructions (iteration44)
+# Directories mandated by the assessment instructions (iteration45)
 # ---------------------------------------------------------------------------
-_BASE_RESULTS_DIR = Path(".research/iteration44")
+_BASE_RESULTS_DIR = Path(".research/iteration45")
 _IMAGES_DIR = _BASE_RESULTS_DIR / "images"
 _BASE_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -62,7 +62,7 @@ class ExperimentBase:
         self.global_cfg = global_cfg
         # Keep a sub-directory for any auxiliary artefacts the experiment wants
         # to dump (e.g. counterfactual samples) but store *results* & *figures*
-        # strictly under .research/iteration44/ as required by the rubric.
+        # strictly under .research/iteration45/ as required by the rubric.
         self.results_dir = _BASE_RESULTS_DIR / name
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
@@ -96,7 +96,7 @@ class ExperimentBase:
         ylabel: str,
         fig_name: str,
     ) -> None:
-        """Write a small line plot under .research/iteration44/images."""
+        """Write a small line plot under .research/iteration45/images."""
         plt.figure(figsize=(6, 4))
         sns.lineplot(x=list(xs), y=list(ys), marker="o", label=ylabel)
         for x_val, y_val in zip(xs, ys):

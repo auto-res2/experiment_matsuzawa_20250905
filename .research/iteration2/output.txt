@@ -1,0 +1,4 @@
+=== uv sync start Sat Sep  6 06:13:35 UTC 2025 ===
+=== uv install end Sat Sep  6 06:14:13 UTC 2025 ===
+=== experiment start Sat Sep  6 06:14:13 UTC 2025 ===
+[setup] Installing PairNorm from git+https://github.com/LingxiaoShawn/PairNorm.git …

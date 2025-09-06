@@ -122,13 +122,14 @@ class DeepGCN(nn.Module):
     def forward(self, x: torch.Tensor, edge_index: torch.Tensor):
         masks = None
         for i, conv in enumerate(self.convs):
-            h_in = x  # for residual
+            h_in = x  # store input for potential residual connection
             x = conv(x, edge_index)
-            if i != len(self.convs) - 1:  # last layer –> no activation
+            if i != len(self.convs) - 1:  # hidden layer – apply activation & extras
                 x = F.relu(x)
-                if self.plugin_type == "SAMP" and i != 0:  # plugin between hidden layers
+                if self.plugin_type == "SAMP" and i != 0:
                     x, masks = self.samp(x, edge_index)
-                if self.residual:
+                # ----- residual connection (skip if dimension mismatch) -----
+                if self.residual and h_in.shape == x.shape:
                     x = x + h_in
         return F.log_softmax(x, dim=1), masks
 
@@ -136,7 +137,7 @@ class DeepGCN(nn.Module):
 # 2.  Single run helper – trains *one* (model,dataset,seed) combination
 # ---------------------------------------------------------------------------
 
-_RESULT_IMG_DIR = Path(".research/iteration4/images")  # UPDATED PATH
+_RESULT_IMG_DIR = Path(".research/iteration5/images")  # UPDATED PATH – rule compliance
 _RESULT_IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -238,7 +239,7 @@ def run_experiment(exp_name: str, cfg) -> Tuple[Dict, List[str]]:
     metrics : dict
         Aggregate metrics.
     fig_files : list[str]
-        PDF paths created during the run (saved in .research/iteration4/images).
+        PDF paths created during the run (saved in .research/iteration5/images).
     """
 
     fig_files: List[str] = []

@@ -1,29 +1,38 @@
-"""src/preprocess.py – data download, checksum and DataLoader helpers"""
+"""
+preprocess.py – data download, verification and task stream builders
+Only CIFAR-100 variants are needed for this iteration.
+"""
 from __future__ import annotations
 
-# std -----------------------------------------------------------------------
-import hashlib, os, random, tarfile, pathlib
-from typing import Tuple, List
+import hashlib
+import pathlib
+import random
+import tarfile
+from typing import List, Tuple
 
-# third-party ---------------------------------------------------------------
 import requests
-import torchvision
 import torch
-from torch.utils.data import Subset
+import torchvision
+from torch.utils.data import ConcatDataset, DataLoader, Dataset, Subset
+from yaml import safe_load
 
-# ============================================================================
-# Constants ------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+DATA_ROOT = pathlib.Path("data")
 
-DATA_ROOT = "data"
-CIFAR100_URL = "https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz"
-CIFAR100_MD5 = "eb9058c3a382ffc7106e4002c42a8d85"
 
-Path = pathlib.Path
+# ---------------------------------------------------------------------------
+#  Helper – checksums & downloads
+# ---------------------------------------------------------------------------
 
-# ============================================================================
-# Utility helpers ------------------------------------------------------------
+def _sha1(path: pathlib.Path) -> str:
+    h = hashlib.sha1()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
 
-def _md5sum(path: Path) -> str:
+
+def _md5(path: pathlib.Path) -> str:
     h = hashlib.md5()
     with path.open("rb") as f:
         for chunk in iter(lambda: f.read(8192), b""):
@@ -31,32 +40,42 @@ def _md5sum(path: Path) -> str:
     return h.hexdigest()
 
 
-def _download(url: str, target: Path, md5: str) -> None:
-    if target.exists() and _md5sum(target) == md5:
-        return
-    print(f"[Download] {url} -> {target}")
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with requests.get(url, stream=True, timeout=120) as r:
+def _download(url: str, tgt: pathlib.Path, checksum: str, kind: str = "md5") -> None:
+    if tgt.exists():
+        ok = (_md5(tgt) if kind == "md5" else _sha1(tgt)) == checksum
+        if ok:
+            return
+    print(f"[Download] {url} -> {tgt}")
+    tgt.parent.mkdir(parents=True, exist_ok=True)
+    with requests.get(url, stream=True, timeout=180) as r:
         r.raise_for_status()
-        with target.open("wb") as fp:
-            for chunk in r.iter_content(chunk_size=8192):
-                fp.write(chunk)
-    if _md5sum(target) != md5:
-        raise RuntimeError("Checksum mismatch for " + str(target))
+        with tgt.open("wb") as f:
+            for chunk in r.iter_content(chunk_size=1 << 20):
+                f.write(chunk)
+    ok = (_md5(tgt) if kind == "md5" else _sha1(tgt)) == checksum
+    if not ok:
+        raise RuntimeError("Checksum mismatch – aborting as per STRICT NO-FALLBACK rule")
 
-# ============================================================================
-# Dataset builders -----------------------------------------------------------
 
-def build_split_cifar100(seed: int) -> Tuple[List[Subset], torch.utils.data.Dataset]:
-    """Return a list of 20 task-datasets (5 classes each) and the full test set."""
-    data_root = Path(DATA_ROOT)
-    data_root.mkdir(parents=True, exist_ok=True)
-    arc = data_root / "cifar-100-python.tar.gz"
-    _download(CIFAR100_URL, arc, CIFAR100_MD5)
+# ---------------------------------------------------------------------------
+#  CIFAR-100 continual variants
+# ---------------------------------------------------------------------------
 
-    if not (data_root / "cifar-100-python").exists():
+def _load_shared_cfg():
+    return safe_load(pathlib.Path("config/config.yaml").read_text())
+
+
+def build_split_cifar100(seed: int) -> Tuple[List[Subset], Dataset]:
+    cfg = _load_shared_cfg()
+    url, md5 = cfg["shared"]["cifar100_url"], cfg["shared"]["cifar100_md5"]
+
+    DATA_ROOT.mkdir(parents=True, exist_ok=True)
+    arc = DATA_ROOT / "cifar-100-python.tar.gz"
+    _download(url, arc, md5, "md5")
+
+    if not (DATA_ROOT / "cifar-100-python").exists():
         with tarfile.open(arc) as tf:
-            tf.extractall(data_root)
+            tf.extractall(DATA_ROOT)
 
     tf_train = torchvision.transforms.Compose(
         [
@@ -64,7 +83,7 @@ def build_split_cifar100(seed: int) -> Tuple[List[Subset], torch.utils.data.Data
             torchvision.transforms.RandomHorizontalFlip(),
             torchvision.transforms.ToTensor(),
             torchvision.transforms.Normalize(
-                mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761]
+                [0.5071, 0.4867, 0.4408], [0.2675, 0.2565, 0.2761]
             ),
         ]
     )
@@ -72,25 +91,44 @@ def build_split_cifar100(seed: int) -> Tuple[List[Subset], torch.utils.data.Data
         [
             torchvision.transforms.ToTensor(),
             torchvision.transforms.Normalize(
-                mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761]
+                [0.5071, 0.4867, 0.4408], [0.2675, 0.2565, 0.2761]
             ),
         ]
     )
 
-    train = torchvision.datasets.CIFAR100(
-        root=data_root, train=True, download=False, transform=tf_train
+    train_set = torchvision.datasets.CIFAR100(
+        root=DATA_ROOT, train=True, download=False, transform=tf_train
     )
-    test = torchvision.datasets.CIFAR100(
-        root=data_root, train=False, download=False, transform=tf_test
+    test_set = torchvision.datasets.CIFAR100(
+        root=DATA_ROOT, train=False, download=False, transform=tf_test
     )
 
     cls_order = list(range(100))
     random.Random(seed).shuffle(cls_order)
-    tasks = [cls_order[i * 5 : (i + 1) * 5] for i in range(20)]
+    tasks = [cls_order[i * 5 : (i + 1) * 5] for i in range(20)]  # 20 × 5-class tasks
 
-    train_stream = []
+    stream: List[Subset] = []
     for cls in tasks:
-        idx = [i for i, y in enumerate(train.targets) if y in cls]
-        train_stream.append(Subset(train, idx))
+        idx = [i for i, y in enumerate(train_set.targets) if y in cls]  # type: ignore[attr-defined]
+        stream.append(Subset(train_set, idx))
 
-    return train_stream, test
+    return stream, test_set
+
+
+# ---------------------------------------------------------------------------
+#  100-task variant (one class per task)
+# ---------------------------------------------------------------------------
+
+def build_cifar100_one_class(seed: int):
+    stream, test_set = build_split_cifar100(seed)
+
+    single: List[Subset] = []
+    for subset in stream:
+        # which classes are inside this subset?
+        labels = set(int(torchvision.datasets.CIFAR100.targets[i]) for i in subset.indices)  # type: ignore[attr-defined]
+        for c in labels:
+            idx = [i for i in subset.indices if torchvision.datasets.CIFAR100.targets[i] == c]  # type: ignore[attr-defined]
+            single.append(Subset(subset.dataset, idx))
+
+    single = single[:100]  # ensure 100 tasks exactly
+    return single, test_set

@@ -1,26 +1,26 @@
 shared:
+  # ---------------- training protocol ----------------
   passes_per_task: 10
   batch_size: 128
   lr_grid: [0.001, 0.0005, 0.0002]
   seeds: [7, 17, 23, 31, 47]
   budget_kb: 32
 
+# ---------------- datasets ---------------------------
+  cifar100_url: https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz
+  cifar100_md5: eb9058c3a382ffc7106e4002c42a8d85
+  miniimagenet_url: https://cseweb.ucsd.edu/~weijian/static/datasets/mini-ImageNet/MiniImagenet.tar.gz
+  miniimagenet_sha1: d85c8b055ff3e4b34c1a0533e87e817939e6f145
+
 experiments:
-  - dataset: cifar100
+  - name: EXP1_smoke_only  # sanity-audit is driven by pytest, not by main.py
+  - name: EXP2_cifar100_r18
+    dataset: split_cifar100
     backbone: resnet18
-    method: LOSR
-  - dataset: cifar100
+    methods: [LOSR, ER, DERPP, AGEM, ORTHO]
+    budgets_kb: [32, 128, 512]
+  - name: EXP3_cifar100_one_cls
+    dataset: cifar100_oneclass
     backbone: resnet18
-    method: ER
-    buffer_kb: [32, 128, 512]
-  - dataset: cifar100
-    backbone: resnet18
-    method: DERPP
-    buffer_kb: [32, 128, 512]
-  - dataset: cifar100
-    backbone: resnet18
-    method: AGEM
-    buffer_kb: [32, 128, 512]
-  - dataset: cifar100
-    backbone: resnet18
-    method: ORTHO_SUB
+    methods: [LOSR, ER, PRD]
+    budgets_kb: [32]            # ER grows automatically; LOSR fixed 32 kB

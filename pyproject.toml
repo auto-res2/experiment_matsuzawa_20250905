@@ -12,16 +12,15 @@ authors = [
 requires-python = ">=3.10"
 
 # ---------------------------------------------------------------------------
-#  Run-time dependencies.  torch-geometric & ogb versions are chosen to be
-#  compatible with PyTorch ≥2.1  (CUDA 12 wheels available on PyPI).
+#  Run-time dependencies.
 # ---------------------------------------------------------------------------
 
 dependencies = [
   "torch>=2.0",
   "torch_geometric>=2.4.0",
   "torch_sparse>=0.6.18",
-  "torch_cluster>=1.6.1",
   "torch_scatter>=2.1.2",
+  "torch_cluster>=1.6.1",
   "networkx>=3.1",
   "scikit-learn",
   "pyyaml",
@@ -30,3 +29,11 @@ dependencies = [
   "ogb",
   "GraphRicciCurvature",
 ]
+
+[tool.uv.extra-build-dependencies]
+# Ensure that PyTorch is present in the build environment when compiling
+# the PyG extension wheels.  Without this the wheels fall back to building
+# from source and fail because the torch headers are missing.
+torch_scatter = ["torch"]
+torch_sparse   = ["torch"]
+torch_cluster  = ["torch"]

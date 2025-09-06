@@ -17,7 +17,7 @@ from train import build_model, run_training
 #  Directory structure (auto-created on first run)
 # ---------------------------------------------------------------------------
 
-RESEARCH_DIR = Path(".research") / "iteration1"
+RESEARCH_DIR = Path(".research") / "iteration2"
 IMG_DIR = RESEARCH_DIR / "images"
 RESEARCH_DIR.mkdir(parents=True, exist_ok=True)
 IMG_DIR.mkdir(parents=True, exist_ok=True)

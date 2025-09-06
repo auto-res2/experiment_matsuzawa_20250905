@@ -86,13 +86,35 @@ class _SGC(torch.nn.Module):
 #  Model factory – dynamically assembles a sequential model of arbitrary depth
 # ---------------------------------------------------------------------------
 
+class GraphModel(torch.nn.Module):
+    """Light wrapper that routes arguments to the appropriate sub-modules."""
+
+    def __init__(self, layers: List[torch.nn.Module]):
+        super().__init__()
+        self.layers = torch.nn.ModuleList(layers)
+
+    def forward(self, x: torch.Tensor, edge_index: torch.Tensor, kappa_node: torch.Tensor | None = None):
+        for layer in self.layers:
+            if isinstance(layer, CurvAdaNormLayer):
+                if kappa_node is None:
+                    raise RuntimeError("CurvAdaNormLayer requires 'kappa_node' input.  Make sure to pass it when calling the model.")
+                x = layer(x, kappa_node)
+            elif isinstance(layer, (PairNorm,)):
+                x = layer(x)
+            elif isinstance(layer, (_GCN, _GAT, _SGC)):
+                x = layer(x, edge_index)
+            else:  # linear layer
+                x = layer(x)
+        return x
+
+
 def build_model(backbone: str,
                 in_channels: int,
                 out_channels: int,
                 num_layers: int,
                 variant: str,
                 curvada_hypers: Dict[str, float]) -> torch.nn.Module:
-    layers = []
+    layers: List[torch.nn.Module] = []
     hidden = 128
     use_curvada = variant.startswith("curvada") or variant.startswith("ablation")
 
@@ -118,7 +140,7 @@ def build_model(backbone: str,
         if variant == "pairnorm":
             layers.append(PairNorm())
     layers.append(torch.nn.Linear(hidden, out_channels))
-    return torch.nn.Sequential(*layers)
+    return GraphModel(layers)
 
 
 # ---------------------------------------------------------------------------
@@ -133,11 +155,13 @@ def run_training(model: torch.nn.Module,
                  epochs: int,
                  val_mask: torch.Tensor,
                  test_mask: torch.Tensor,
-                 kappa_node: torch.Tensor = None,
+                 kappa_node: torch.Tensor | None = None,
                  log_dict: dict | None = None) -> float:
     """Core mini-batch-less full-graph training routine."""
     model.to(device)
     data = data.to(device)
+    if kappa_node is not None:
+        kappa_node = kappa_node.to(device)
     x, y = data.x, data.y.squeeze()
     edge_index = data.edge_index
 
@@ -148,7 +172,7 @@ def run_training(model: torch.nn.Module,
         model.train()
         optimizer.zero_grad()
         with autocast(enabled=(device == "cuda")):
-            logits = model(x, edge_index)
+            logits = model(x, edge_index, kappa_node)
             loss = F.cross_entropy(logits[val_mask], y[val_mask])
         scaler.scale(loss).backward()
         scaler.step(optimizer)
@@ -158,7 +182,7 @@ def run_training(model: torch.nn.Module,
         if epoch % 10 == 0 or epoch == epochs:
             model.eval()
             with torch.no_grad():
-                logits = model(x, edge_index)
+                logits = model(x, edge_index, kappa_node)
                 val_acc = accuracy(logits[val_mask], y[val_mask])
                 test_acc = accuracy(logits[test_mask], y[test_mask])
             if val_acc > best_val:

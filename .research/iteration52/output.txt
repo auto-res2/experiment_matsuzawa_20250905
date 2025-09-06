@@ -1,0 +1,4 @@
+=== uv sync start Sat Sep  6 06:14:35 UTC 2025 ===
+=== uv install end Sat Sep  6 06:15:10 UTC 2025 ===
+=== experiment start Sat Sep  6 06:15:10 UTC 2025 ===
+[Init] Experiment exp1 → output dir .research/iteration52/exp1

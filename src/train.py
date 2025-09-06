@@ -147,16 +147,37 @@ class ExpandingClassifier(nn.Module):
         super().__init__()
         self.in_dim = in_dim
         self.out_dim = 0
+        # Start with *no* output neurons.  We will grow the layer on-the-fly as
+        # new classes become visible.
         self.fc = nn.Linear(in_dim, 0, bias=True)
 
+    # ---------------------------------------------------------------------
+    # Public helper --------------------------------------------------------
+
+    def ensure_capacity(self, n_classes: int) -> None:
+        """Grow the classifier so that it can predict ``n_classes`` classes.
+
+        This helper is *idempotent* -- calling it with a number smaller than or
+        equal to ``self.out_dim`` is a no-op.
+        """
+        if n_classes > self.out_dim:
+            self.add_classes(n_classes - self.out_dim)
+
+    # ---------------------------------------------------------------------
+    # Internal – actually perform the layer surgery -----------------------
+
     def add_classes(self, n: int):
+        """Physically append ``n`` output neurons to the linear layer."""
         weight_old = self.fc.weight.data
         bias_old = self.fc.bias.data if self.fc.bias is not None else None
         new_fc = nn.Linear(self.in_dim, self.out_dim + n, bias=True)
+        # Copy over existing parameters ------------------------------------------------
         if self.out_dim:
             new_fc.weight.data[: self.out_dim] = weight_old
             new_fc.bias.data[: self.out_dim] = bias_old
-        self.fc = new_fc.to(self.fc.weight.device)
+        # Move to the same device as the old layer -------------------------------------
+        new_fc = new_fc.to(self.fc.weight.device)
+        self.fc = new_fc
         self.out_dim += n
 
     def forward(self, x: torch.Tensor):  # type: ignore[override]
@@ -182,27 +203,41 @@ def train_one_experience(
 
     for x, y in loader:
         x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
-        # Dynamically grow classifier if unseen labels occur
-        new_labels = [int(c) for c in torch.unique(y) if c >= clf.out_dim]
-        if new_labels:
-            clf.add_classes(len(new_labels))
+
+        # ------------------------------------------------------------------
+        # 1)  Make sure the classifier can handle the *real* batch labels.
+        # ------------------------------------------------------------------
+        clf.ensure_capacity(int(y.max().item()) + 1)
 
         optimiser.zero_grad()
+
         feats = backbone(x)
         logits = clf(feats)
         loss = F.cross_entropy(logits, y)
 
-        # -------------- LOSR replay --------------------------------------------
+        # ------------------------------------------------------------------
+        # 2)  Optional LOSR replay.
+        # ------------------------------------------------------------------
         if losr is not None and losr.bank.mu:
             syn_feats, syn_labels = losr.generate(n_per_class=16)
-            loss += F.cross_entropy(clf(syn_feats), syn_labels)
+            # Some classes might *just* have been added; double-check capacity.
+            clf.ensure_capacity(int(syn_labels.max().item()) + 1)
+
+            loss = loss + F.cross_entropy(clf(syn_feats), syn_labels)
+
             noise = torch.randn(len(syn_labels), 8, device=device)
             gen_feats = losr(noise, syn_labels)
-            loss += F.cross_entropy(clf(gen_feats), syn_labels)
+            loss = loss + F.cross_entropy(clf(gen_feats), syn_labels)
 
+        # ------------------------------------------------------------------
+        # 3)  Optimise.
+        # ------------------------------------------------------------------
         loss.backward()
         optimiser.step()
 
-        # Update anchor bank *after* weight update so features use new backbone
+        # ------------------------------------------------------------------
+        # 4)  Update anchor bank *after* weights were updated so that the new
+        #     features reflect the current state of the backbone.
+        # ------------------------------------------------------------------
         if losr is not None:
             losr.update_bank(feats.detach(), y.detach())

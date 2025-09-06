@@ -28,10 +28,10 @@ from .preprocess import build_split_cifar100
 
 Path = pathlib.Path
 # ---------------------------------------------------------------------------
-# IMPORTANT: all artefacts for this iteration must live under `.research/iteration8/`
+# IMPORTANT: all artefacts for this iteration must live under `.research/iteration9/`
 # ---------------------------------------------------------------------------
-IMAGES_DIR = Path(".research/iteration8/images")
-RESULTS_DIR = Path(".research/iteration8")
+IMAGES_DIR = Path(".research/iteration9/images")
+RESULTS_DIR = Path(".research/iteration9")
 
 
 def gpu_assert() -> None:
@@ -85,7 +85,9 @@ def run_one(exp_cfg: dict, seed: int) -> None:
     buffer = None
     params = list(backbone.parameters()) + list(clf.parameters())
     if strategy == "LOSR":
-        losr = LOSRMemory(256, budget_kb=shared["budget_kb"]).to(device)
+        # Keep AnchorBank on CPU to minimise GPU RAM, move only synthesiser to GPU
+        losr = LOSRMemory(256, budget_kb=shared["budget_kb"])
+        losr.synth.to(device)
         params += list(losr.synth.parameters())
     elif strategy == "ER":
         buffer = ERBuffer(shared["budget_kb"] * 1024)

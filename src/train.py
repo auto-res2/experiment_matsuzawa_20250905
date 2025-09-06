@@ -51,13 +51,13 @@ class CurvGCNConv(MessagePassing):
         # with their corresponding edges to avoid length mismatches.
         # ------------------------------------------------------------------
         if self.training and dropedge_p > 0.0:
-            edge_index, kappa_edge = dropout_edge(
+            edge_index, edge_mask = dropout_edge(
                 edge_index,
-                kappa_edge,
                 p=dropedge_p,
                 force_undirected=True,
                 training=True,
             )
+            kappa_edge = kappa_edge[edge_mask]
 
         # ------------------------------------------------------------------
         # Add self-loops; curvature for those edges is defined as 0.

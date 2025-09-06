@@ -1,72 +1,103 @@
+"""src/evaluate.py
+Evaluation utilities: clean accuracy, PGD robustness and line-plot saving.
+"""
 from __future__ import annotations
 
-"""src/evaluate.py – utilities for logging, JSON serialisation & plotting.
-    NOTE:   Pathing updated for iteration-56 as required by the repair task.
-"""
-
-import json
-import time
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Dict, List, Tuple
 
-import matplotlib
+import numpy as np
+import torch
+import torch.nn.functional as F
+from matplotlib import pyplot as plt
+from sklearn.metrics import confusion_matrix
 
-matplotlib.use("Agg")  # head-less CI environments
-import matplotlib.pyplot as plt
+# -----------------------------------------------------------------------------
+#                  CLEAN  VALIDATION / TEST  METRICS
+# -----------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-#   Global research output directory (current iteration = 56)
-# ---------------------------------------------------------------------------
+@torch.no_grad()
+def evaluate(
+    model: torch.nn.Module, loader: torch.utils.data.DataLoader
+) -> Tuple[float, float, float, np.ndarray]:
+    """Return (AvgAcc, Worst-Group-Acc, CorrGap, 2×2 confusion-matrix)."""
+    model.eval()
+    preds, labels, groups = [], [], []
+    for imgs, y, g in loader:
+        imgs = imgs.cuda(non_blocking=True)
+        logits = model(imgs)
+        preds.append(logits.argmax(1).cpu())
+        labels.append(y)
+        groups.append(g)
 
-_RESEARCH_ROOT = Path(".research") / "iteration56"
-_RESEARCH_ROOT.mkdir(parents=True, exist_ok=True)
+    y = torch.cat(labels)
+    p = torch.cat(preds)
+    g = torch.cat(groups)
+    acc = (p == y).float()
 
-# Central directory for ALL experiment figures (mandatory by rubric) --------
-_IMG_DIR = _RESEARCH_ROOT / "images"
-_IMG_DIR.mkdir(parents=True, exist_ok=True)
+    group_acc = [(acc[g == gi].mean().item()) for gi in range(4)]
+    wg_acc = min(group_acc)
 
+    land_major, land_minor = group_acc[0], group_acc[1]
+    water_major, water_minor = group_acc[3], group_acc[2]
+    corr_gap = 0.5 * (abs(land_major - land_minor) + abs(water_major - water_minor))
 
-class ExperimentBase:
-    """Light-weight helper that manages directories + pretty printing."""
+    cm = confusion_matrix(y, p, labels=[0, 1])
+    return acc.mean().item(), wg_acc, corr_gap, cm
 
-    def __init__(self, exp_id: str, exp_cfg: Dict[str, Any], global_cfg: Dict[str, Any]):
-        self.exp_id = exp_id
-        self.exp_cfg = exp_cfg
-        self.global_cfg = global_cfg
-        self.out_dir = _RESEARCH_ROOT / exp_id
-        self.out_dir.mkdir(parents=True, exist_ok=True)
-        print(f"[Init] Experiment {exp_id} → output dir {self.out_dir}")
+# -----------------------------------------------------------------------------
+#                    VERY  LIGHTWEIGHT  PGD-L∞  ATTACK
+# -----------------------------------------------------------------------------
 
-    # ------------------------------------------------------------------
-    def log_and_save(self, seed: int, result: Dict[str, Any]):
-        fn = self.out_dir / f"results_seed{seed}.json"
-        result["timestamp"] = time.strftime("%Y-%m-%d %H:%M:%S")
-        try:
-            with fn.open("w", encoding="utf-8") as fp:
-                json.dump(result, fp, indent=2)
-        except Exception as exc:  # pragma: no cover
-            print(f"[Err] Could not write {fn}: {exc}")
-            raise
-        print(f"[JSON] {fn.relative_to(Path('.'))} =\n{json.dumps(result, indent=2)}")
+def _pgd_attack(
+    model: torch.nn.Module, imgs: torch.Tensor, labels: torch.Tensor, eps: float, steps: int
+) -> torch.Tensor:
+    delta = torch.zeros_like(imgs, device=imgs.device, requires_grad=True)
+    for _ in range(steps):
+        outputs = model(imgs + delta)
+        F.cross_entropy(outputs, labels).backward()
+        grad = delta.grad.detach()
+        delta.data = (delta + 0.01 * torch.sign(grad)).clamp(-eps, eps)
+        delta.grad.zero_()
+    return delta.detach()
 
-    # ------------------------------------------------------------------
-    def save_line_plot(self, y: List[float], x: List[int], ylabel: str, filename: str):
-        """Save a simple line-plot into the central .research/iteration56/images dir.
+@torch.no_grad()
+def evaluate_pgd(
+    model: torch.nn.Module, loader: torch.utils.data.DataLoader, eps: float, steps: int
+) -> float:
+    model.eval()
+    total, correct = 0, 0
+    for imgs, labels, _ in loader:
+        imgs = imgs.cuda(non_blocking=True)
+        labels = labels.cuda(non_blocking=True)
+        delta = _pgd_attack(model, imgs, labels, eps, steps)
+        preds = model(imgs + delta).argmax(1)
+        correct += (preds == labels).sum().item()
+        total += imgs.size(0)
+    return correct / total
 
-        All plots from any experiment are stored inside `_IMG_DIR` to satisfy
-        the specification.  The original `filename` is prefixed with the
-        experiment ID so that collisions are avoided.
-        """
-        try:
-            plt.figure(figsize=(4, 3))
-            plt.plot(x, y, marker="o")
-            plt.xlabel("Epoch")
-            plt.ylabel(ylabel)
-            plt.tight_layout()
-            img_name = f"{self.exp_id}_{filename}"
-            path = _IMG_DIR / img_name
-            plt.savefig(path)
-            plt.close()
-            print(f"[Fig ] saved → {path.relative_to(Path('.'))}")
-        except Exception as exc:  # pragma: no cover
-            print(f"[Warn] Could not save figure {filename}: {exc}")
+# -----------------------------------------------------------------------------
+#                                PLOTTING
+# -----------------------------------------------------------------------------
+
+def save_lineplot(
+    x: List[int],
+    ys: Dict[str, List[float]],
+    ylabel: str,
+    name: str,
+    fig_dir: Path,
+):
+    fig_dir.mkdir(parents=True, exist_ok=True)
+    plt.figure(figsize=(5, 4))
+    for label, y in ys.items():
+        plt.plot(x, y, marker="o", label=label)
+        for xv, yv in zip(x, y):
+            plt.annotate(f"{yv:.2f}", (xv, yv), textcoords="offset points", xytext=(0, 4), ha="center", fontsize=6)
+    plt.xlabel("Epoch")
+    plt.ylabel(ylabel)
+    plt.legend()
+    plt.tight_layout()
+    fn = fig_dir / f"{name}.pdf"
+    plt.savefig(fn, bbox_inches="tight")
+    print(f"[Fig ] saved {fn.relative_to(Path('.'))}")
+    plt.close()

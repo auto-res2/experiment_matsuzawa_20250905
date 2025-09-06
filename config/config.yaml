@@ -1,48 +1,22 @@
-global:
-  device: "cuda:0"
-  data_root: "data"
-  num_workers: 2
-  seeds: [0]
-  batch_size:
-    exp1: 16
-    exp2: 32
-  optim:
-    lr: 3e-4
-    weight_decay: 1e-4
-    betas: [0.9, 0.999]
-    eps: 1e-8
+# config/config.yaml
+# All hyper-parameters and constant paths for EXP-1 (Waterbirds).
 
-models:
-  sdxl_base: "stabilityai/stable-diffusion-2-base"  # only logged – not downloaded
+device: "cuda"  # will be validated at runtime
 
-# ---------------------------------------------------------------------------
-#                            Dataset section
-# ---------------------------------------------------------------------------
+# File system ----------------------------------------------------
+data_root: "data"               # dataset cache
+results_dir: ".research/iteration57"
 
-datasets:
-  waterbirds:
-    hf_repo: "grodino/waterbirds"        # public mirror that is world-readable
-    split:
-      train: "train"
-      val: "val"
-      test: "test"
-  celeba:
-    hf_repo: "nateraw/celeba-img-aligned-256"
+# Dataset --------------------------------------------------------
+dataset_repo: "grodino/waterbirds"
 
-# ---------------------------------------------------------------------------
-#                           Experiment parameters
-# ---------------------------------------------------------------------------
+# Training -------------------------------------------------------
+seeds: [0, 1, 2]
+batch_size: 96
+epochs: 15
+lr: 1.0e-4
+weight_decay: 5.0e-5
 
-experiments:
-  exp1:
-    concept_k: 32
-    cf_ratio: 0.05
-    lambda_gc: 0.1
-    lambda_wd: 1e-4
-    epochs: 2
-  exp2:
-    concept_k: 16
-    epochs_erm: 1
-  exp3:
-    placeholder: true  # skeleton only – see src.main
-
+# PGD sanity check ----------------------------------------------
+pgd_eps: 0.00784313725490196   # 2/255
+pgd_steps: 20

@@ -1,0 +1,4 @@
+=== uv sync start Sat Sep  6 04:33:27 UTC 2025 ===
+=== uv install end Sat Sep  6 04:33:54 UTC 2025 ===
+=== experiment start Sat Sep  6 04:33:54 UTC 2025 ===
+[Download] https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz -> data/cifar-100-python.tar.gz

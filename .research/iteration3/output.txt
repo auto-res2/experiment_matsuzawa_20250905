@@ -1,0 +1,415 @@
+=== uv sync start Sat Sep  6 04:26:02 UTC 2025 ===
+=== uv install end Sat Sep  6 04:35:47 UTC 2025 ===
+=== experiment start Sat Sep  6 04:35:47 UTC 2025 ===
+Loading dataset Cora – 3.26s
+Sinkhorn curvature – 1.99s
+
+===== Variant curvada_2 =====
+Epoch   10 | loss 1.5540 | val 0.5800 | test 0.5200
+Epoch   20 | loss 0.7320 | val 0.7860 | test 0.6970
+Epoch   30 | loss 0.2911 | val 0.9300 | test 0.7880
+Epoch   40 | loss 0.0992 | val 0.9800 | test 0.8100
+Epoch   50 | loss 0.0360 | val 0.9960 | test 0.8090
+Epoch   60 | loss 0.0167 | val 1.0000 | test 0.8020
+Epoch   70 | loss 0.0094 | val 1.0000 | test 0.8010
+Epoch   80 | loss 0.0064 | val 1.0000 | test 0.8000
+Epoch   90 | loss 0.0050 | val 1.0000 | test 0.8000
+Epoch  100 | loss 0.0042 | val 1.0000 | test 0.7990
+Epoch  110 | loss 0.0037 | val 1.0000 | test 0.7990
+Epoch  120 | loss 0.0033 | val 1.0000 | test 0.7990
+Epoch  130 | loss 0.0031 | val 1.0000 | test 0.7990
+Epoch  140 | loss 0.0029 | val 1.0000 | test 0.7980
+Epoch  150 | loss 0.0028 | val 1.0000 | test 0.7970
+Epoch  160 | loss 0.0027 | val 1.0000 | test 0.7970
+Epoch  170 | loss 0.0027 | val 1.0000 | test 0.7960
+Epoch  180 | loss 0.0026 | val 1.0000 | test 0.7960
+Epoch  190 | loss 0.0026 | val 1.0000 | test 0.7960
+Epoch  200 | loss 0.0026 | val 1.0000 | test 0.7960
+Epoch   10 | loss 1.5566 | val 0.5840 | test 0.5030
+Epoch   20 | loss 0.6975 | val 0.8260 | test 0.7100
+Epoch   30 | loss 0.2559 | val 0.9400 | test 0.8070
+Epoch   40 | loss 0.0856 | val 0.9840 | test 0.8240
+Epoch   50 | loss 0.0321 | val 0.9980 | test 0.8280
+Epoch   60 | loss 0.0153 | val 1.0000 | test 0.8210
+Epoch   70 | loss 0.0089 | val 1.0000 | test 0.8130
+Epoch   80 | loss 0.0062 | val 1.0000 | test 0.8170
+Epoch   90 | loss 0.0049 | val 1.0000 | test 0.8170
+Epoch  100 | loss 0.0041 | val 1.0000 | test 0.8170
+Epoch  110 | loss 0.0036 | val 1.0000 | test 0.8160
+Epoch  120 | loss 0.0033 | val 1.0000 | test 0.8170
+Epoch  130 | loss 0.0031 | val 1.0000 | test 0.8180
+Epoch  140 | loss 0.0029 | val 1.0000 | test 0.8160
+Epoch  150 | loss 0.0028 | val 1.0000 | test 0.8140
+Epoch  160 | loss 0.0027 | val 1.0000 | test 0.8130
+Epoch  170 | loss 0.0027 | val 1.0000 | test 0.8130
+Epoch  180 | loss 0.0027 | val 1.0000 | test 0.8130
+Epoch  190 | loss 0.0026 | val 1.0000 | test 0.8130
+Epoch  200 | loss 0.0026 | val 1.0000 | test 0.8130
+Epoch   10 | loss 1.5673 | val 0.5860 | test 0.5040
+Epoch   20 | loss 0.7143 | val 0.8460 | test 0.7290
+Epoch   30 | loss 0.2710 | val 0.9460 | test 0.8080
+Epoch   40 | loss 0.0910 | val 0.9860 | test 0.8160
+Epoch   50 | loss 0.0325 | val 0.9980 | test 0.8160
+Epoch   60 | loss 0.0145 | val 1.0000 | test 0.8110
+Epoch   70 | loss 0.0082 | val 1.0000 | test 0.8090
+Epoch   80 | loss 0.0056 | val 1.0000 | test 0.8090
+Epoch   90 | loss 0.0044 | val 1.0000 | test 0.8080
+Epoch  100 | loss 0.0037 | val 1.0000 | test 0.8060
+Epoch  110 | loss 0.0033 | val 1.0000 | test 0.8060
+Epoch  120 | loss 0.0030 | val 1.0000 | test 0.8060
+Epoch  130 | loss 0.0028 | val 1.0000 | test 0.8080
+Epoch  140 | loss 0.0026 | val 1.0000 | test 0.8080
+Epoch  150 | loss 0.0025 | val 1.0000 | test 0.8080
+Epoch  160 | loss 0.0025 | val 1.0000 | test 0.8100
+Epoch  170 | loss 0.0024 | val 1.0000 | test 0.8100
+Epoch  180 | loss 0.0024 | val 1.0000 | test 0.8100
+Epoch  190 | loss 0.0024 | val 1.0000 | test 0.8100
+Epoch  200 | loss 0.0024 | val 1.0000 | test 0.8100
+
+===== Variant curvada_8 =====
+Epoch   10 | loss 0.4863 | val 0.8480 | test 0.7490
+Epoch   20 | loss 0.1880 | val 0.9480 | test 0.7980
+Epoch   30 | loss 0.0752 | val 0.9720 | test 0.7790
+Epoch   40 | loss 0.0294 | val 0.9880 | test 0.7730
+Epoch   50 | loss 0.0155 | val 0.9980 | test 0.7540
+Epoch   60 | loss 0.0050 | val 0.9980 | test 0.7530
+Epoch   70 | loss 0.0019 | val 1.0000 | test 0.7540
+Epoch   80 | loss 0.0007 | val 1.0000 | test 0.7520
+Epoch   90 | loss 0.0003 | val 1.0000 | test 0.7510
+Epoch  100 | loss 0.0002 | val 1.0000 | test 0.7530
+Epoch  110 | loss 0.0002 | val 1.0000 | test 0.7550
+Epoch  120 | loss 0.0001 | val 1.0000 | test 0.7550
+Epoch  130 | loss 0.0001 | val 1.0000 | test 0.7550
+Epoch  140 | loss 0.0001 | val 1.0000 | test 0.7550
+Epoch  150 | loss 0.0001 | val 1.0000 | test 0.7550
+Epoch  160 | loss 0.0001 | val 1.0000 | test 0.7550
+Epoch  170 | loss 0.0001 | val 1.0000 | test 0.7550
+Epoch  180 | loss 0.0001 | val 1.0000 | test 0.7550
+Epoch  190 | loss 0.0001 | val 1.0000 | test 0.7540
+Epoch  200 | loss 0.0001 | val 1.0000 | test 0.7540
+Epoch   10 | loss 0.7310 | val 0.7500 | test 0.6580
+Epoch   20 | loss 0.2677 | val 0.9460 | test 0.7920
+Epoch   30 | loss 0.1216 | val 0.9560 | test 0.7790
+Epoch   40 | loss 0.0534 | val 0.9860 | test 0.7840
+Epoch   50 | loss 0.0222 | val 0.9860 | test 0.7650
+Epoch   60 | loss 0.0093 | val 0.9980 | test 0.7690
+Epoch   70 | loss 0.0032 | val 1.0000 | test 0.7660
+Epoch   80 | loss 0.0015 | val 1.0000 | test 0.7690
+Epoch   90 | loss 0.0008 | val 1.0000 | test 0.7680
+Epoch  100 | loss 0.0005 | val 1.0000 | test 0.7690
+Epoch  110 | loss 0.0003 | val 1.0000 | test 0.7700
+Epoch  120 | loss 0.0003 | val 1.0000 | test 0.7690
+Epoch  130 | loss 0.0002 | val 1.0000 | test 0.7710
+Epoch  140 | loss 0.0002 | val 1.0000 | test 0.7700
+Epoch  150 | loss 0.0002 | val 1.0000 | test 0.7710
+Epoch  160 | loss 0.0002 | val 1.0000 | test 0.7710
+Epoch  170 | loss 0.0002 | val 1.0000 | test 0.7710
+Epoch  180 | loss 0.0002 | val 1.0000 | test 0.7710
+Epoch  190 | loss 0.0002 | val 1.0000 | test 0.7710
+Epoch  200 | loss 0.0002 | val 1.0000 | test 0.7710
+Epoch   10 | loss 0.6100 | val 0.7840 | test 0.7120
+Epoch   20 | loss 0.2600 | val 0.9320 | test 0.7730
+Epoch   30 | loss 0.1332 | val 0.9620 | test 0.7860
+Epoch   40 | loss 0.0534 | val 0.9840 | test 0.7670
+Epoch   50 | loss 0.0167 | val 0.9980 | test 0.7550
+Epoch   60 | loss 0.0069 | val 0.9980 | test 0.7550
+Epoch   70 | loss 0.0030 | val 0.9980 | test 0.7570
+Epoch   80 | loss 0.0011 | val 1.0000 | test 0.7560
+Epoch   90 | loss 0.0005 | val 1.0000 | test 0.7580
+Epoch  100 | loss 0.0003 | val 1.0000 | test 0.7580
+Epoch  110 | loss 0.0002 | val 1.0000 | test 0.7570
+Epoch  120 | loss 0.0002 | val 1.0000 | test 0.7580
+Epoch  130 | loss 0.0001 | val 1.0000 | test 0.7580
+Epoch  140 | loss 0.0001 | val 1.0000 | test 0.7580
+Epoch  150 | loss 0.0001 | val 1.0000 | test 0.7580
+Epoch  160 | loss 0.0001 | val 1.0000 | test 0.7570
+Epoch  170 | loss 0.0001 | val 1.0000 | test 0.7570
+Epoch  180 | loss 0.0001 | val 1.0000 | test 0.7570
+Epoch  190 | loss 0.0001 | val 1.0000 | test 0.7570
+Epoch  200 | loss 0.0001 | val 1.0000 | test 0.7570
+
+===== Variant curvada_32 =====
+Epoch   10 | loss 2.6958 | val 0.3440 | test 0.3090
+Epoch   20 | loss 1.7119 | val 0.4420 | test 0.4200
+Epoch   30 | loss 13.7299 | val 0.1840 | test 0.2050
+Epoch   40 | loss 3.5486 | val 0.1700 | test 0.2040
+Epoch   50 | loss 2.8992 | val 0.4100 | test 0.3830
+Epoch   60 | loss 1.5189 | val 0.4200 | test 0.3850
+Epoch   70 | loss 1.1088 | val 0.6620 | test 0.5830
+Epoch   80 | loss 0.8738 | val 0.6920 | test 0.6210
+Epoch   90 | loss 0.7622 | val 0.7140 | test 0.6340
+Epoch  100 | loss 0.6677 | val 0.7660 | test 0.6810
+Epoch  110 | loss 0.6004 | val 0.7840 | test 0.6950
+Epoch  120 | loss 0.5538 | val 0.7920 | test 0.7070
+Epoch  130 | loss 0.5024 | val 0.8520 | test 0.7660
+Epoch  140 | loss 0.4774 | val 0.8580 | test 0.7660
+Epoch  150 | loss 0.4609 | val 0.8620 | test 0.7690
+Epoch  160 | loss 0.4513 | val 0.8640 | test 0.7680
+Epoch  170 | loss 0.4458 | val 0.8640 | test 0.7680
+Epoch  180 | loss 0.4429 | val 0.8620 | test 0.7680
+Epoch  190 | loss 0.4417 | val 0.8620 | test 0.7680
+Epoch  200 | loss 0.4415 | val 0.8620 | test 0.7680
+Epoch   10 | loss 1.9792 | val 0.3560 | test 0.3530
+Epoch   20 | loss 1.4172 | val 0.4400 | test 0.4030
+Epoch   30 | loss 4.8611 | val 0.3000 | test 0.3080
+Epoch   40 | loss 1.5542 | val 0.5400 | test 0.4670
+Epoch   50 | loss 1.9807 | val 0.3040 | test 0.2910
+Epoch   60 | loss 1.4020 | val 0.4740 | test 0.4230
+Epoch   70 | loss 2.4868 | val 0.1340 | test 0.1120
+Epoch   80 | loss 1.6429 | val 0.4540 | test 0.4350
+Epoch   90 | loss 1.3863 | val 0.4740 | test 0.4390
+Epoch  100 | loss 0.9842 | val 0.7420 | test 0.7060
+Epoch  110 | loss 0.6378 | val 0.8280 | test 0.7470
+Epoch  120 | loss 0.5468 | val 0.8440 | test 0.7810
+Epoch  130 | loss 0.4876 | val 0.8700 | test 0.7710
+Epoch  140 | loss 0.4574 | val 0.8740 | test 0.7650
+Epoch  150 | loss 0.4358 | val 0.8800 | test 0.7700
+Epoch  160 | loss 0.4197 | val 0.8840 | test 0.7740
+Epoch  170 | loss 0.4093 | val 0.8820 | test 0.7710
+Epoch  180 | loss 0.4039 | val 0.8820 | test 0.7720
+Epoch  190 | loss 0.4017 | val 0.8840 | test 0.7720
+Epoch  200 | loss 0.4013 | val 0.8860 | test 0.7720
+Epoch   10 | loss 2.4669 | val 0.0420 | test 0.0530
+Epoch   20 | loss 6.4423 | val 0.0540 | test 0.0580
+Epoch   30 | loss 1.6797 | val 0.5140 | test 0.5020
+Epoch   40 | loss 1.6593 | val 0.3620 | test 0.3500
+Epoch   50 | loss 3.7593 | val 0.2880 | test 0.2820
+Epoch   60 | loss 5.5587 | val 0.1020 | test 0.0860
+Epoch   70 | loss 1.6025 | val 0.3760 | test 0.3540
+Epoch   80 | loss 1.4511 | val 0.5640 | test 0.5110
+Epoch   90 | loss 1.4066 | val 0.4900 | test 0.4800
+Epoch  100 | loss 1.0500 | val 0.6660 | test 0.5970
+Epoch  110 | loss 0.7512 | val 0.7440 | test 0.6840
+Epoch  120 | loss 0.6538 | val 0.7800 | test 0.7130
+Epoch  130 | loss 0.6032 | val 0.7760 | test 0.7110
+Epoch  140 | loss 0.5682 | val 0.7940 | test 0.7300
+Epoch  150 | loss 0.5420 | val 0.8220 | test 0.7520
+Epoch  160 | loss 0.5235 | val 0.8260 | test 0.7660
+Epoch  170 | loss 0.5120 | val 0.8280 | test 0.7710
+Epoch  180 | loss 0.5060 | val 0.8240 | test 0.7770
+Epoch  190 | loss 0.5037 | val 0.8240 | test 0.7770
+Epoch  200 | loss 0.5032 | val 0.8240 | test 0.7770
+
+===== Variant curvada_64 =====
+Epoch   10 | loss 292.7226 | val 0.0140 | test 0.0230
+Epoch   20 | loss nan | val 0.2880 | test 0.2570
+Epoch   30 | loss nan | val 0.2880 | test 0.2570
+Epoch   40 | loss nan | val 0.2880 | test 0.2570
+Epoch   50 | loss nan | val 0.2880 | test 0.2570
+Epoch   60 | loss nan | val 0.2880 | test 0.2570
+Epoch   70 | loss nan | val 0.2880 | test 0.2570
+Epoch   80 | loss nan | val 0.2880 | test 0.2570
+Epoch   90 | loss nan | val 0.2880 | test 0.2570
+Epoch  100 | loss nan | val 0.2880 | test 0.2570
+Epoch  110 | loss nan | val 0.2880 | test 0.2570
+Epoch  120 | loss nan | val 0.2880 | test 0.2570
+Epoch  130 | loss nan | val 0.2880 | test 0.2570
+Epoch  140 | loss nan | val 0.2880 | test 0.2570
+Epoch  150 | loss nan | val 0.2880 | test 0.2570
+Epoch  160 | loss nan | val 0.2880 | test 0.2570
+Epoch  170 | loss nan | val 0.2880 | test 0.2570
+Epoch  180 | loss nan | val 0.2880 | test 0.2570
+Epoch  190 | loss nan | val 0.2880 | test 0.2570
+Epoch  200 | loss nan | val 0.2880 | test 0.2570
+Epoch   10 | loss 263.3519 | val 0.2960 | test 0.2920
+Epoch   20 | loss nan | val 0.4060 | test 0.3820
+Epoch   30 | loss nan | val 0.4060 | test 0.3820
+Epoch   40 | loss nan | val 0.4060 | test 0.3820
+Epoch   50 | loss nan | val 0.4060 | test 0.3820
+Epoch   60 | loss nan | val 0.4060 | test 0.3820
+Epoch   70 | loss nan | val 0.4060 | test 0.3820
+Epoch   80 | loss nan | val 0.4060 | test 0.3820
+Epoch   90 | loss nan | val 0.4060 | test 0.3820
+Epoch  100 | loss nan | val 0.4060 | test 0.3820
+Epoch  110 | loss nan | val 0.4060 | test 0.3820
+Epoch  120 | loss nan | val 0.4060 | test 0.3820
+Epoch  130 | loss nan | val 0.4060 | test 0.3820
+Epoch  140 | loss nan | val 0.4060 | test 0.3820
+Epoch  150 | loss nan | val 0.4060 | test 0.3820
+Epoch  160 | loss nan | val 0.4060 | test 0.3820
+Epoch  170 | loss nan | val 0.4060 | test 0.3820
+Epoch  180 | loss nan | val 0.4060 | test 0.3820
+Epoch  190 | loss nan | val 0.4060 | test 0.3820
+Epoch  200 | loss nan | val 0.4060 | test 0.3820
+Epoch   10 | loss 276.8664 | val 0.4460 | test 0.4150
+Epoch   20 | loss nan | val 0.2080 | test 0.1980
+Epoch   30 | loss nan | val 0.2080 | test 0.1980
+Epoch   40 | loss nan | val 0.2080 | test 0.1980
+Epoch   50 | loss nan | val 0.2080 | test 0.1980
+Epoch   60 | loss nan | val 0.2080 | test 0.1980
+Epoch   70 | loss nan | val 0.2080 | test 0.1980
+Epoch   80 | loss nan | val 0.2080 | test 0.1980
+Epoch   90 | loss nan | val 0.2080 | test 0.1980
+Epoch  100 | loss nan | val 0.2080 | test 0.1980
+Epoch  110 | loss nan | val 0.2080 | test 0.1980
+Epoch  120 | loss nan | val 0.2080 | test 0.1980
+Epoch  130 | loss nan | val 0.2080 | test 0.1980
+Epoch  140 | loss nan | val 0.2080 | test 0.1980
+Epoch  150 | loss nan | val 0.2080 | test 0.1980
+Epoch  160 | loss nan | val 0.2080 | test 0.1980
+Epoch  170 | loss nan | val 0.2080 | test 0.1980
+Epoch  180 | loss nan | val 0.2080 | test 0.1980
+Epoch  190 | loss nan | val 0.2080 | test 0.1980
+Epoch  200 | loss nan | val 0.2080 | test 0.1980
+
+===== Variant curvada_120 =====
+Epoch   10 | loss nan | val 0.0620 | test 0.0620
+Epoch   20 | loss nan | val 0.0620 | test 0.0620
+Epoch   30 | loss nan | val 0.0620 | test 0.0620
+Epoch   40 | loss nan | val 0.0620 | test 0.0620
+Epoch   50 | loss nan | val 0.0620 | test 0.0620
+Epoch   60 | loss nan | val 0.0620 | test 0.0620
+Epoch   70 | loss nan | val 0.0620 | test 0.0620
+Epoch   80 | loss nan | val 0.0620 | test 0.0620
+Epoch   90 | loss nan | val 0.0620 | test 0.0620
+Epoch  100 | loss nan | val 0.0620 | test 0.0620
+Epoch  110 | loss nan | val 0.0620 | test 0.0620
+Epoch  120 | loss nan | val 0.0620 | test 0.0620
+Epoch  130 | loss nan | val 0.0620 | test 0.0620
+Epoch  140 | loss nan | val 0.0620 | test 0.0620
+Epoch  150 | loss nan | val 0.0620 | test 0.0620
+Epoch  160 | loss nan | val 0.0620 | test 0.0620
+Epoch  170 | loss nan | val 0.0620 | test 0.0620
+Epoch  180 | loss nan | val 0.0620 | test 0.0620
+Epoch  190 | loss nan | val 0.0620 | test 0.0620
+Epoch  200 | loss nan | val 0.0620 | test 0.0620
+Epoch   10 | loss nan | val 0.1260 | test 0.1160
+Epoch   20 | loss nan | val 0.1260 | test 0.1160
+Epoch   30 | loss nan | val 0.1260 | test 0.1160
+Epoch   40 | loss nan | val 0.1260 | test 0.1160
+Epoch   50 | loss nan | val 0.1260 | test 0.1160
+Epoch   60 | loss nan | val 0.1260 | test 0.1160
+Epoch   70 | loss nan | val 0.1260 | test 0.1160
+Epoch   80 | loss nan | val 0.1260 | test 0.1160
+Epoch   90 | loss nan | val 0.1260 | test 0.1160
+Epoch  100 | loss nan | val 0.1260 | test 0.1160
+Epoch  110 | loss nan | val 0.1260 | test 0.1160
+Epoch  120 | loss nan | val 0.1260 | test 0.1160
+Epoch  130 | loss nan | val 0.1260 | test 0.1160
+Epoch  140 | loss nan | val 0.1260 | test 0.1160
+Epoch  150 | loss nan | val 0.1260 | test 0.1160
+Epoch  160 | loss nan | val 0.1260 | test 0.1160
+Epoch  170 | loss nan | val 0.1260 | test 0.1160
+Epoch  180 | loss nan | val 0.1260 | test 0.1160
+Epoch  190 | loss nan | val 0.1260 | test 0.1160
+Epoch  200 | loss nan | val 0.1260 | test 0.1160
+Epoch   10 | loss nan | val 0.2500 | test 0.2480
+Epoch   20 | loss nan | val 0.2500 | test 0.2480
+Epoch   30 | loss nan | val 0.2500 | test 0.2480
+Epoch   40 | loss nan | val 0.2500 | test 0.2480
+Epoch   50 | loss nan | val 0.2500 | test 0.2480
+Epoch   60 | loss nan | val 0.2500 | test 0.2480
+Epoch   70 | loss nan | val 0.2500 | test 0.2480
+Epoch   80 | loss nan | val 0.2500 | test 0.2480
+Epoch   90 | loss nan | val 0.2500 | test 0.2480
+Epoch  100 | loss nan | val 0.2500 | test 0.2480
+Epoch  110 | loss nan | val 0.2500 | test 0.2480
+Epoch  120 | loss nan | val 0.2500 | test 0.2480
+Epoch  130 | loss nan | val 0.2500 | test 0.2480
+Epoch  140 | loss nan | val 0.2500 | test 0.2480
+Epoch  150 | loss nan | val 0.2500 | test 0.2480
+Epoch  160 | loss nan | val 0.2500 | test 0.2480
+Epoch  170 | loss nan | val 0.2500 | test 0.2480
+Epoch  180 | loss nan | val 0.2500 | test 0.2480
+Epoch  190 | loss nan | val 0.2500 | test 0.2480
+Epoch  200 | loss nan | val 0.2500 | test 0.2480
+==== JSON RESULTS ====
+{
+  "description": {
+    "tag": "depth_stress_cora",
+    "dataset": {
+      "name": "Cora"
+    },
+    "variants": [
+      {
+        "backbone": "GCN",
+        "layers": 2,
+        "variant": "curvada"
+      },
+      {
+        "backbone": "GCN",
+        "layers": 8,
+        "variant": "curvada"
+      },
+      {
+        "backbone": "GCN",
+        "layers": 32,
+        "variant": "curvada"
+      },
+      {
+        "backbone": "GCN",
+        "layers": 64,
+        "variant": "curvada"
+      },
+      {
+        "backbone": "GCN",
+        "layers": 120,
+        "variant": "curvada"
+      }
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "optim": {
+      "lr": 0.005,
+      "weight_decay": 0.0005
+    },
+    "scheduler": {
+      "max_epochs": 200
+    },
+    "curvada": {
+      "alpha_init": 1.0,
+      "beta_init": 0.0,
+      "gamma_init": 1.0
+    }
+  },
+  "curvada_2": {
+    "mean": 0.8113333582878113,
+    "std": 0.009504381567239761,
+    "all": [
+      0.802,
+      0.821,
+      0.811
+    ]
+  },
+  "curvada_8": {
+    "mean": 0.7586666941642761,
+    "std": 0.00642908550798893,
+    "all": [
+      0.754,
+      0.766,
+      0.756
+    ]
+  },
+  "curvada_32": {
+    "mean": 0.7703332901000977,
+    "std": 0.0020816726610064507,
+    "all": [
+      0.768,
+      0.772,
+      0.771
+    ]
+  },
+  "curvada_64": {
+    "mean": 0.351333349943161,
+    "std": 0.08334466069936752,
+    "all": [
+      0.257,
+      0.382,
+      0.415
+    ]
+  },
+  "curvada_120": {
+    "mean": 0.1420000046491623,
+    "std": 0.09568698704242706,
+    "all": [
+      0.062,
+      0.116,
+      0.248
+    ]
+  }
+}
+Generated figure → .research/iteration3/images/accuracy_depth_Cora.pdf
+=== experiment end Sat Sep  6 04:39:00 UTC 2025 ===

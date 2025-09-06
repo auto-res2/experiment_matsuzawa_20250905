@@ -16,6 +16,7 @@ dependencies = [
   "torchvision",     # Matches the installed torch version
   "timm",            # Vision Transformer models
   "diffusers",       # Stable-Diffusion-XL in-painting pipeline
+  "accelerate>=0.20,<1.0",  # Needed for efficient CPU/GPU off-load
   "scikit-learn",    # K-means, MI, metrics …
   "matplotlib",      # Plotting utilities
   "seaborn",         # Nicer matplotlib defaults

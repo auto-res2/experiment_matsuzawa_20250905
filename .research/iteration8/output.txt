@@ -1,0 +1,20 @@
+=== uv sync start Sat Sep  6 05:28:23 UTC 2025 ===
+=== uv install end Sat Sep  6 05:38:15 UTC 2025 ===
+=== experiment start Sat Sep  6 05:38:15 UTC 2025 ===
+Loaded Cora – nodes: 2708, edges: 10556
+[WARN] GraphRicciCurvature unavailable or failed (No module named 'GraphRicciCurvature') – using zero-curvature fallback.
+Cora_vanilla_2: 0.8060 ± 0.0130
+Cora_pairnorm_2: 0.7570 ± 0.0130
+Cora_dgn_2: 0.6983 ± 0.0040
+Cora_psnr_2: 0.6920 ± 0.0173
+Cora_curvada_2: 0.8090 ± 0.0044
+Cora_vanilla_8: 0.7643 ± 0.0221
+Cora_pairnorm_8: 0.7560 ± 0.0079
+Cora_dgn_8: 0.7513 ± 0.0119
+Cora_psnr_8: 0.7463 ± 0.0316
+Cora_curvada_8: 0.7417 ± 0.0130
+Cora_vanilla_32: 0.7610 ± 0.0026
+Cora_pairnorm_32: 0.7233 ± 0.0420
+Cora_dgn_32: 0.7387 ± 0.0321
+Cora_psnr_32: 0.6787 ± 0.0139
+Cora_curvada_32: 0.7070 ± 0.0175

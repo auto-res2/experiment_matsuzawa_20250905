@@ -1,22 +1,27 @@
+from __future__ import annotations
+
 """
 evaluate.py – generic helper utilities for logging, plotting and storing
 per-experiment JSON results.  No experiment-specific code lives here.
 """
-from __future__ import annotations
 
 import json
-import time
 from pathlib import Path
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, Sequence
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 # optional – only for GPU utilisation logging; failing gracefully is OK
 try:
-    from pynvml import nvmlInit, nvmlDeviceGetHandleByIndex, nvmlDeviceGetUtilizationRates
+    from pynvml import (
+        nvmlInit,
+        nvmlDeviceGetHandleByIndex,
+        nvmlDeviceGetUtilizationRates,
+    )
 
     nvmlInit()
     _NVML_HANDLE = nvmlDeviceGetHandleByIndex(0)
@@ -24,6 +29,14 @@ except Exception:  # pragma: no cover – best effort only
     _NVML_HANDLE = None  # type: ignore
 
 __all__ = ["ExperimentBase"]
+
+# ---------------------------------------------------------------------------
+# Directories mandated by the assessment instructions
+# ---------------------------------------------------------------------------
+_BASE_RESULTS_DIR = Path(".research/iteration3")
+_IMAGES_DIR = _BASE_RESULTS_DIR / "images"
+_BASE_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+_IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class ExperimentBase:
@@ -33,7 +46,10 @@ class ExperimentBase:
         self.name = name
         self.cfg = exp_cfg
         self.global_cfg = global_cfg
-        self.results_dir = Path(global_cfg["results_dir"]) / self.name
+        # keep a sub-directory for any auxiliary files the experiment wishes
+        # to dump (e.g. counterfactual samples) but store *results* & *figures*
+        # strictly under .research/iteration3/ as required.
+        self.results_dir = _BASE_RESULTS_DIR / name
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------------------------
@@ -46,11 +62,12 @@ class ExperimentBase:
 
     # ------------------------------------------------------------------
     def log_and_save(self, seed: int, result: Dict[str, Any]):
-        json_path = self.results_dir / f"seed{seed}.json"
-        with open(json_path, "w") as fp:
+        """Save *result* as JSON and print it to STDOUT for verification."""
+        json_path = _BASE_RESULTS_DIR / f"{self.name}_seed{seed}.json"
+        with open(json_path, "w", encoding="utf-8") as fp:
             json.dump(result, fp, indent=2)
 
-        # STDOUT – text description followed by full JSON
+        # STDOUT – human-readable header followed by the full JSON blob
         print(f"\n=====  {self.name}  |  seed={seed}  =====")
         print(json.dumps(result, indent=2, sort_keys=True))
 
@@ -62,6 +79,7 @@ class ExperimentBase:
         ylabel: str,
         fig_name: str,
     ) -> None:
+        """Utility that writes a small line plot to .research/iteration3/images."""
         plt.figure(figsize=(6, 4))
         sns.lineplot(x=list(xs), y=list(ys), marker="o", label=ylabel)
         for x_val, y_val in zip(xs, ys):
@@ -69,5 +87,5 @@ class ExperimentBase:
         plt.xlabel("Epoch")
         plt.ylabel(ylabel)
         plt.tight_layout()
-        plt.savefig(self.results_dir / fig_name, bbox_inches="tight")
+        plt.savefig(_IMAGES_DIR / fig_name, bbox_inches="tight")
         plt.close()

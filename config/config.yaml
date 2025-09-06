@@ -1,0 +1,67 @@
+global:
+  seeds:
+    - 0
+    - 1
+    - 2
+  device: cuda
+  num_workers: 4
+  results_dir: results/
+  data_root: data/
+  batch_size:
+    exp1: 134
+    exp2: 128
+    exp3: 64
+  optim:
+    lr: 0.0001
+    weight_decay: 0.05
+    betas:
+      - 0.9
+      - 0.999
+    eps: 1.0e-08
+
+datasets:
+  waterbirds:
+    hf_repo: grodino/waterbirds
+    split:
+      train: train
+      val: val
+      test: test
+  celeba:
+    hf_repo: flwrlabs/celeba
+  nico:
+    zenodo_url: https://zenodo.org/records/4807599/files/NICO.zip?download=1
+  imagenet_a:
+    tfds_name: imagenet_a
+  eurosat:
+    hf_repo: mikewang/EuroSAT
+
+models:
+  vit_s16: timm/vit_small_patch16_224.augreg_in1k
+  vit_b16: google/vit-base-patch16-224
+  dinov2_s: facebook/dinov2-small-imagenet1k-1-layer
+  sdxl_base: stabilityai/stable-diffusion-xl-base-1.0
+  u2net: https://drive.google.com/uc?id=1ao1ovG1Qtx4b7EoskHXmi2E9rp5CHLcZ
+
+experiments:
+  exp1:
+    name: WATERBIRDS_HIDDEN_SPURIOUS_BG
+    epochs: 15
+    lambda_cc: 1.0
+    lambda_gc: 0.1
+    lambda_wd: 0.05
+    cf_ratio: 0.4
+    concept_k: 64
+  exp2:
+    name: CELEBA_TINT_CAUSAL_VERIFICATION
+    epochs_erm: 3
+    epochs_finetune: 1
+    concept_k: 32
+    cf_ratio: 0.2
+  exp3:
+    name: NICO_ANIMAL_GENERALISATION
+    epochs: 25
+    lambda_cc: 1.0
+    lambda_gc: 0.1
+    lambda_wd: 0.05
+    cf_ratio: 0.3
+    concept_k: 128

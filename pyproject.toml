@@ -1,1 +1,30 @@
-# Please list the required python packages.
+[project]
+name = "cgsi-refactor"
+version = "0.1.0"
+description = "Refactored project structure for CGSI experiments"
+requires-python = ">=3.9"
+authors = [
+    {name = "Researcher", email = "research@example.com"}
+]
+
+# ---------------------------------------------------------------------------
+# Dependencies – kept minimal; CUDA variants of torch/torchvision must be
+# pre-installed on the target machine.  Version pins are intentionally loose
+# to avoid conflicts.
+# ---------------------------------------------------------------------------
+[project.dependencies]
+torch = "*"
+torchvision = "*"
+timm = "*"
+diffusers = "*"
+scikit-learn = "*"
+matplotlib = "*"
+seaborn = "*"
+PyYAML = "*"
+huggingface-hub = "*"
+Pillow = "*"
+requests = "*"
+tqdm = "*"
+# optional – not fatal if missing
+fvcore = {version = "*", optional = true}
+pynvml = {version = "*", optional = true}

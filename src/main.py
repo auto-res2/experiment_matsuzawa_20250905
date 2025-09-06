@@ -1,7 +1,7 @@
+from __future__ import annotations
 """
 main.py – orchestration entry-point (python -m src.main)
 """
-from __future__ import annotations
 
 import json
 from pathlib import Path
@@ -14,13 +14,13 @@ from .train import train_single
 from .evaluate import lineplot
 
 # -----------------------------------------------------------------------------
-#  Global configuration & paths (iteration *6* as per submission guidelines)
+#  Global configuration & paths (iteration *7* as per submission guidelines)
 # -----------------------------------------------------------------------------
 
 CONFIG_PATH = Path("config/config.yaml")
 CFG = yaml.safe_load(CONFIG_PATH.read_text())
 
-RESULTS_DIR = Path(".research/iteration6")
+RESULTS_DIR = Path(".research/iteration7")
 IMAGES_DIR = RESULTS_DIR / "images"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -43,7 +43,7 @@ def run_exp1():
                 scores = []
                 for seed in cfg["seeds"]:
                     set_seed(seed)
-                    test_acc, val_acc = train_single(
+                    test_acc, _ = train_single(
                         data, kappa_e, kappa_n, depth, variant, DEVICE, cfg
                     )
                     scores.append(test_acc)
@@ -52,14 +52,14 @@ def run_exp1():
                 results[key] = {"mean": mean, "std": std, "all": scores}
                 print(f"{key}: {mean:.4f} ± {std:.4f}")
 
-        # plot CurvAdaNorm accuracy vs depth
+        # Plot CurvAdaNorm accuracy vs depth.
         depths = cfg["depths"]
         ys = [results[f"{ds_name}_curvada_{d}"]["mean"] for d in depths]
         plot_path = IMAGES_DIR / f"accuracy_{ds_name}.pdf"
         lineplot(depths, ys, "Depth", "Accuracy", f"CurvAdaNorm – {ds_name}", plot_path)
         print("Saved figure →", plot_path)
 
-    # write JSON
+    # Write JSON summary for this experiment.
     json_path = RESULTS_DIR / "experiment1_results.json"
     json_path.write_text(json.dumps(results, indent=2))
     print("==== Experiment 1 summary ====")

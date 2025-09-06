@@ -14,10 +14,10 @@ from evaluate import save_line
 from train import build_model, run_training
 
 # ---------------------------------------------------------------------------
-#  Directory structure (auto-created on first run)
+#  Directory structure (auto-created on first run)  – *** ITERATION-3 ***
 # ---------------------------------------------------------------------------
 
-RESEARCH_DIR = Path(".research") / "iteration2"
+RESEARCH_DIR = Path(".research") / "iteration3"
 IMG_DIR = RESEARCH_DIR / "images"
 RESEARCH_DIR.mkdir(parents=True, exist_ok=True)
 IMG_DIR.mkdir(parents=True, exist_ok=True)
@@ -91,7 +91,9 @@ def main():
                 variant=variant["variant"],
                 curvada_hypers=cfg["curvada"],
             )
-            optim = torch.optim.AdamW(model.parameters(), lr=cfg["optim"]["lr"], weight_decay=cfg["optim"]["weight_decay"])
+            optim = torch.optim.AdamW(
+                model.parameters(), lr=cfg["optim"]["lr"], weight_decay=cfg["optim"]["weight_decay"]
+            )
             sched = torch.optim.lr_scheduler.CosineAnnealingLR(optim, cfg["scheduler"]["max_epochs"])
             best_test = run_training(
                 model=model,

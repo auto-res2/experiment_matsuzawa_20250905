@@ -13,6 +13,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch_geometric.nn import PairNorm
 from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.utils import add_self_loops, dropout_edge
+import torch.nn.functional as F  # NEW
 
 from .evaluate import accuracy  # evaluation metrics used inside the training loop
 
@@ -51,12 +52,19 @@ class CurvGCNConv(MessagePassing):
         # with their corresponding edges to avoid length mismatches.
         # ------------------------------------------------------------------
         if self.training and dropedge_p > 0.0:
-            edge_index, edge_mask = dropout_edge(
+            # dropout_edge now returns (edge_index, edge_attr, mask) in recent
+            # PyG releases.  We therefore unpack accordingly and fall back to the
+            # older 2-tuple behaviour if only two values are returned.
+            out = dropout_edge(
                 edge_index,
                 p=dropedge_p,
                 force_undirected=True,
                 training=True,
             )
+            if len(out) == 3:
+                edge_index, _, edge_mask = out
+            else:
+                edge_index, edge_mask = out  # type: ignore[misc]
             kappa_edge = kappa_edge[edge_mask]
 
         # ------------------------------------------------------------------
@@ -183,6 +191,10 @@ class GNNStack(nn.Module):
                         x = x_new + x
                     else:
                         x = x_new
+
+                # --- NEW: Non-linearity for numerical stability ---
+                x = F.relu(x)
+
             elif isinstance(layer, CurvAdaNorm):
                 x = layer(x, kappa_node)
             elif isinstance(layer, PairNorm):
@@ -256,8 +268,8 @@ def train_single(
             loss = torch.nn.functional.cross_entropy(
                 out[data.train_mask], data.y[data.train_mask]
             )
-        if torch.isnan(loss):
-            raise RuntimeError("NaN encountered during training – aborting.")
+        if torch.isnan(loss) or torch.isinf(loss):  # stronger check
+            raise RuntimeError("NaN/Inf encountered during training – aborting.")
         scaler.scale(loss).backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         scaler.step(opt)

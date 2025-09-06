@@ -19,6 +19,7 @@ dependencies = [
   "seaborn",
   "PyYAML",
   "ptflops",
+  "scipy>=1.8,<2.0",
 ]
 
 [project.optional-dependencies]

@@ -78,7 +78,16 @@ def make_sbm_graph(
     probs = [[p_in, p_out], [p_out, p_in]]
 
     g = nx.stochastic_block_model(sizes, probs, seed=seed)
-    A: sp.csr_matrix = nx.to_scipy_sparse_matrix(g, format="csr")
+
+    # NetworkX 3.x removed `to_scipy_sparse_matrix`; fall back to the new API
+    if hasattr(nx, "to_scipy_sparse_matrix"):
+        A: sp.csr_matrix = nx.to_scipy_sparse_matrix(g, format="csr")  # type: ignore[attr-defined]
+    else:
+        # `to_scipy_sparse_array` returns a csr_array for SciPy >=1.8 – convert
+        # to csr_matrix for compatibility with older PyG versions.
+        A = nx.to_scipy_sparse_array(g, format="csr")  # type: ignore[attr-defined]
+        if not isinstance(A, sp.csr_matrix):
+            A = sp.csr_matrix(A)
 
     attrs = rng.randn(2 * n_per_block, d).astype("float32")
     attrs[n_per_block:] += sigma * rng.randn(n_per_block, d).astype("float32")

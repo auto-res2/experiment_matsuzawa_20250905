@@ -10,7 +10,7 @@ It performs the following steps:
      importing PyTorch to avoid duplicate CUDA context creation.
   2. Reads the YAML configuration from `config/config.yaml` using PyYAML.
   3. Runs each experiment via `src.train.run_experiment`.
-  4. Saves the resulting metrics as JSON under `.research/iteration3` **and**
+  4. Saves the resulting metrics as JSON under `.research/iteration4` **and**
      prints the JSON object to stdout – the evaluation harness depends on this.
 """
 from __future__ import annotations
@@ -98,7 +98,7 @@ with _CFG_PATH.open("r") as fp:
 # ---------------------------------------------------------------------------
 # 2.  Run the experiments
 # ---------------------------------------------------------------------------
-_RESULTS_DIR = Path(".research/iteration3")  # UPDATED PATH
+_RESULTS_DIR = Path(".research/iteration4")  # UPDATED PATH
 _RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 

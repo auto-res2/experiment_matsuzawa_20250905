@@ -111,22 +111,38 @@ class CurvAdaNorm(nn.Module):
 
 
 class DGNLayer(nn.Module):
-    """Deep Graph Normalisation (simplified, default groups = 2)."""
+    """Deep Graph Normalisation (robust – handles arbitrary batch sizes)."""
 
     def __init__(self, feat_dim: int, num_groups: int = 2):
         super().__init__()
-        self.num_groups = num_groups
+        self.num_groups = max(1, int(num_groups))
         self.weight = nn.Parameter(torch.ones(feat_dim))
         self.eps = 1.0e-5
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        n, c = x.shape
-        # Reshape into groups * batch * feat
-        x_g = x.reshape(self.num_groups, -1, c)
-        mean = x_g.mean(dim=1, keepdim=True)
-        var = x_g.var(dim=1, unbiased=False, keepdim=True)
-        x = (x_g - mean) / torch.sqrt(var + self.eps)
-        return x.reshape(n, c) * self.weight
+        """Group-wise normalisation along the node dimension.
+
+        The original DGN paper divides the *batch of nodes* into groups to
+        mitigate over-smoothing.  A naïve `reshape` implementation breaks when
+        the node count is not divisible by the number of groups.  We instead
+        split the nodes using `torch.chunk`, which tolerates uneven group
+        sizes, and concatenate the normalised chunks back in the original
+        order.
+        """
+        if self.num_groups == 1 or x.size(0) < self.num_groups:
+            mean = x.mean(dim=0, keepdim=True)
+            var = x.var(dim=0, unbiased=False, keepdim=True)
+            x_hat = (x - mean) / torch.sqrt(var + self.eps)
+            return x_hat * self.weight
+
+        chunks = torch.chunk(x, self.num_groups, dim=0)
+        normed_chunks = []
+        for ch in chunks:
+            m = ch.mean(dim=0, keepdim=True)
+            v = ch.var(dim=0, unbiased=False, keepdim=True)
+            normed_chunks.append((ch - m) / torch.sqrt(v + self.eps))
+        x_hat = torch.cat(normed_chunks, dim=0)
+        return x_hat * self.weight
 
 
 class PSNRGate(nn.Module):

@@ -52,28 +52,59 @@ def evaluate(
 def _pgd_attack(
     model: torch.nn.Module, imgs: torch.Tensor, labels: torch.Tensor, eps: float, steps: int
 ) -> torch.Tensor:
+    """A simple white-box PGD-L∞ attack.
+
+    Notes
+    -----
+    • Implements the *untargeted* variant with fixed step-size 0.01.
+    • Returned perturbation *delta* is **detached** so that the caller can
+      safely use it in a no-grad context.
+    """
     delta = torch.zeros_like(imgs, device=imgs.device, requires_grad=True)
+    step_size = 0.01  # hard-coded as in the original released baseline
+
     for _ in range(steps):
+        # forward & backward ---------------------------------------------------
         outputs = model(imgs + delta)
-        F.cross_entropy(outputs, labels).backward()
+        loss = F.cross_entropy(outputs, labels)
+        loss.backward()
+
+        # gradient sign step ---------------------------------------------------
         grad = delta.grad.detach()
-        delta.data = (delta + 0.01 * torch.sign(grad)).clamp(-eps, eps)
+        delta.data = (delta + step_size * torch.sign(grad)).clamp(-eps, eps)
+
+        # reset gradient for the next iteration -------------------------------
         delta.grad.zero_()
+
     return delta.detach()
 
-@torch.no_grad()
+
 def evaluate_pgd(
     model: torch.nn.Module, loader: torch.utils.data.DataLoader, eps: float, steps: int
 ) -> float:
+    """Report classification accuracy under an untargeted PGD-L∞ attack."""
+
+    # We need gradients for the adversarial search, but not for the forward
+    # pass used to *measure* accuracy.  Hence, we selectively enable / disable
+    # autograd instead of decorating the whole function with @torch.no_grad().
+
     model.eval()
     total, correct = 0, 0
+
     for imgs, labels, _ in loader:
         imgs = imgs.cuda(non_blocking=True)
         labels = labels.cuda(non_blocking=True)
-        delta = _pgd_attack(model, imgs, labels, eps, steps)
-        preds = model(imgs + delta).argmax(1)
-        correct += (preds == labels).sum().item()
-        total += imgs.size(0)
+
+        # 1) craft the adversarial perturbation (requires grad)
+        with torch.enable_grad():
+            delta = _pgd_attack(model, imgs, labels, eps, steps)
+
+        # 2) evaluate robustness without tracking gradients -------------------
+        with torch.no_grad():
+            preds = model(imgs + delta).argmax(1)
+            correct += (preds == labels).sum().item()
+            total += imgs.size(0)
+
     return correct / total
 
 # -----------------------------------------------------------------------------

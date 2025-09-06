@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 """src/evaluate.py – utilities for logging, JSON serialisation & plotting.
-    NOTE:   Modified to comply with iteration-54 path & central image directory
-            requirement (see instruction header in repair task).
+    NOTE:   Pathing updated for iteration-55 as required by the repair task.
 """
 
 import json
@@ -16,10 +15,10 @@ matplotlib.use("Agg")  # head-less CI environments
 import matplotlib.pyplot as plt
 
 # ---------------------------------------------------------------------------
-#   Global research output directory (current iteration = 54)
+#   Global research output directory (current iteration = 55)
 # ---------------------------------------------------------------------------
 
-_RESEARCH_ROOT = Path(".research") / "iteration54"
+_RESEARCH_ROOT = Path(".research") / "iteration55"
 _RESEARCH_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Central directory for ALL experiment figures (mandatory by rubric) --------
@@ -52,7 +51,7 @@ class ExperimentBase:
 
     # ------------------------------------------------------------------
     def save_line_plot(self, y: List[float], x: List[int], ylabel: str, filename: str):
-        """Save a simple line-plot into the central .research/iteration54/images dir.
+        """Save a simple line-plot into the central .research/iteration55/images dir.
 
         All plots from any experiment are stored inside `_IMG_DIR` to satisfy
         the specification.  The original `filename` is prefixed with the

@@ -1,131 +1,69 @@
-"""Orchestrates the whole experiment pipeline.
-Launch via:  python -m src.main   (cwd should be project root)
 """
+main.py – orchestration entry-point (python -m src.main)
+"""
+from __future__ import annotations
+
 import json
-import os
 from pathlib import Path
-from typing import Dict
 
 import torch
 import yaml
 
-import preprocess as pp
-from evaluate import save_line
-from train import build_model, run_training
+from .preprocess import compute_curvature, load_dataset, set_seed
+from .train import train_single
+from .evaluate import lineplot
 
-# ---------------------------------------------------------------------------
-#  Directory structure (auto-created on first run)  – *** ITERATION-3 ***
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  Global configuration & paths
+# -----------------------------------------------------------------------------
 
-RESEARCH_DIR = Path(".research") / "iteration3"
-IMG_DIR = RESEARCH_DIR / "images"
-RESEARCH_DIR.mkdir(parents=True, exist_ok=True)
-IMG_DIR.mkdir(parents=True, exist_ok=True)
+CONFIG_PATH = Path("config/config.yaml")
+CFG = yaml.safe_load(CONFIG_PATH.read_text())
 
+RESULTS_DIR = Path(".research/iteration4")
+IMAGES_DIR = RESULTS_DIR / "images"
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
-# ---------------------------------------------------------------------------
-#  Load YAML config – if missing write a default one identical to the paper
-# ---------------------------------------------------------------------------
-
-CFG_PATH = Path("config") / "config.yaml"
-CFG_PATH.parent.mkdir(exist_ok=True)
-
-DEFAULT_CFG = {
-    "tag": "depth_stress_cora",
-    "dataset": {"name": "Cora"},
-    "variants": [
-        {"backbone": "GCN", "layers": l, "variant": "curvada"} for l in [2, 8, 32, 64, 120]
-    ],
-    "seeds": [0, 1, 2],
-    "optim": {"lr": 5e-3, "weight_decay": 5e-4},
-    "scheduler": {"max_epochs": 200},
-    "curvada": {"alpha_init": 1.0, "beta_init": 0.0, "gamma_init": 1.0},
-}
-if not CFG_PATH.exists():
-    with open(CFG_PATH, "w") as f:
-        yaml.safe_dump(DEFAULT_CFG, f)
-
-with open(CFG_PATH) as f:
-    cfg: Dict = yaml.safe_load(f)
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
-# ---------------------------------------------------------------------------
-#  Main logic
-# ---------------------------------------------------------------------------
+def run_exp1():
+    cfg = CFG["exp1"]
+    results = {"description": cfg["description"]}
 
-def main():
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    for ds_name in cfg["datasets"]:
+        data = load_dataset(ds_name)
+        print(f"Loaded {ds_name} – nodes: {data.num_nodes}, edges: {data.edge_index.size(1)}")
+        kappa_e, kappa_n = compute_curvature(data, device=DEVICE)
 
-    # -------------------------------------------------------------------
-    #  Load data + Sinkhorn curvature (edge & node-wise averages)
-    # -------------------------------------------------------------------
-    data = pp.get_dataset(cfg["dataset"]["name"])
-    in_dim = data.x.size(-1)
-    out_dim = int(data.y.max().item() + 1)
+        for depth in cfg["depths"]:
+            for variant in cfg["variants"]:
+                key = f"{ds_name}_{variant}_{depth}"
+                scores = []
+                for seed in cfg["seeds"]:
+                    set_seed(seed)
+                    test_acc, val_acc = train_single(data, kappa_e, kappa_n, depth,
+                                                     variant, DEVICE, cfg)
+                    scores.append(test_acc)
+                mean = float(torch.tensor(scores).mean().item())
+                std = float(torch.tensor(scores).std().item())
+                results[key] = {"mean": mean, "std": std, "all": scores}
+                print(f"{key}: {mean:.4f} ± {std:.4f}")
 
-    kappa_edge = pp.compute_sinkhorn_curvature(data.edge_index, device=device)
-    kappa_node = torch.zeros(data.num_nodes, device=device)
-    src, dst = data.edge_index
-    kappa_node.index_add_(0, src.to(device), kappa_edge)
-    kappa_node.index_add_(0, dst.to(device), kappa_edge)
-    deg = torch.bincount(src, minlength=data.num_nodes).to(device).clamp(min=1)
-    kappa_node = kappa_node / deg
+        # plot CurvAdaNorm accuracy vs depth
+        depths = cfg["depths"]
+        ys = [results[f"{ds_name}_curvada_{d}"]["mean"] for d in depths]
+        plot_path = IMAGES_DIR / f"accuracy_{ds_name}.pdf"
+        lineplot(depths, ys, "Depth", "Accuracy", f"CurvAdaNorm – {ds_name}", plot_path)
+        print("Saved figure →", plot_path)
 
-    # -------------------------------------------------------------------
-    #  Results container – stored as JSON
-    # -------------------------------------------------------------------
-    results_json = RESEARCH_DIR / f"{cfg['tag']}.json"
-    all_results = {"description": cfg}
-
-    for variant in cfg["variants"]:
-        name = f"{variant['variant']}_{variant['layers']}"
-        print(f"\n===== Variant {name} =====")
-        test_scores = []
-        for seed in cfg["seeds"]:
-            pp.set_seed(seed)
-            model = build_model(
-                backbone=variant["backbone"],
-                in_channels=in_dim,
-                out_channels=out_dim,
-                num_layers=variant["layers"],
-                variant=variant["variant"],
-                curvada_hypers=cfg["curvada"],
-            )
-            optim = torch.optim.AdamW(
-                model.parameters(), lr=cfg["optim"]["lr"], weight_decay=cfg["optim"]["weight_decay"]
-            )
-            sched = torch.optim.lr_scheduler.CosineAnnealingLR(optim, cfg["scheduler"]["max_epochs"])
-            best_test = run_training(
-                model=model,
-                data=data,
-                optimizer=optim,
-                scheduler=sched,
-                device=device,
-                epochs=cfg["scheduler"]["max_epochs"],
-                val_mask=data.val_mask,
-                test_mask=data.test_mask,
-                kappa_node=kappa_node,
-            )
-            test_scores.append(best_test)
-        all_results[name] = {
-            "mean": float(torch.tensor(test_scores).mean()),
-            "std": float(torch.tensor(test_scores).std()),
-            "all": test_scores,
-        }
-    with open(results_json, "w") as f:
-        json.dump(all_results, f, indent=2)
-    print("==== JSON RESULTS ====")
-    print(json.dumps(all_results, indent=2))
-
-    # -------------------------------------------------------------------
-    #  Plot accuracy vs depth
-    # -------------------------------------------------------------------
-    depths = [v["layers"] for v in cfg["variants"]]
-    accs = [all_results[f"{v['variant']}_{v['layers']}"]["mean"] for v in cfg["variants"]]
-    fig_path = IMG_DIR / f"accuracy_depth_{cfg['dataset']['name']}.pdf"
-    save_line(depths, accs, "Depth", "Accuracy", f"Depth-Stress – {cfg['dataset']['name']}", fig_path.as_posix())
-    print(f"Generated figure → {fig_path}")
+    # write JSON
+    json_path = RESULTS_DIR / "experiment1_results.json"
+    json_path.write_text(json.dumps(results, indent=2))
+    print("==== Experiment 1 summary ====")
+    print(json.dumps(results, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    run_exp1()

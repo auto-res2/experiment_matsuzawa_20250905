@@ -1,39 +1,27 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "curvada_norm_experiments"
+name = "curvada-experiments"
 version = "0.1.0"
-description = "CurvAdaNorm – curvature-adaptive normalisation experiments"
-authors = [
-  {name = "Research Engineer", email = "research@example.com"}
-]
-requires-python = ">=3.10"
+description = "CurvAdaNorm experimental suite (refactored)"
+authors = [ {name = "ML Researcher"} ]
+requires-python = ">=3.9"
 
-# ---------------------------------------------------------------------------
-#  Run-time dependencies.
-# ---------------------------------------------------------------------------
-
+# Core dependencies – order chosen to avoid circular / build issues
 dependencies = [
-  "torch>=2.0",
-  "torch_geometric>=2.4.0",
-  "torch_sparse>=0.6.18",
-  "torch_scatter>=2.1.2",
-  "torch_cluster>=1.6.1",
-  "networkx>=3.1",
-  "scikit-learn",
-  "pyyaml",
-  "matplotlib",
-  "seaborn",
-  "ogb",
-  "GraphRicciCurvature",
+    "torch",
+    "torchvision",
+    "torch-geometric",
+    "torch-scatter",
+    "torch-sparse",
+    "torch-cluster",
+    "torch-spline-conv",
+    "networkx",
+    "pyyaml",
+    "matplotlib",
+    "seaborn",
+    "scikit-learn",
+    "ogb",
+    "GraphRicciCurvature",
 ]
 
-[tool.uv.extra-build-dependencies]
-# Ensure that PyTorch is present in the build environment when compiling
-# the PyG extension wheels.  Without this the wheels fall back to building
-# from source and fail because the torch headers are missing.
-torch_scatter = ["torch"]
-torch_sparse   = ["torch"]
-torch_cluster  = ["torch"]
+[tool.setuptools.packages.find]
+where = ["src"]

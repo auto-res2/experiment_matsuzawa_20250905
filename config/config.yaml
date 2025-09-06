@@ -1,29 +1,18 @@
-tag: depth_stress_cora
-dataset:
-  name: Cora
-variants:
-  - backbone: GCN
-    layers: 2
-    variant: curvada
-  - backbone: GCN
-    layers: 8
-    variant: curvada
-  - backbone: GCN
-    layers: 32
-    variant: curvada
-  - backbone: GCN
-    layers: 64
-    variant: curvada
-  - backbone: GCN
-    layers: 120
-    variant: curvada
-seeds: [0, 1, 2]
-optim:
+# Experiments.yaml – Experiments 1 & 3 consolidated
+exp1:
+  description: Depth-Stability Benchmark (corrected implementation)
+  datasets: [Cora, PubMed, Chameleon, Texas, RingTransfer]
+  backbones: [GCN]
+  depths: [2, 8, 32, 64, 120]
+  variants: [vanilla, pairnorm, dgn, psnr, curvada]
+  seeds: [0, 1, 2]
+  max_epochs: 400
   lr: 0.005
-  weight_decay: 0.0005
-scheduler:
-  max_epochs: 200
-curvada:
-  alpha_init: 1.0
-  beta_init: 0.0
-  gamma_init: 1.0
+exp3:
+  description: Large-Scale Efficiency (ogbn-products, 100-layer SGC)
+  dataset: ogbn-products
+  depths: [100]
+  variants: [vanilla, curvada]
+  seeds: [0]
+  max_epochs: 40
+  lr: 0.005

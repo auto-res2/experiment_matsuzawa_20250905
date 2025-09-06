@@ -27,8 +27,11 @@ from .preprocess import build_split_cifar100
 # Simple utilities -----------------------------------------------------------
 
 Path = pathlib.Path
-IMAGES_DIR = Path(".research/iteration7/images")  # <–– updated as required
-RESULTS_DIR = Path(".research/iteration7")        # <–– updated as required
+# ---------------------------------------------------------------------------
+# IMPORTANT: all artefacts for this iteration must live under `.research/iteration8/`
+# ---------------------------------------------------------------------------
+IMAGES_DIR = Path(".research/iteration8/images")
+RESULTS_DIR = Path(".research/iteration8")
 
 
 def gpu_assert() -> None:

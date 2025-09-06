@@ -11,14 +11,13 @@ authors = [
 # ---------------------------------------------------------------------------
 # Runtime dependencies -------------------------------------------------------
 
-# NOTE: The previous attempt to pin CUDA/CPU–specific build strings (e.g.
-# "torch==2.1.2+cpu") led to an unsatisfiable environment on the CI runner.
-# We instead rely on the default PyPI wheels which already include GPU (CUDA
-# 12.x) support or fall back to CPU where no GPU is present.  Explicit "cu118"
-# wheels can still be supplied externally via the extra index URL but are no
-# longer hard-pinned here.
+# Pin NumPy to <2.0 to avoid the ABI break that prevents PyTorch from finding
+# the NumPy C‐API (see failing log: "Failed to initialize NumPy: _ARRAY_API not found").
+# This single change resolves the cascade of "Numpy is not available" errors
+# originating from torchvision → torch.utils.numpy_interface.
 
 dependencies = [
+  "numpy>=1.24,<2.0",          # ← ABI compatible with current PyTorch wheels
   "torch>=2.1,<2.2",
   "torchvision>=0.16,<0.17",
   "matplotlib>=3.7,<4.0",

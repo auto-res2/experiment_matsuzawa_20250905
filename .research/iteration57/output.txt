@@ -1,0 +1,24 @@
+=== uv sync start Sat Sep  6 06:31:56 UTC 2025 ===
+=== uv install end Sat Sep  6 06:32:31 UTC 2025 ===
+=== experiment start Sat Sep  6 06:32:31 UTC 2025 ===
+================ EXP-1  WATERBIRDS  ==================
+Full hyper-parameters:
+{
+  "device": "cuda",
+  "data_root": "data",
+  "results_dir": ".research/iteration57",
+  "dataset_repo": "grodino/waterbirds",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "batch_size": 96,
+  "epochs": 15,
+  "lr": 0.0001,
+  "weight_decay": 5e-05,
+  "pgd_eps": 0.00784313725490196,
+  "pgd_steps": 20
+}
+
+===== Running seed 0 =====

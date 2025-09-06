@@ -8,9 +8,6 @@ authors = [
   {name = "Researcher", email = "research@openai.com"}
 ]
 
-# Dependencies must be expressed as an *array* of requirement strings according
-# to PEP 621. The previous table-style declaration was invalid and caused the
-# TOML parser to fail.
 dependencies = [
   "torch",
   "torchvision",
@@ -19,7 +16,7 @@ dependencies = [
   "scikit-learn",
   "pyyaml",
   "requests",
-  "avalanche-lib"
+  "numpy"
 ]
 
 [tool.setuptools.packages.find]

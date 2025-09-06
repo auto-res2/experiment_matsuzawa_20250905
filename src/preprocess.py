@@ -11,13 +11,12 @@ import tarfile
 import zipfile
 from pathlib import Path
 from typing import Dict, List
+from types import SimpleNamespace
 
 import numpy as np
 import requests
 import torch
 import torchvision
-from avalanche.benchmarks.classic import SplitCIFAR100
-from avalanche.benchmarks.generators import benchmark_with_validation_stream
 from torch.utils.data import DataLoader, Subset
 
 # -----------------------------------------------------------------------------
@@ -28,7 +27,7 @@ DATA_ROOT = Path("data")
 DATA_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Updated research folder structure to comply with the prompt requirements
-RESEARCH_ROOT = Path(".research") / "iteration2"
+RESEARCH_ROOT = Path(".research") / "iteration3"
 IMAGES_DIR = RESEARCH_ROOT / "images"
 RESULTS_DIR = RESEARCH_ROOT
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -80,7 +79,9 @@ def download(url: str, dest: Path, expected_hash: str | None = None, algo: str =
 # 3.  DATASET BUILDERS
 # -----------------------------------------------------------------------------
 
+
 def _download_cifar100() -> Path:
+    """Download and extract the original CIFAR-100 python archive."""
     arc = DATA_ROOT / "cifar-100-python.tar.gz"
     download(CIFAR100_URL, arc, CIFAR100_MD5, "md5")
     extract_dir = DATA_ROOT / "cifar-100-python"
@@ -100,12 +101,48 @@ def _download_mini_imgnet() -> Path:
     return extract_dir
 
 
-def build_cifar100_benchmark(val_ratio: float = 0.05, seed: int = 0):
-    _download_cifar100()
-    benchmark = SplitCIFAR100(n_experiences=20, seed=seed, return_task_id=False)
-    benchmark = benchmark_with_validation_stream(benchmark, val_ratio)
-    return benchmark
+# ------------------------- CIFAR-100 benchmark --------------------------------
 
+def build_cifar100_benchmark(val_ratio: float = 0.05, seed: int = 0):
+    """Mimic Avalanche's SplitCIFAR100 (20 × 5-class experiences).
+
+    Only the parts that are actually used by *src.main* are implemented: a
+    20-element *train_stream* (list of Subset objects) and a *test_stream*
+    containing a single element whose ``dataset`` attribute points to the full
+    CIFAR-100 test set.  This avoids the heavyweight ``avalanche-lib`` package
+    which currently pulls in the incompatible *proxsuite* dependency.
+    """
+    _download_cifar100()
+
+    tf_train = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize(mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761]),
+    ])
+    tf_test = torchvision.transforms.Compose([
+        torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize(mean=[0.5071, 0.4867, 0.4408], std=[0.2675, 0.2565, 0.2761]),
+    ])
+
+    train_set = torchvision.datasets.CIFAR100(root=DATA_ROOT, train=True, download=True, transform=tf_train)
+    test_set = torchvision.datasets.CIFAR100(root=DATA_ROOT, train=False, download=True, transform=tf_test)
+
+    # ----- class order & per-experience split --------------------------------
+    class_order = list(range(100))
+    random.Random(seed).shuffle(class_order)
+    exp_classes = [class_order[i * 5: (i + 1) * 5] for i in range(20)]
+
+    train_stream: List[Subset] = []
+    for cls in exp_classes:
+        idx = [i for i, lbl in enumerate(train_set.targets) if lbl in cls]
+        train_stream.append(Subset(train_set, idx))
+
+    # A tiny shim so that *main.py* can access ``bench.test_stream[0].dataset``
+    test_stream = [SimpleNamespace(dataset=test_set)]
+
+    return SimpleNamespace(train_stream=train_stream, test_stream=test_stream)
+
+
+# ------------------------- Mini-ImageNet benchmark ----------------------------
 
 class _MiniImageNet(torchvision.datasets.ImageFolder):
     def __init__(self, root: Path, split: str, transform):

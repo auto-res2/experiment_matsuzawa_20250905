@@ -4,9 +4,9 @@ from __future__ import annotations
 evaluate.py – generic helper utilities for logging, plotting and storing
 per-experiment JSON results.  No experiment-specific code lives here.
 
-Key change (iteration27):
+Key change (iteration28):
   • All results and images must now reside under the directory
-        .research/iteration27/
+        .research/iteration28/
     as required by the latest assessment instructions.
 """
 
@@ -42,9 +42,9 @@ except Exception:  # pragma: no cover – best-effort only
 __all__ = ["ExperimentBase"]
 
 # ---------------------------------------------------------------------------
-# Directories mandated by the assessment instructions (iteration27)
+# Directories mandated by the assessment instructions (iteration28)
 # ---------------------------------------------------------------------------
-_BASE_RESULTS_DIR = Path(".research/iteration27")
+_BASE_RESULTS_DIR = Path(".research/iteration28")
 _IMAGES_DIR = _BASE_RESULTS_DIR / "images"
 _BASE_RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 _IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -59,7 +59,7 @@ class ExperimentBase:
         self.global_cfg = global_cfg
         # Keep a sub-directory for any auxiliary artefacts the experiment wants
         # to dump (e.g. counterfactual samples) but store *results* & *figures*
-        # strictly under .research/iteration27/ as required by the rubric.
+        # strictly under .research/iteration28/ as required by the rubric.
         self.results_dir = _BASE_RESULTS_DIR / name
         self.results_dir.mkdir(parents=True, exist_ok=True)
 
@@ -91,7 +91,7 @@ class ExperimentBase:
         ylabel: str,
         fig_name: str,
     ) -> None:
-        """Utility that writes a small line plot under .research/iteration27/images."""
+        """Utility that writes a small line plot under .research/iteration28/images."""
         plt.figure(figsize=(6, 4))
         sns.lineplot(x=list(xs), y=list(ys), marker="o", label=ylabel)
         for x_val, y_val in zip(xs, ys):

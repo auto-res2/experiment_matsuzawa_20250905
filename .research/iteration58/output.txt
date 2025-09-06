@@ -1,0 +1,41 @@
+=== uv sync start Sat Sep  6 06:34:41 UTC 2025 ===
+=== uv install end Sat Sep  6 06:35:14 UTC 2025 ===
+=== experiment start Sat Sep  6 06:35:14 UTC 2025 ===
+================ EXP-1  WATERBIRDS  ==================
+Full hyper-parameters:
+{
+  "device": "cuda",
+  "data_root": "data",
+  "results_dir": ".research/iteration57",
+  "dataset_repo": "grodino/waterbirds",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "batch_size": 96,
+  "epochs": 15,
+  "lr": 0.0001,
+  "weight_decay": 5e-05,
+  "pgd_eps": 0.00784313725490196,
+  "pgd_steps": 20
+}
+
+===== Running seed 0 =====
+
+[Model] training ERM
+[Epoch] {"epoch": 1, "sec": 16.54, "train_loss": 0.12675368959264785, "val_AvgAcc": 0.9207673072814941, "val_WGAcc": 0.7744361162185669, "val_CorrGap": 0.16159647703170776, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 2, "sec": 15.92, "train_loss": 0.028650458088694326, "val_AvgAcc": 0.9349457621574402, "val_WGAcc": 0.7894737124443054, "val_CorrGap": 0.1379832625389099, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 3, "sec": 15.95, "train_loss": 0.011715920965601928, "val_AvgAcc": 0.9466221928596497, "val_WGAcc": 0.7969924807548523, "val_CorrGap": 0.11544299125671387, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 4, "sec": 16.23, "train_loss": 0.014874636808437479, "val_AvgAcc": 0.9007506370544434, "val_WGAcc": 0.7918455004692078, "val_CorrGap": 0.1475960910320282, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 5, "sec": 16.32, "train_loss": 0.015887378746637836, "val_AvgAcc": 0.9165971875190735, "val_WGAcc": 0.7293233275413513, "val_CorrGap": 0.18736717104911804, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 6, "sec": 16.59, "train_loss": 0.008108182204158916, "val_AvgAcc": 0.9149290919303894, "val_WGAcc": 0.7894737124443054, "val_CorrGap": 0.15890195965766907, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 7, "sec": 16.67, "train_loss": 0.013847308819899888, "val_AvgAcc": 0.9157631397247314, "val_WGAcc": 0.5789473652839661, "val_CorrGap": 0.2131747007369995, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 8, "sec": 16.67, "train_loss": 0.007395956552236869, "val_AvgAcc": 0.8949124217033386, "val_WGAcc": 0.6390977501869202, "val_CorrGap": 0.2314058244228363, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 9, "sec": 16.9, "train_loss": 0.013550618797933005, "val_AvgAcc": 0.8707256317138672, "val_WGAcc": 0.7553648352622986, "val_CorrGap": 0.22277483344078064, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 10, "sec": 16.96, "train_loss": 0.01052019008512029, "val_AvgAcc": 0.8824020028114319, "val_WGAcc": 0.6090225577354431, "val_CorrGap": 0.26307833194732666, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 11, "sec": 17.21, "train_loss": 0.008629884483822941, "val_AvgAcc": 0.9274395108222961, "val_WGAcc": 0.8345864415168762, "val_CorrGap": 0.12025809288024902, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 12, "sec": 17.17, "train_loss": 0.00996450442750137, "val_AvgAcc": 0.9082568883895874, "val_WGAcc": 0.61654132604599, "val_CorrGap": 0.2265850305557251, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 13, "sec": 17.1, "train_loss": 0.01121278018654228, "val_AvgAcc": 0.9099249243736267, "val_WGAcc": 0.6842105388641357, "val_CorrGap": 0.18845278024673462, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 14, "sec": 17.16, "train_loss": 0.016589046907111056, "val_AvgAcc": 0.9132610559463501, "val_WGAcc": 0.5563910007476807, "val_CorrGap": 0.24109360575675964, "FLOPs(G)": 4.25}
+[Epoch] {"epoch": 15, "sec": 17.19, "train_loss": 0.007416229883179251, "val_AvgAcc": 0.9282735586166382, "val_WGAcc": 0.7067669034004211, "val_CorrGap": 0.17128539085388184, "FLOPs(G)": 4.25}

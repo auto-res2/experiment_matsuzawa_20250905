@@ -27,7 +27,7 @@ DATA_ROOT = Path("data")
 DATA_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Updated research folder structure to comply with the prompt requirements
-RESEARCH_ROOT = Path(".research") / "iteration3"
+RESEARCH_ROOT = Path(".research") / "iteration4"  # <-- changed to *iteration4*
 IMAGES_DIR = RESEARCH_ROOT / "images"
 RESULTS_DIR = RESEARCH_ROOT
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
@@ -174,6 +174,7 @@ def build_mini_imgnet_benchmark(val_ratio: float = 0.05, seed: int = 0):
 # -----------------------------------------------------------------------------
 # 4.  REPRODUCIBILITY
 # -----------------------------------------------------------------------------
+
 
 def seed_everything(seed: int):
     random.seed(seed)

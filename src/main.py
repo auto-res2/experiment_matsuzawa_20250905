@@ -1,21 +1,16 @@
+from __future__ import annotations
+
 """src/main.py
 -------------------------------------------------------------------------------
 Entry-point.  Usage: ``python -m src.main``
 
-The script
-1. parses YAML config from ``config/config.yaml``,
-2. orchestrates data-loading, model training and evaluation using the helper
-   modules in ``src.*``,
-3. stores all numerical results as JSON under ``.research/iteration1`` and all
-   figures in ``.research/iteration1/images`` as mandated by the prompt.
-
-Only a *very small* subset of the full experiment grid is executed so the
-pipeline remains runnable on a single GPU / CPU instance.
+The script orchestrates a single representative continual-learning experiment
+for CI / demo purposes.  Results (JSON) are stored under
+``.research/iteration4`` and figures under ``.research/iteration4/images`` as
+mandated by the prompt.
 """
-from __future__ import annotations
 
 import json
-from dataclasses import asdict
 from pathlib import Path
 from typing import List
 
@@ -40,10 +35,18 @@ from .evaluate import accuracy, barplot_accuracy, save_json
 
 CONFIG_PATH = Path("config") / "config.yaml"
 
+
 def _load_cfg() -> List[dict]:
     with CONFIG_PATH.open() as fp:
         cfg = yaml.safe_load(fp)
     return cfg["experiments"]
+
+
+def _ensure_classifier_capacity(clf: ExpandingClassifier, labels: torch.Tensor):
+    """Grow classifier so that ``clf.out_dim > labels.max()``."""
+    needed = int(labels.max().item()) + 1
+    if needed > clf.out_dim:
+        clf.add_classes(needed - clf.out_dim)
 
 
 def _run_single(exp_cfg: dict):
@@ -80,7 +83,8 @@ def _run_single(exp_cfg: dict):
 
     # --------------- training loop over 20 experiences -----------------------
     for exp_ds in train_stream:
-        loader = DataLoader(exp_ds.dataset if hasattr(exp_ds, "dataset") else exp_ds, batch_size=128, shuffle=True, num_workers=4)
+        # exp_ds is a ``Subset`` – pass it directly to retain index subset
+        loader = DataLoader(exp_ds, batch_size=128, shuffle=True, num_workers=4)
         train_one_experience(backbone, clf, losr, loader, optimiser, device)
         # simple cosine decay proxy
         for pg in optimiser.param_groups:

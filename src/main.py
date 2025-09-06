@@ -2,7 +2,20 @@ from __future__ import annotations
 
 """
 main.py – orchestrates the whole experimental pipeline
-Entry-point:  python main.py
+Entry-point:  python -m src.main  (recommended) or python src/main.py
+
+Changes in iteration-16
+=======================
+1. Robust local imports: ensure that the directory that contains the
+   current file (i.e. the *src* folder) is **always** on ``sys.path``
+   before attempting to import sibling modules.  This fixes the
+   ``ModuleNotFoundError: No module named 'evaluate'`` that occurred
+   when the project root (not *src*) was the first entry on
+   ``PYTHONPATH`` and the program was executed with ``python -m main``.
+2. Research artefact locations have been bumped from *iteration15* to
+   *iteration16* in accordance with the specification:
+     • result JSON files   →  .research/iteration16/
+     • figures (PDFs)      →  .research/iteration16/images/
 """
 
 import json
@@ -16,9 +29,19 @@ import torch
 import yaml
 from torch.utils.data import DataLoader
 
-from evaluate import evaluate, plot_line
-from preprocess import build_cifar100_one_class, build_split_cifar100
-from train import (
+# ---------------------------------------------------------------------------
+#  Ensure the *src* directory (where this file lives) is on sys.path
+# ---------------------------------------------------------------------------
+_SRC_DIR = pathlib.Path(__file__).resolve().parent
+if str(_SRC_DIR) not in sys.path:
+    # Pre-pend so that local modules shadow any pip packages with the
+    # same name (e.g. the HF ``evaluate`` package).
+    sys.path.insert(0, str(_SRC_DIR))
+
+# Local imports – **must** come after the path fix above
+from evaluate import evaluate, plot_line  # noqa: E402  pylint: disable=wrong-import-position
+from preprocess import build_cifar100_one_class, build_split_cifar100  # noqa: E402
+from train import (  # noqa: E402
     ERBuffer,
     ExpandingClassifier,
     LOSRMemory,
@@ -28,10 +51,10 @@ from train import (
 )
 
 # ---------------------------------------------------------------------------
-#  Directories – updated to iteration15 as per specification
+#  Directories – updated to iteration16 as per specification
 # ---------------------------------------------------------------------------
-RESULT_DIR = pathlib.Path(".research/iteration15")
-FIG_DIR = pathlib.Path(".research/iteration15/images")
+RESULT_DIR = pathlib.Path(".research/iteration16")
+FIG_DIR = RESULT_DIR / "images"
 
 # ---------------------------------------------------------------------------
 #  Environment sanity check – GPU required for the heavy models
@@ -43,7 +66,6 @@ def _gpu_guard():
 
 
 _gpu_guard()
-
 
 # ---------------------------------------------------------------------------
 #  Seeding helper (makes all libraries deterministic)
@@ -63,7 +85,6 @@ def _seed_all(s: int) -> None:
 # ---------------------------------------------------------------------------
 CFG = yaml.safe_load(pathlib.Path("config/config.yaml").read_text())
 SHARED = CFG["shared"]
-
 
 # ---------------------------------------------------------------------------
 #  Single experiment runner (one seed, one (method,budget) combo)

@@ -1,3 +1,4 @@
+[UPDATED FILE]
 from __future__ import annotations
 
 """src/main.py – orchestrates the complete experimental workflow"""
@@ -28,10 +29,10 @@ from .preprocess import build_split_cifar100
 
 Path = pathlib.Path
 # ---------------------------------------------------------------------------
-# IMPORTANT: all artefacts for this iteration must live under `.research/iteration11/`
+# IMPORTANT: all artefacts for this iteration must live under `.research/iteration12/`
 # ---------------------------------------------------------------------------
-IMAGES_DIR = Path(".research/iteration11/images")
-RESULTS_DIR = Path(".research/iteration11")
+IMAGES_DIR = Path(".research/iteration12/images")
+RESULTS_DIR = Path(".research/iteration12")
 
 
 def gpu_assert() -> None:

@@ -1,3 +1,4 @@
+[UPDATED FILE]
 """src/train.py – models, replay memories and training loop"""
 from __future__ import annotations
 
@@ -109,8 +110,11 @@ class AnchorBank(nn.Module):
         self.scale: Dict[int, float] = {}
         self.U_idx: Dict[int, torch.Tensor] = {}
 
-        # 16-vector 32-D code-book (parameter -> counted as model param, not memory)
-        self.codebook = nn.Parameter(torch.randn(16, self.comp))
+        # 16-level scalar code-book.  Using a 1-D codebook avoids the erroneous
+        # (r, comp, comp) broadcast that caused the matmul dimension mismatch at
+        # runtime (see CI log).  Each entry represents a single scalar value
+        # sampled when reconstructing the low-rank matrix U ∈ ℝ^{r×comp}.
+        self.codebook = nn.Parameter(torch.randn(16))
 
     # ---------------------------------------------------------------- utils
     @staticmethod
@@ -155,10 +159,12 @@ class AnchorBank(nn.Module):
     # ---------------------------------------------------------------- sampling
     def sample(self, cls: int, n: int = 32) -> torch.Tensor:
         """Return *n* normalised features for *cls* (on CPU)."""
-        mu = self.dequant_mu(cls)                     # [32]
+        mu = self.dequant_mu(cls)                     # [comp]
+        # --- reconstruct U ∈ ℝ^{r×comp} from the packed 4-bit indices
         U_code = _unpack4bit(self.U_idx[cls], self.r * self.comp)
-        U_code = U_code.view(self.r, self.comp).long()  # ← convert to long for integer indexing
+        U_code = U_code.view(self.r, self.comp).long()
         U = self.codebook[U_code]                     # [r, comp]
+
         eps = torch.randn(n, self.r)
         z_comp = mu + eps @ U                         # [n, comp]
         z_full = z_comp @ self.P.T                    # back-projection to 256-D

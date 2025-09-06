@@ -1,5 +1,3 @@
-# config/config.yaml – minimal yet functional parameters for the refactored demo
-
 global:
   device: "cuda:0"
   data_root: "data"
@@ -23,7 +21,7 @@ models:
 
 datasets:
   waterbirds:
-    hf_repo: "dslim/waterbirds"           # public mirror (placeholder)
+    hf_repo: "grodino/waterbirds"        # public mirror that is world-readable
     split:
       train: "train"
       val: "val"
@@ -47,3 +45,4 @@ experiments:
     epochs_erm: 1
   exp3:
     placeholder: true  # skeleton only – see src.main
+

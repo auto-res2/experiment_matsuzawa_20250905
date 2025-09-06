@@ -1,15 +1,26 @@
-# config/config.yaml
-# -----------------------------------------------------------------------------
-# Minimal configuration file consumed by ``src.main``.  In a real research
-# project we would place the full experiment grid here; for demonstration
-# purposes – and to keep the CI runtime acceptable – only one configuration is
-# executed.
-# -----------------------------------------------------------------------------
+shared:
+  passes_per_task: 10
+  batch_size: 128
+  lr_grid: [0.001, 0.0005, 0.0002]
+  seeds: [7, 17, 23, 31, 47]
+  budget_kb: 32
+
 experiments:
-  - name: exp1
-    dataset: cifar100
+  - dataset: cifar100
     backbone: resnet18
-    method: LOSR        # choose from {LOSR, ER, DERPP, etc.}
-    seed: 7
-    lr: 0.001
-    budget_kb: 32       # LOSR uses a fixed 32 kB budget
+    method: LOSR
+  - dataset: cifar100
+    backbone: resnet18
+    method: ER
+    buffer_kb: [32, 128, 512]
+  - dataset: cifar100
+    backbone: resnet18
+    method: DERPP
+    buffer_kb: [32, 128, 512]
+  - dataset: cifar100
+    backbone: resnet18
+    method: AGEM
+    buffer_kb: [32, 128, 512]
+  - dataset: cifar100
+    backbone: resnet18
+    method: ORTHO_SUB

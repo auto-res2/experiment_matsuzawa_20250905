@@ -1,121 +1,128 @@
+"""src/main.py – orchestrates the complete experimental workflow"""
 from __future__ import annotations
 
-"""src/main.py
--------------------------------------------------------------------------------
-Entry-point.  Usage: ``python -m src.main``
+# std -----------------------------------------------------------------------
+import json, os, random, sys, pathlib
+from typing import Any
 
-The script orchestrates a single representative continual-learning experiment
-for CI / demo purposes.  Results (JSON) are stored under
-``.research/iteration4`` and figures under ``.research/iteration4/images`` as
-mandated by the prompt.
-"""
-
-import json
-from pathlib import Path
-from typing import List
-
+# third-party ---------------------------------------------------------------
+import numpy as np
 import torch
-import yaml
 from torch.utils.data import DataLoader
+import yaml
 
-from .preprocess import (
-    RESULTS_DIR,
-    IMAGES_DIR,
-    build_cifar100_benchmark,
-    build_mini_imgnet_benchmark,
-    seed_everything,
-)
+# local modules --------------------------------------------------------------
 from .train import (
-    LOSRMemory,
-    ExpandingClassifier,
     build_backbone,
-    train_one_experience,
+    ExpandingClassifier,
+    LOSRMemory,
+    ERBuffer,
+    train_stream,
 )
-from .evaluate import accuracy, barplot_accuracy, save_json
+from .evaluate import evaluate, plot_curves
+from .preprocess import build_split_cifar100
 
-CONFIG_PATH = Path("config") / "config.yaml"
+# ============================================================================
+# Simple utilities -----------------------------------------------------------
 
-
-def _load_cfg() -> List[dict]:
-    with CONFIG_PATH.open() as fp:
-        cfg = yaml.safe_load(fp)
-    return cfg["experiments"]
-
-
-def _ensure_classifier_capacity(clf: ExpandingClassifier, labels: torch.Tensor):
-    """Grow classifier so that ``clf.out_dim > labels.max()``."""
-    needed = int(labels.max().item()) + 1
-    if needed > clf.out_dim:
-        clf.add_classes(needed - clf.out_dim)
+Path = pathlib.Path
+IMAGES_DIR = Path(".research/iteration6/images")
+RESULTS_DIR = Path(".research/iteration6/results")
 
 
-def _run_single(exp_cfg: dict):
-    print("\n=== Running experiment ===")
-    print(json.dumps(exp_cfg, indent=2))
+def gpu_assert() -> None:
+    if not torch.cuda.is_available():
+        sys.exit("[ERROR] GPU runner required – aborting as per spec.")
 
-    seed_everything(exp_cfg["seed"])
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # --------------- data -----------------------------------------------------
-    if exp_cfg["dataset"] == "cifar100":
-        bench = build_cifar100_benchmark(seed=exp_cfg["seed"])
-        train_stream = bench.train_stream
-        test_loader = DataLoader(bench.test_stream[0].dataset, batch_size=256, shuffle=False, num_workers=4)
-    elif exp_cfg["dataset"] == "mini_imagenet":
-        bench = build_mini_imgnet_benchmark(seed=exp_cfg["seed"])
-        train_stream = bench["train_stream"]
-        test_loader = DataLoader(bench["test_set"], batch_size=256, shuffle=False, num_workers=4)
-    else:
-        raise ValueError(exp_cfg["dataset"])
+def seed_all(seed: int) -> None:
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
-    # --------------- model ----------------------------------------------------
+
+def load_yaml(path: str | Path) -> Any:  # type: ignore[override]
+    with open(path) as fp:
+        return yaml.safe_load(fp)
+
+
+def dump_json(obj: Any, path: Path) -> None:  # noqa: D401
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w") as fp:
+        json.dump(obj, fp, indent=2)
+    print(json.dumps(obj, indent=2))
+
+# ============================================================================
+# Main experiment logic ------------------------------------------------------
+
+gpu_assert()
+CONFIG = load_yaml("config/config.yaml")
+shared = CONFIG["shared"]
+
+
+def run_one(exp_cfg: dict, seed: int) -> None:
+    seed_all(seed)
+    device = "cuda"
+
+    # ------------------------------- data
+    train_stream_ds, testset = build_split_cifar100(seed)
+    test_loader = DataLoader(testset, batch_size=256, shuffle=False, num_workers=4)
+
+    # ------------------------------- model
     backbone = build_backbone(exp_cfg["backbone"]).to(device)
-    clf = ExpandingClassifier().to(device)
+    clf = ExpandingClassifier(256).to(device)
 
+    strategy = exp_cfg["method"]
     losr = None
-    if exp_cfg["method"] == "LOSR":
-        losr = LOSRMemory(feat_dim=256, r=2, budget_kb=exp_cfg["budget_kb"]).to(device)
-        params = list(backbone.parameters()) + list(clf.parameters()) + list(losr.parameters())
-    else:
-        params = list(backbone.parameters()) + list(clf.parameters())
+    buffer = None
+    params = list(backbone.parameters()) + list(clf.parameters())
+    if strategy == "LOSR":
+        losr = LOSRMemory(256, budget_kb=shared["budget_kb"]).to(device)
+        params += list(losr.synth.parameters())
+    elif strategy == "ER":
+        buffer = ERBuffer(shared["budget_kb"] * 1024)
 
-    optimiser = torch.optim.AdamW(params, lr=exp_cfg["lr"], weight_decay=1e-4)
+    optimiser = torch.optim.AdamW(params, lr=shared["lr_grid"][0], weight_decay=1e-4)
 
-    # --------------- training loop over 20 experiences -----------------------
-    for exp_ds in train_stream:
-        # exp_ds is a ``Subset`` – pass it directly to retain index subset
-        loader = DataLoader(exp_ds, batch_size=128, shuffle=True, num_workers=4)
-        train_one_experience(backbone, clf, losr, loader, optimiser, device)
-        # simple cosine decay proxy
-        for pg in optimiser.param_groups:
-            pg["lr"] *= 0.95
+    # ------------------------------- continual training
+    for subset in train_stream_ds:
+        loader = DataLoader(
+            subset, batch_size=shared["batch_size"], shuffle=True, num_workers=4
+        )
+        for _ in range(shared["passes_per_task"]):
+            train_stream(backbone, clf, strategy, loader, optimiser, losr, buffer, device)
 
-    # --------------- evaluation ----------------------------------------------
-    acc = accuracy(backbone, clf, test_loader, device)
+    # ------------------------------- evaluation
+    acc = evaluate(backbone, clf, test_loader, device)
+    mem_kb = 0.0
+    if losr is not None:
+        mem_kb = losr.bytes() / 1024
+    elif buffer is not None:
+        mem_kb = buffer.bytes() / 1024
 
     result = {
-        "dataset": exp_cfg["dataset"],
-        "backbone": exp_cfg["backbone"],
-        "method": exp_cfg["method"],
-        "mem_kB": losr.bytes() / 1024 if losr else exp_cfg["budget_kb"],
-        "final_accuracy": acc,
-        "seed": exp_cfg["seed"],
+        "method": strategy,
+        "seed": seed,
+        "accuracy": acc,
+        "memory_kB": mem_kb,
     }
+    out_json = RESULTS_DIR / f"{strategy}_seed{seed}.json"
+    dump_json(result, out_json)
 
-    # Persist & display JSON ---------------------------------------------------
-    out_json = RESULTS_DIR / f"exp1_{exp_cfg['dataset']}_{exp_cfg['backbone']}_{exp_cfg['method']}_{exp_cfg['seed']}.json"
-    save_json(result, out_json)
-
-    # quick bar plot -----------------------------------------------------------
-    barplot_accuracy(exp_cfg["dataset"], exp_cfg["backbone"], exp_cfg["method"], acc, IMAGES_DIR)
+    # quick sanity plot
+    plot_curves([0, 1], [0, acc * 100], "", "Accuracy %", strategy, IMAGES_DIR / f"acc_{strategy}.pdf")
 
 
-# -----------------------------------------------------------------------------
-#  Main – run only a *single* representative experiment for CI / demo
-# -----------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    for exp in CONFIG["experiments"]:
+        for s in shared["seeds"]:
+            run_one(exp, s)
+
 
 if __name__ == "__main__":
-    cfgs = _load_cfg()
-
-    # Keep runtime small:  run just the first config in the list --------------
-    _run_single(cfgs[0])
+    main()

@@ -1,0 +1,35 @@
+=== uv sync start Sat Sep  6 06:33:25 UTC 2025 ===
+=== uv install end Sat Sep  6 06:43:13 UTC 2025 ===
+=== experiment start Sat Sep  6 06:43:13 UTC 2025 ===
+Loaded Cora – nodes: 2708, edges: 10556
+[WARN] GraphRicciCurvature unavailable or failed (No module named 'GraphRicciCurvature') – using zero-curvature fallback.
+Cora_vanilla_2: 0.7903 ± 0.0068
+Cora_pairnorm_2: 0.6477 ± 0.0415
+Cora_dgn_2: 0.6967 ± 0.0112
+Cora_psnr_2: 0.6903 ± 0.0437
+Cora_curvada_2: 0.7893 ± 0.0095
+Cora_vanilla_8: 0.7257 ± 0.0231
+Cora_pairnorm_8: 0.6380 ± 0.0627
+Cora_dgn_8: 0.6430 ± 0.0075
+Cora_psnr_8: 0.6757 ± 0.0057
+Cora_curvada_8: 0.6290 ± 0.0303
+Cora_vanilla_32: 0.6250 ± 0.0452
+Cora_pairnorm_32: 0.5673 ± 0.0715
+Cora_dgn_32: 0.5807 ± 0.0474
+Cora_psnr_32: 0.5720 ± 0.0426
+Cora_curvada_32: 0.6233 ± 0.0170
+Cora_vanilla_64: 0.3697 ± 0.0309
+Cora_pairnorm_64: 0.5670 ± 0.0572
+Cora_dgn_64: 0.6640 ± 0.0263
+Cora_psnr_64: 0.5843 ± 0.0441
+Cora_curvada_64: 0.5903 ± 0.0391
+Cora_vanilla_120: 0.3473 ± 0.0293
+Cora_pairnorm_120: 0.4883 ± 0.0130
+Cora_dgn_120: 0.6093 ± 0.0325
+Cora_psnr_120: 0.3637 ± 0.0231
+Cora_curvada_120: 0.4257 ± 0.0932
+Saved figure → .research/iteration11/images/accuracy_Cora.pdf
+Loaded PubMed – nodes: 19717, edges: 88648
+[WARN] GraphRicciCurvature unavailable or failed (No module named 'GraphRicciCurvature') – using zero-curvature fallback.
+PubMed_vanilla_2: 0.7577 ± 0.0015
+PubMed_pairnorm_2: 0.7387 ± 0.0067

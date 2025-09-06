@@ -1,1 +1,22 @@
-# Please list the required python packages.
+[project]
+name = "losr_experiments"
+version = "0.1.0"
+requires-python = ">=3.9"
+description = "Refactored continual-learning baseline & LOSR experiments"
+license = {text = "MIT"}
+authors = [
+  {name = "Researcher", email = "research@openai.com"}
+]
+
+[project.dependencies]
+torch = "*"
+torchvision = "*"
+matplotlib = "*"
+seaborn = "*"
+scikit-learn = "*"
+pyyaml = "*"
+requests = "*"
+avalanche-lib = "*"
+
+[tool.setuptools.packages.find]
+where = ["src"]

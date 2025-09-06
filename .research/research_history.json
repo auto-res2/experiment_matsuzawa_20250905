@@ -6,5 +6,82 @@
     "invariant risk minimization",
     "domain generalization",
     "counterfactual data augmentation"
+  ],
+  "research_study_list": [
+    {
+      "title": "Seeing is not Believing: Robust Reinforcement Learning against Spurious Correlation"
+    },
+    {
+      "title": "A Causal Framework for Decomposing Spurious Variations"
+    },
+    {
+      "title": "Examining and Combating Spurious Features under Distribution Shift"
+    },
+    {
+      "title": "Contextual Reliability: When Different Features Matter in Different Contexts"
+    },
+    {
+      "title": "Causal Effect Regularization: Automated Detection and Removal of Spurious Correlations"
+    },
+    {
+      "title": "YolOOD: Utilizing Object Detection Concepts for Multi-Label Out-of-Distribution Detection"
+    },
+    {
+      "title": "In or Out? Fixing ImageNet Out-of-Distribution Detection Evaluation"
+    },
+    {
+      "title": "Long-Tailed Out-of-Distribution Detection via Normalized Outlier Distribution Adaptation"
+    },
+    {
+      "title": "POODLE: Improving Few-shot Learning via Penalizing Out-of-Distribution Samples"
+    },
+    {
+      "title": "A Noisy Elephant in the Room: Is Your Out-of-Distribution Detector Robust to Label Noise?"
+    },
+    {
+      "title": "Invariant Risk Minimization Is A Total Variation Model"
+    },
+    {
+      "title": "The Missing Invariance Principle found --  the Reciprocal Twin of Invariant Risk Minimization "
+    },
+    {
+      "title": "Sparse Invariant Risk Minimization"
+    },
+    {
+      "title": "Sparse Invariant Risk Minimization"
+    },
+    {
+      "title": "The Risks of Invariant Risk Minimization"
+    },
+    {
+      "title": "Domain Invariant Representation Learning with Domain Density Transformations"
+    },
+    {
+      "title": "Domain Generalization via Entropy Regularization"
+    },
+    {
+      "title": "Improving Generalization With Domain Convex Game"
+    },
+    {
+      "title": "In Search of Lost Domain Generalization"
+    },
+    {
+      "title": "Adversarially Robust Models may not Transfer Better: Sufficient Conditions for Domain Transferability from the View of Regularization"
+    },
+    {
+      "title": "COCO-Counterfactuals: Automatically Constructed Counterfactual Examples for Image-Text Pairs"
+    },
+    {
+      "title": "Learning from Counterfactual Links for Link Prediction"
+    },
+    {
+      "title": "Learning from Counterfactual Links for Link Prediction"
+    },
+    {
+      "title": "Making a (Counterfactual) Difference One Rationale at a Time"
+    },
+    {
+      "title": "Diagnosis, Feedback, Adaptation: A Human-in-the-Loop Framework for Test-Time Policy Adaptation"
+    }
   ]
 }

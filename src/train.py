@@ -157,7 +157,7 @@ class AnchorBank(nn.Module):
         """Return *n* normalised features for *cls* (on CPU)."""
         mu = self.dequant_mu(cls)                     # [32]
         U_code = _unpack4bit(self.U_idx[cls], self.r * self.comp)
-        U_code = U_code.view(self.r, self.comp)
+        U_code = U_code.view(self.r, self.comp).long()  # ← convert to long for integer indexing
         U = self.codebook[U_code]                     # [r, comp]
         eps = torch.randn(n, self.r)
         z_comp = mu + eps @ U                         # [n, comp]
